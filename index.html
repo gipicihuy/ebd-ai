@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eberardos AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+        }
+        .chat-container {
+            height: calc(100vh - 140px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #4a4a4a transparent;
+        }
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background-color: #4a4a4a;
+            border-radius: 3px;
+        }
+        .sidebar {
+            transition: all 0.3s ease;
+            background-color: #1e1e1e;
+            border-right: 1px solid #333;
+            height: 100vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: #4a4a4a;
+            border-radius: 3px;
+        }
+        .message {
+            padding: 16px 0;
+            border-bottom: 1px solid #2d2d2d;
+        }
+        .user-message {
+            background-color: #1a1a1a;
+        }
+        .ai-message {
+            background-color: #1a1a1a;
+        }
+        .profile-image {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            margin-right: 12px;
+            background-color: #3a3a3a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .input-container {
+            background-color: #2d2d2d;
+            border-radius: 8px;
+            padding: 8px;
+        }
+        .input-field {
+            background-color: transparent;
+            border: none;
+            color: white;
+            width: 100%;
+            resize: none;
+            outline: none;
+            max-height: 200px;
+        }
+        .send-button {
+            background-color: #3a3a3a;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .send-button:hover {
+            background-color: #4a4a4a;
+        }
+        .history-item {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .history-item:hover {
+            background-color: #2d2d2d;
+        }
+        .active-chat {
+            background-color: #2d2d2d;
+        }
+        .code-block {
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+            position: relative;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .code-toolbar {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 5px;
+        }
+        .code-btn {
+            background-color: #3a3a3a;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        .code-btn:hover {
+            background-color: #4a4a4a;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                z-index: 1000;
+                height: 100vh;
+                top: 0;
+                width: 80%;
+                max-width: 300px;
+            }
+            .sidebar.active {
+                left: 0;
+                box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
+            }
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0,0,0,0.7);
+                z-index: 999;
+            }
+            .overlay.active {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+    <nav class="navbar navbar-dark bg-black px-3 py-2 border-bottom border-secondary">
+        <div class="container-fluid">
+            <button class="btn btn-outline-light d-md-none" type="button" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <span class="navbar-brand mb-0 h1 mx-auto fw-bold">Eberardos AI</span>
+            <button class="btn btn-outline-light d-none d-md-block" type="button" id="desktopSidebarToggle">
+                <i class="fas fa-history"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="sidebar col-md-3 p-3" id="mainSidebar">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Chat History</h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-danger me-2" id="clearHistory" title="Clear history">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary d-md-none" id="closeSidebar">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="chatHistory">
+                    <!-- History items will be added here -->
+                </div>
+            </div>
+            <div class="col-md-9 p-0 d-flex flex-column" id="chatArea">
+                <div class="chat-container p-3" id="chatContainer">
+                    <div class="message ai-message">
+                        <div class="d-flex">
+                            <div class="profile-image">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                Welcome to Eberardos AI. How can I help you today?
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-3 bg-dark border-top border-secondary">
+                    <div class="input-container d-flex align-items-center">
+                        <textarea class="input-field" placeholder="Type your message..." id="userInput" rows="1"></textarea>
+                        <button class="send-button ms-2" id="sendButton">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatContainer = document.getElementById('chatContainer');
+            const userInput = document.getElementById('userInput');
+            const sendButton = document.getElementById('sendButton');
+            const chatHistory = document.getElementById('chatHistory');
+            const clearHistoryBtn = document.getElementById('clearHistory');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const desktopSidebarToggle = document.getElementById('desktopSidebarToggle');
+            const closeSidebar = document.getElementById('closeSidebar');
+            const overlay = document.querySelector('.overlay');
+            const sidebar = document.getElementById('mainSidebar');
+            const chatArea = document.getElementById('chatArea');
+
+            let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || [];
+            let currentConversationId = null;
+            let sidebarVisible = window.innerWidth >= 768;
+
+            // Sanitize HTML to prevent XSS
+            function sanitizeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // Extract code blocks from text
+            function extractCodeBlocks(text) {
+                const codeBlockRegex = /```([\s\S]*?)```/g;
+                const matches = [];
+                let match;
+                let lastIndex = 0;
+                const parts = [];
+                
+                while ((match = codeBlockRegex.exec(text)) !== null) {
+                    // Add text before code block
+                    if (match.index > lastIndex) {
+                        parts.push({
+                            type: 'text',
+                            content: text.substring(lastIndex, match.index)
+                        });
+                    }
+                    
+                    // Add code block
+                    const codeContent = match[1].replace(/^(\w+)\n/, ''); // Remove language identifier if present
+                    parts.push({
+                        type: 'code',
+                        content: codeContent,
+                        language: match[1].split('\n')[0] || 'text'
+                    });
+                    
+                    lastIndex = match.index + match[0].length;
+                }
+                
+                // Add remaining text after last code block
+                if (lastIndex < text.length) {
+                    parts.push({
+                        type: 'text',
+                        content: text.substring(lastIndex)
+                    });
+                }
+                
+                return parts.length > 0 ? parts : [{ type: 'text', content: text }];
+            }
+
+            // Create code block element with copy and download buttons
+            function createCodeBlock(code, language = 'text') {
+                const codeBlock = document.createElement('div');
+                codeBlock.className = 'code-block';
+                
+                const codeContent = document.createElement('pre');
+                codeContent.textContent = code;
+                
+                const toolbar = document.createElement('div');
+                toolbar.className = 'code-toolbar';
+                
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'code-btn';
+                copyBtn.title = 'Copy code';
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                copyBtn.addEventListener('click', () => copyCodeToClipboard(code));
+                
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'code-btn';
+                downloadBtn.title = 'Download code';
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
+                downloadBtn.addEventListener('click', () => downloadCode(code, language));
+                
+                toolbar.appendChild(copyBtn);
+                toolbar.appendChild(downloadBtn);
+                
+                codeBlock.appendChild(codeContent);
+                codeBlock.appendChild(toolbar);
+                
+                return codeBlock;
+            }
+
+            // Copy code to clipboard
+            function copyCodeToClipboard(code) {
+                navigator.clipboard.writeText(code).then(() => {
+                    // Show feedback (you could add a toast notification here)
+                    console.log('Code copied to clipboard');
+                }).catch(err => {
+                    console.error('Failed to copy code: ', err);
+                });
+            }
+
+            // Download code as file
+            function downloadCode(code, language) {
+                const extension = getExtensionForLanguage(language);
+                const blob = new Blob([code], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `code.${extension}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            // Get file extension for language
+            function getExtensionForLanguage(language) {
+                const extensions = {
+                    javascript: 'js',
+                    typescript: 'ts',
+                    python: 'py',
+                    java: 'java',
+                    c: 'c',
+                    cpp: 'cpp',
+                    html: 'html',
+                    css: 'css',
+                    php: 'php',
+                    ruby: 'rb',
+                    go: 'go',
+                    rust: 'rs',
+                    sql: 'sql',
+                    json: 'json',
+                    xml: 'xml',
+                    markdown: 'md'
+                };
+                
+                return extensions[language.toLowerCase()] || 'txt';
+            }
+
+            function toggleSidebar() {
+                if (window.innerWidth < 768) {
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                } else {
+                    sidebarVisible = !sidebarVisible;
+                    if (sidebarVisible) {
+                        sidebar.classList.remove('d-none');
+                        chatArea.classList.remove('col-md-12');
+                        chatArea.classList.add('col-md-9');
+                    } else {
+                        sidebar.classList.add('d-none');
+                        chatArea.classList.remove('col-md-9');
+                        chatArea.classList.add('col-md-12');
+                    }
+                }
+            }
+
+            function updateChatHistory() {
+                chatHistory.innerHTML = '';
+                if (conversations.length === 0) {
+                    chatHistory.innerHTML = '<div class="text-center text-secondary py-3">No conversations yet</div>';
+                    return;
+                }
+                
+                conversations.forEach(conv => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = `history-item ${currentConversationId === conv.id ? 'active-chat' : ''}`;
+                    historyItem.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-truncate">${sanitizeHtml(conv.messages[0]?.text?.substring(0, 30) + '...' || 'New conversation')}</div>
+                            <button class="btn btn-sm btn-outline-danger delete-conv" data-id="${conv.id}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    historyItem.addEventListener('click', (e) => {
+                        if (!e.target.classList.contains('delete-conv') && !e.target.parentElement.classList.contains('delete-conv')) {
+                            loadConversation(conv.id);
+                            if (window.innerWidth < 768) toggleSidebar();
+                        }
+                    });
+                    
+                    const deleteBtn = historyItem.querySelector('.delete-conv');
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deleteConversation(conv.id);
+                    });
+                    
+                    chatHistory.appendChild(historyItem);
+                });
+            }
+
+            function deleteConversation(id) {
+                conversations = conversations.filter(conv => conv.id !== id);
+                if (currentConversationId === id) {
+                    currentConversationId = null;
+                    chatContainer.innerHTML = `
+                        <div class="message ai-message">
+                            <div class="d-flex">
+                                <div class="profile-image">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div class="message-content">
+                                    Welcome to Eberardos AI. How can I help you today?
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
+                updateChatHistory();
+            }
+
+            function loadConversation(id) {
+                currentConversationId = id;
+                const conversation = conversations.find(conv => conv.id === id);
+                chatContainer.innerHTML = '';
+                
+                if (conversation && conversation.messages) {
+                    conversation.messages.forEach(msg => {
+                        appendMessage(msg.text, msg.sender);
+                    });
+                }
+                updateChatHistory();
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            function createNewConversation() {
+                const newConv = {
+                    id: Date.now(),
+                    messages: []
+                };
+                conversations.push(newConv);
+                currentConversationId = newConv.id;
+                localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
+                updateChatHistory();
+                chatContainer.innerHTML = '';
+                return newConv.id;
+            }
+
+            function appendMessage(text, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
+                
+                const messageContentDiv = document.createElement('div');
+                messageContentDiv.className = 'd-flex';
+                
+                const profileImage = document.createElement('div');
+                profileImage.className = 'profile-image';
+                profileImage.innerHTML = sender === 'ai' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
+                
+                messageContentDiv.appendChild(profileImage);
+                
+                const contentContainer = document.createElement('div');
+                contentContainer.className = 'message-content';
+                contentContainer.style.flex = '1';
+                
+                // Process message content for code blocks
+                const contentParts = extractCodeBlocks(text);
+                
+                contentParts.forEach(part => {
+                    if (part.type === 'code') {
+                        contentContainer.appendChild(createCodeBlock(part.content, part.language));
+                    } else {
+                        const textNode = document.createElement('div');
+                        textNode.textContent = part.content;
+                        contentContainer.appendChild(textNode);
+                    }
+                });
+                
+                messageContentDiv.appendChild(contentContainer);
+                messageDiv.appendChild(messageContentDiv);
+                
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            function saveMessage(text, sender) {
+                let conversation = conversations.find(conv => conv.id === currentConversationId);
+                if (!conversation) {
+                    currentConversationId = createNewConversation();
+                    conversation = conversations.find(conv => conv.id === currentConversationId);
+                }
+                
+                if (conversation) {
+                    conversation.messages.push({ text, sender });
+                    localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
+                    updateChatHistory();
+                }
+            }
+
+            function adjustTextareaHeight() {
+                userInput.style.height = 'auto';
+                userInput.style.height = (userInput.scrollHeight) + 'px';
+            }
+
+            async function sendMessage() {
+                const message = userInput.value.trim();
+                if (!message) return;
+
+                if (!currentConversationId) {
+                    createNewConversation();
+                }
+
+                appendMessage(message, 'user');
+                saveMessage(message, 'user');
+                userInput.value = '';
+                userInput.style.height = 'auto';
+                userInput.focus();
+
+                const prompt = "ingat, namamu adalah Eberardos AI, Eberardos AI tidak formal. " + message;
+                const apiUrl = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=gemini`;
+
+                try {
+                    const typingIndicator = document.createElement('div');
+                    typingIndicator.className = 'message ai-message';
+                    typingIndicator.innerHTML = `
+                        <div class="d-flex">
+                            <div class="profile-image">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">Thinking...</div>
+                        </div>
+                    `;
+                    chatContainer.appendChild(typingIndicator);
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                    const response = await fetch(apiUrl);
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const data = await response.text();
+                    
+                    chatContainer.removeChild(typingIndicator);
+                    appendMessage(data, 'ai');
+                    saveMessage(data, 'ai');
+                } catch (error) {
+                    console.error('Error:', error);
+                    const typingIndicator = document.querySelector('.message:last-child');
+                    if (typingIndicator && typingIndicator.querySelector('.message-content').textContent === 'Thinking...') {
+                        chatContainer.removeChild(typingIndicator);
+                    }
+                    appendMessage('Sorry, there was an error processing your request.', 'ai');
+                    saveMessage('Sorry, there was an error processing your request.', 'ai');
+                }
+            }
+
+            sendButton.addEventListener('click', sendMessage);
+            userInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            userInput.addEventListener('input', adjustTextareaHeight);
+
+            clearHistoryBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all chat history?')) {
+                    conversations = [];
+                    localStorage.removeItem('eberardosConversations');
+                    updateChatHistory();
+                    chatContainer.innerHTML = `
+                        <div class="message ai-message">
+                            <div class="d-flex">
+                                <div class="profile-image">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div class="message-content">
+                                    Welcome to Eberardos AI. How can I help you today?
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    currentConversationId = null;
+                }
+            });
+
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            desktopSidebarToggle.addEventListener('click', toggleSidebar);
+            closeSidebar.addEventListener('click', toggleSidebar);
+            overlay.addEventListener('click', toggleSidebar);
+
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                    sidebarVisible = true;
+                    sidebar.classList.remove('d-none');
+                    chatArea.classList.remove('col-md-12');
+                    chatArea.classList.add('col-md-9');
+                } else {
+                    sidebarVisible = false;
+                    if (!sidebar.classList.contains('active')) {
+                        sidebar.classList.add('d-none');
+                    }
+                    chatArea.classList.remove('col-md-9');
+                    chatArea.classList.add('col-md-12');
+                }
+            });
+
+            updateChatHistory();
+            if (conversations.length > 0) {
+                loadConversation(conversations[0].id);
+            }
+        });
+    </script>
+</body>
+</html>
