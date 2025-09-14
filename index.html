@@ -211,6 +211,11 @@
             background-color: var(--color-primary-hover);
             transform: translateY(-2px);
         }
+        .send-button:disabled {
+            background-color: var(--color-text-secondary);
+            cursor: not-allowed;
+            transform: none;
+        }
 
         /* --- Code Blocks & Utils --- */
         .code-block {
@@ -226,6 +231,7 @@
             padding: 0;
             overflow-x: auto;
             white-space: pre-wrap;
+            word-break: break-all;
         }
         .code-toolbar {
             position: absolute;
@@ -372,6 +378,18 @@
                 const div = document.createElement('div');
                 div.textContent = text;
                 return div.innerHTML;
+            }
+
+            function convertMarkdownToHtml(markdownText) {
+                let html = markdownText;
+                // Simple bold and italic
+                html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                // Simple link
+                html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+                // Newlines to <br> for proper spacing
+                html = html.replace(/\n/g, '<br>');
+                return html;
             }
 
             function extractCodeBlocks(text) {
@@ -572,7 +590,7 @@
                         contentContainer.appendChild(createCodeBlock(part.content, part.language));
                     } else {
                         const textNode = document.createElement('div');
-                        textNode.textContent = part.content;
+                        textNode.innerHTML = convertMarkdownToHtml(part.content);
                         contentContainer.appendChild(textNode);
                     }
                 });
@@ -617,6 +635,11 @@
                 adjustTextareaHeight();
                 userInput.focus();
 
+                // Disable input and show loading state
+                userInput.disabled = true;
+                sendButton.disabled = true;
+                sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
                 const prompt = "ingat, namamu adalah Eberardos AI, Eberardos AI tidak formal. " + message;
                 const apiUrl = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=gemini`;
 
@@ -647,6 +670,11 @@
                     }
                     appendMessage('Sorry, there was an error processing your request.', 'ai');
                     saveMessage('Sorry, there was an error processing your request.', 'ai');
+                } finally {
+                    // Re-enable input and reset button state
+                    userInput.disabled = false;
+                    sendButton.disabled = false;
+                    sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
                 }
             }
 
@@ -654,7 +682,9 @@
             userInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    sendMessage();
+                    if (!sendButton.disabled) { // Prevent sending if disabled
+                        sendMessage();
+                    }
                 }
             });
             userInput.addEventListener('input', adjustTextareaHeight);
