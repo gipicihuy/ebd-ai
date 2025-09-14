@@ -9,16 +9,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            background-color: #1a1a1a;
-            color: #ffffff;
+            background-color: #242729; /* Latar belakang lebih gelap */
+            color: #f0f0f0;
             min-height: 100vh;
             font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         .chat-container {
             height: calc(100vh - 140px);
             overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: #4a4a4a transparent;
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Jarak antar pesan */
+            padding: 20px;
         }
         .chat-container::-webkit-scrollbar {
             width: 6px;
@@ -29,8 +36,8 @@
         }
         .sidebar {
             transition: all 0.3s ease;
-            background-color: #1e1e1e;
-            border-right: 1px solid #333;
+            background-color: #2d3133; /* Warna sidebar lebih seragam */
+            border-right: 1px solid #444;
             height: 100vh;
             overflow-y: auto;
             scrollbar-width: thin;
@@ -39,33 +46,49 @@
             width: 6px;
         }
         .sidebar::-webkit-scrollbar-thumb {
-            background-color: #4a4a4a;
+            background-color: #5a5a5a;
             border-radius: 3px;
         }
         .message {
-            padding: 16px 0;
-            border-bottom: 1px solid #2d2d2d;
+            display: flex;
+            align-items: flex-start;
+            max-width: 85%;
         }
         .user-message {
-            background-color: #1a1a1a;
+            align-self: flex-end; /* Pesan pengguna di kanan */
+            justify-content: flex-end;
+            background-color: #0B84FE;
+            color: #ffffff;
+            border-radius: 12px 12px 0 12px;
+            padding: 10px 15px;
         }
         .ai-message {
-            background-color: #1a1a1a;
+            align-self: flex-start; /* Pesan AI di kiri */
+            background-color: #3a3d40;
+            color: #f0f0f0;
+            border-radius: 12px 12px 12px 0;
+            padding: 10px 15px;
+        }
+        .user-message .message-content, .ai-message .message-content {
+            flex: none;
         }
         .profile-image {
             width: 28px;
             height: 28px;
             border-radius: 4px;
             margin-right: 12px;
-            background-color: #3a3a3a;
+            background-color: #5a5a5a;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0; /* Mencegah gambar menyusut */
         }
         .input-container {
-            background-color: #2d2d2d;
-            border-radius: 8px;
-            padding: 8px;
+            background-color: #3a3d40;
+            border-radius: 20px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
         }
         .input-field {
             background-color: transparent;
@@ -77,18 +100,19 @@
             max-height: 200px;
         }
         .send-button {
-            background-color: #3a3a3a;
+            background-color: #0B84FE;
             border: none;
-            border-radius: 4px;
+            border-radius: 50%;
             color: white;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-left: 10px;
         }
         .send-button:hover {
-            background-color: #4a4a4a;
+            background-color: #0975e5;
         }
         .history-item {
             padding: 12px;
@@ -98,15 +122,15 @@
             transition: background-color 0.2s;
         }
         .history-item:hover {
-            background-color: #2d2d2d;
+            background-color: #3a3d40;
         }
         .active-chat {
-            background-color: #2d2d2d;
+            background-color: #3a3d40;
         }
         .code-block {
             background-color: #2d2d2d;
             border: 1px solid #444;
-            border-radius: 6px;
+            border-radius: 8px; /* Sudut lebih lembut */
             padding: 12px;
             margin: 10px 0;
             position: relative;
@@ -123,7 +147,7 @@
             gap: 5px;
         }
         .code-btn {
-            background-color: #3a3a3a;
+            background-color: #5a5a5a;
             border: none;
             border-radius: 4px;
             color: white;
@@ -136,7 +160,14 @@
             font-size: 0.8em;
         }
         .code-btn:hover {
-            background-color: #4a4a4a;
+            background-color: #6a6a6a;
+        }
+        .navbar {
+            background-color: #2d3133 !important; /* Warna navbar seragam dengan sidebar */
+            border-bottom: 1px solid #444 !important;
+        }
+        .navbar-brand {
+            color: #f0f0f0 !important;
         }
         @media (max-width: 768px) {
             .sidebar {
@@ -197,19 +228,16 @@
                     </div>
                 </div>
                 <div id="chatHistory">
-                    <!-- History items will be added here -->
-                </div>
+                    </div>
             </div>
             <div class="col-md-9 p-0 d-flex flex-column" id="chatArea">
                 <div class="chat-container p-3" id="chatContainer">
-                    <div class="message ai-message">
-                        <div class="d-flex">
-                            <div class="profile-image">
-                                <i class="fas fa-robot"></i>
-                            </div>
-                            <div class="message-content">
-                                Welcome to Eberardos AI. How can I help you today?
-                            </div>
+                    <div class="ai-message">
+                        <div class="profile-image">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            Welcome to Eberardos AI. How can I help you today?
                         </div>
                     </div>
                 </div>
@@ -428,14 +456,12 @@
                 if (currentConversationId === id) {
                     currentConversationId = null;
                     chatContainer.innerHTML = `
-                        <div class="message ai-message">
-                            <div class="d-flex">
-                                <div class="profile-image">
-                                    <i class="fas fa-robot"></i>
-                                </div>
-                                <div class="message-content">
-                                    Welcome to Eberardos AI. How can I help you today?
-                                </div>
+                        <div class="ai-message">
+                            <div class="profile-image">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                Welcome to Eberardos AI. How can I help you today?
                             </div>
                         </div>
                     `;
@@ -473,20 +499,14 @@
 
             function appendMessage(text, sender) {
                 const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
-                
-                const messageContentDiv = document.createElement('div');
-                messageContentDiv.className = 'd-flex';
+                messageDiv.className = `${sender === 'user' ? 'user-message' : 'ai-message'}`;
                 
                 const profileImage = document.createElement('div');
                 profileImage.className = 'profile-image';
                 profileImage.innerHTML = sender === 'ai' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
                 
-                messageContentDiv.appendChild(profileImage);
-                
                 const contentContainer = document.createElement('div');
                 contentContainer.className = 'message-content';
-                contentContainer.style.flex = '1';
                 
                 // Process message content for code blocks
                 const contentParts = extractCodeBlocks(text);
@@ -496,13 +516,17 @@
                         contentContainer.appendChild(createCodeBlock(part.content, part.language));
                     } else {
                         const textNode = document.createElement('div');
-                        textNode.textContent = part.content;
+                        textNode.innerHTML = part.content.replace(/\n/g, '<br>'); // Mengganti newline dengan <br>
                         contentContainer.appendChild(textNode);
                     }
                 });
                 
-                messageContentDiv.appendChild(contentContainer);
-                messageDiv.appendChild(messageContentDiv);
+                if (sender === 'ai') {
+                    messageDiv.appendChild(profileImage);
+                    messageDiv.appendChild(contentContainer);
+                } else {
+                    messageDiv.appendChild(contentContainer);
+                }
                 
                 chatContainer.appendChild(messageDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -546,14 +570,12 @@
 
                 try {
                     const typingIndicator = document.createElement('div');
-                    typingIndicator.className = 'message ai-message';
+                    typingIndicator.className = 'ai-message';
                     typingIndicator.innerHTML = `
-                        <div class="d-flex">
-                            <div class="profile-image">
-                                <i class="fas fa-robot"></i>
-                            </div>
-                            <div class="message-content">Thinking...</div>
+                        <div class="profile-image">
+                            <i class="fas fa-robot"></i>
                         </div>
+                        <div class="message-content">Thinking...</div>
                     `;
                     chatContainer.appendChild(typingIndicator);
                     chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -567,7 +589,7 @@
                     saveMessage(data, 'ai');
                 } catch (error) {
                     console.error('Error:', error);
-                    const typingIndicator = document.querySelector('.message:last-child');
+                    const typingIndicator = document.querySelector('.ai-message:last-child');
                     if (typingIndicator && typingIndicator.querySelector('.message-content').textContent === 'Thinking...') {
                         chatContainer.removeChild(typingIndicator);
                     }
@@ -591,14 +613,12 @@
                     localStorage.removeItem('eberardosConversations');
                     updateChatHistory();
                     chatContainer.innerHTML = `
-                        <div class="message ai-message">
-                            <div class="d-flex">
-                                <div class="profile-image">
-                                    <i class="fas fa-robot"></i>
-                                </div>
-                                <div class="message-content">
-                                    Welcome to Eberardos AI. How can I help you today?
-                                </div>
+                        <div class="ai-message">
+                            <div class="profile-image">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                Welcome to Eberardos AI. How can I help you today?
                             </div>
                         </div>
                     `;
