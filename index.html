@@ -311,365 +311,356 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const chatContainer = document.getElementById('chatContainer');
-            const userInput = document.getElementById('userInput');
-            const sendButton = document.getElementById('sendButton');
-            const chatHistory = document.getElementById('chatHistory');
-            const clearHistoryBtn = document.getElementById('clearHistory');
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            const desktopSidebarToggle = document.getElementById('desktopSidebarToggle');
-            const closeSidebar = document.getElementById('closeSidebar');
-            const overlay = document.querySelector('.overlay');
-            const sidebar = document.getElementById('mainSidebar');
-            const chatArea = document.getElementById('chatArea');
+    const chatContainer = document.getElementById('chatContainer');
+    const userInput = document.getElementById('userInput');
+    const sendButton = document.getElementById('sendButton');
+    const chatHistory = document.getElementById('chatHistory');
+    const clearHistoryBtn = document.getElementById('clearHistory');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const desktopSidebarToggle = document.getElementById('desktopSidebarToggle');
+    const closeSidebar = document.getElementById('closeSidebar');
+    const overlay = document.querySelector('.overlay');
+    const sidebar = document.getElementById('mainSidebar');
+    const newChatBtn = document.getElementById('newChat');
 
-            let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || [];
-            let currentConversationId = null;
+    let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || [];
+    let currentConversationId = null;
 
-            // Sanitize HTML to prevent XSS
-            function sanitizeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
+    // Sanitize HTML to prevent XSS
+    function sanitizeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
 
-            // Extract code blocks from text
-            function extractCodeBlocks(text) {
-                const codeBlockRegex = /```([\s\S]*?)```/g;
-                const matches = [];
-                let match;
-                let lastIndex = 0;
-                const parts = [];
-                
-                while ((match = codeBlockRegex.exec(text)) !== null) {
-                    // Add text before code block
-                    if (match.index > lastIndex) {
-                        parts.push({
-                            type: 'text',
-                            content: text.substring(lastIndex, match.index)
-                        });
-                    }
-                    
-                    // Add code block
-                    const codeContent = match[1].replace(/^(\w+)\n/, '');
-                    parts.push({
-                        type: 'code',
-                        content: codeContent,
-                        language: match[1].split('\n')[0] || 'text'
-                    });
-                    
-                    lastIndex = match.index + match[0].length;
-                }
-                
-                // Add remaining text after last code block
-                if (lastIndex < text.length) {
-                    parts.push({
-                        type: 'text',
-                        content: text.substring(lastIndex)
-                    });
-                }
-                
-                return parts.length > 0 ? parts : [{ type: 'text', content: text }];
-            }
+    // Extract code blocks from text
+    function extractCodeBlocks(text) {
+        const codeBlockRegex = /```([\s\S]*?)```/g;
+        const parts = [];
+        let lastIndex = 0;
+        let match;
 
-            // Create code block element with copy and download buttons
-            function createCodeBlock(code, language = 'text') {
-                const codeBlock = document.createElement('div');
-                codeBlock.className = 'code-block';
-                
-                const codeContent = document.createElement('pre');
-                codeContent.textContent = code;
-                
-                const toolbar = document.createElement('div');
-                toolbar.className = 'code-toolbar';
-                
-                const copyBtn = document.createElement('button');
-                copyBtn.className = 'code-btn';
-                copyBtn.title = 'Copy code';
-                copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
-                copyBtn.addEventListener('click', () => copyCodeToClipboard(code));
-                
-                const downloadBtn = document.createElement('button');
-                downloadBtn.className = 'code-btn';
-                downloadBtn.title = 'Download code';
-                downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
-                downloadBtn.addEventListener('click', () => downloadCode(code, language));
-                
-                toolbar.appendChild(copyBtn);
-                toolbar.appendChild(downloadBtn);
-                
-                codeBlock.appendChild(codeContent);
-                codeBlock.appendChild(toolbar);
-                
-                return codeBlock;
-            }
-
-            // Copy code to clipboard
-            function copyCodeToClipboard(code) {
-                navigator.clipboard.writeText(code).then(() => {
-                    console.log('Code copied to clipboard');
-                }).catch(err => {
-                    console.error('Failed to copy code: ', err);
+        while ((match = codeBlockRegex.exec(text)) !== null) {
+            if (match.index > lastIndex) {
+                parts.push({
+                    type: 'text',
+                    content: text.substring(lastIndex, match.index)
                 });
             }
+            
+            const codeContent = match[1].replace(/^(\w+)\n/, '');
+            parts.push({
+                type: 'code',
+                content: codeContent,
+                language: match[1].split('\n')[0] || 'text'
+            });
+            
+            lastIndex = match.index + match[0].length;
+        }
+        
+        if (lastIndex < text.length) {
+            parts.push({
+                type: 'text',
+                content: text.substring(lastIndex)
+            });
+        }
+        
+        return parts.length > 0 ? parts : [{ type: 'text', content: text }];
+    }
 
-            // Download code as file
-            function downloadCode(code, language) {
-                const extension = getExtensionForLanguage(language);
-                const blob = new Blob([code], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `code.${extension}`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }
+    // Create code block element with copy and download buttons
+    function createCodeBlock(code, language = 'text') {
+        const codeBlock = document.createElement('div');
+        codeBlock.className = 'code-block';
+        
+        const codeContent = document.createElement('pre');
+        codeContent.textContent = code;
+        
+        const toolbar = document.createElement('div');
+        toolbar.className = 'code-toolbar';
+        
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'code-btn';
+        copyBtn.title = 'Copy code';
+        copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+        copyBtn.addEventListener('click', () => copyCodeToClipboard(code));
+        
+        const downloadBtn = document.createElement('button');
+        downloadBtn.className = 'code-btn';
+        downloadBtn.title = 'Download code';
+        downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
+        downloadBtn.addEventListener('click', () => downloadCode(code, language));
+        
+        toolbar.appendChild(copyBtn);
+        toolbar.appendChild(downloadBtn);
+        
+        codeBlock.appendChild(codeContent);
+        codeBlock.appendChild(toolbar);
+        
+        return codeBlock;
+    }
 
-            // Get file extension for language
-            function getExtensionForLanguage(language) {
-                const extensions = {
-                    javascript: 'js', typescript: 'ts', python: 'py', java: 'java', c: 'c', cpp: 'cpp',
-                    html: 'html', css: 'css', php: 'php', ruby: 'rb', go: 'go', rust: 'rs', sql: 'sql',
-                    json: 'json', xml: 'xml', markdown: 'md'
-                };
-                return extensions[language.toLowerCase()] || 'txt';
-            }
+    // Copy code to clipboard
+    function copyCodeToClipboard(code) {
+        navigator.clipboard.writeText(code).then(() => {
+            alert('Code copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy code: ', err);
+        });
+    }
 
-            // --- FUNGSI TOGGLE SIDEBAR YANG DIPERBAIKI ---
-            function toggleSidebar() {
-                // Fungsi ini hanya untuk tampilan mobile (lebar < 768px)
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
-            }
+    // Download code as file
+    function downloadCode(code, language) {
+        const extension = getExtensionForLanguage(language);
+        const blob = new Blob([code], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `code.${extension}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
 
-            function updateChatHistory() {
-                chatHistory.innerHTML = '';
-                if (conversations.length === 0) {
-                    chatHistory.innerHTML = '<div class="text-center text-secondary py-3">No conversations yet</div>';
-                    return;
-                }
-                
-                conversations.forEach(conv => {
-                    const historyItem = document.createElement('div');
-                    historyItem.className = `history-item ${currentConversationId === conv.id ? 'active-chat' : ''}`;
-                    historyItem.innerHTML = `
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="text-truncate">${sanitizeHtml(conv.messages[0]?.text?.substring(0, 30) + '...' || 'New conversation')}</div>
-                            <button class="btn btn-sm btn-outline-danger delete-conv" data-id="${conv.id}">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    `;
-                    
-                    historyItem.addEventListener('click', (e) => {
-                        if (!e.target.classList.contains('delete-conv') && !e.target.parentElement.classList.contains('delete-conv')) {
-                            loadConversation(conv.id);
-                            if (window.innerWidth < 768) toggleSidebar();
-                        }
-                    });
-                    
-                    const deleteBtn = historyItem.querySelector('.delete-conv');
-                    deleteBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        deleteConversation(conv.id);
-                    });
-                    
-                    chatHistory.appendChild(historyItem);
-                });
-            }
+    // Get file extension for language
+    function getExtensionForLanguage(language) {
+        const extensions = {
+            javascript: 'js', typescript: 'ts', python: 'py', java: 'java', c: 'c', cpp: 'cpp',
+            html: 'html', css: 'css', php: 'php', ruby: 'rb', go: 'go', rust: 'rs', sql: 'sql',
+            json: 'json', xml: 'xml', markdown: 'md'
+        };
+        return extensions[language.toLowerCase()] || 'txt';
+    }
 
-            function deleteConversation(id) {
-                conversations = conversations.filter(conv => conv.id !== id);
-                if (currentConversationId === id) {
-                    currentConversationId = null;
-                    chatContainer.innerHTML = `
-                        <div class="message ai-message">
-                            <div class="profile-image">
-                                <i class="fas fa-robot"></i>
-                            </div>
-                            <div>
-                                Welcome to Eberardos AI. How can I help you today?
-                            </div>
-                        </div>
-                    `;
-                }
-                localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
-                updateChatHistory();
-            }
+    function toggleSidebar() {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
 
-            function loadConversation(id) {
-                currentConversationId = id;
-                const conversation = conversations.find(conv => conv.id === id);
-                chatContainer.innerHTML = '';
-                
-                if (conversation && conversation.messages) {
-                    conversation.messages.forEach(msg => {
-                        appendMessage(msg.text, msg.sender);
-                    });
-                }
-                updateChatHistory();
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
+    function updateChatHistory() {
+        chatHistory.innerHTML = '';
+        if (conversations.length === 0) {
+            chatHistory.innerHTML = '<div class="text-center text-secondary py-3">No conversations yet</div>';
+            return;
+        }
+        
+        conversations.forEach(conv => {
+            const historyItem = document.createElement('div');
+            historyItem.className = `history-item ${currentConversationId === conv.id ? 'active-chat' : ''}`;
+            
+            const firstMessage = conv.messages[0];
+            const displayTitle = firstMessage ? (firstMessage.text.substring(0, 30) + '...') : 'New conversation';
 
-            function createNewConversation() {
-                const newConv = {
-                    id: Date.now(),
-                    messages: []
-                };
-                conversations.push(newConv);
-                currentConversationId = newConv.id;
-                localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
-                updateChatHistory();
-                chatContainer.innerHTML = '';
-                return newConv.id;
-            }
-
-            function appendMessage(text, sender) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
-                
-                const contentContainer = document.createElement('div');
-                contentContainer.className = 'message-content';
-                
-                const contentParts = extractCodeBlocks(text);
-                
-                contentParts.forEach(part => {
-                    if (part.type === 'code') {
-                        contentContainer.appendChild(createCodeBlock(part.content, part.language));
-                    } else {
-                        const textNode = document.createElement('div');
-                        textNode.innerHTML = part.content.replace(/\n/g, '<br>');
-                        contentContainer.appendChild(textNode);
-                    }
-                });
-
-                if (sender === 'ai') {
-                    const profileImage = document.createElement('div');
-                    profileImage.className = 'profile-image';
-                    profileImage.innerHTML = '<i class="fas fa-robot"></i>';
-                    messageDiv.appendChild(profileImage);
-                }
-
-                messageDiv.appendChild(contentContainer);
-                
-                chatContainer.appendChild(messageDiv);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
-
-            function saveMessage(text, sender) {
-                let conversation = conversations.find(conv => conv.id === currentConversationId);
-                if (!conversation) {
-                    currentConversationId = createNewConversation();
-                    conversation = conversations.find(conv => conv.id === currentConversationId);
-                }
-                
-                if (conversation) {
-                    conversation.messages.push({ text, sender });
-                    localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
-                    updateChatHistory();
-                }
-            }
-
-            function adjustTextareaHeight() {
-                userInput.style.height = 'auto';
-                userInput.style.height = (userInput.scrollHeight) + 'px';
-            }
-
-            async function sendMessage() {
-                const message = userInput.value.trim();
-                if (!message) return;
-
-                if (!currentConversationId) {
-                    createNewConversation();
-                }
-
-                appendMessage(message, 'user');
-                saveMessage(message, 'user');
-                userInput.value = '';
-                userInput.style.height = 'auto';
-                userInput.focus();
-
-                const prompt = "ingat, namamu adalah Eberardos AI, Eberardos AI tidak formal. " + message;
-                const apiUrl = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=gemini`;
-
-                try {
-                    const typingIndicator = document.createElement('div');
-                    typingIndicator.className = 'message ai-message';
-                    typingIndicator.innerHTML = `
-                        <div class="profile-image">
-                            <i class="fas fa-robot"></i>
-                        </div>
-                        <div>Thinking...</div>
-                    `;
-                    chatContainer.appendChild(typingIndicator);
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
-
-                    const response = await fetch(apiUrl);
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    const data = await response.text();
-                    
-                    chatContainer.removeChild(typingIndicator);
-                    appendMessage(data, 'ai');
-                    saveMessage(data, 'ai');
-                } catch (error) {
-                    console.error('Error:', error);
-                    const typingIndicator = document.querySelector('.message.ai-message:last-child');
-                    if (typingIndicator && typingIndicator.textContent.includes('Thinking...')) {
-                        chatContainer.removeChild(typingIndicator);
-                    }
-                    appendMessage('Sorry, there was an error processing your request.', 'ai');
-                    saveMessage('Sorry, there was an error processing your request.', 'ai');
-                }
-            }
-
-            sendButton.addEventListener('click', sendMessage);
-            userInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
+            historyItem.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center w-100">
+                    <div class="text-truncate">${sanitizeHtml(displayTitle)}</div>
+                    <button class="btn btn-sm btn-outline-danger delete-conv" data-id="${conv.id}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            historyItem.addEventListener('click', (e) => {
+                if (!e.target.closest('.delete-conv')) {
+                    loadConversation(conv.id);
+                    if (window.innerWidth < 768) toggleSidebar();
                 }
             });
-            userInput.addEventListener('input', adjustTextareaHeight);
-
-            clearHistoryBtn.addEventListener('click', function() {
-                if (confirm('Are you sure you want to clear all chat history?')) {
-                    conversations = [];
-                    localStorage.removeItem('eberardosConversations');
-                    updateChatHistory();
-                    chatContainer.innerHTML = `
-                        <div class="message ai-message">
-                            <div class="profile-image">
-                                <i class="fas fa-robot"></i>
-                            </div>
-                            <div>
-                                Welcome to Eberardos AI. How can I help you today?
-                            </div>
-                        </div>
-                    `;
-                    currentConversationId = null;
-                }
+            
+            const deleteBtn = historyItem.querySelector('.delete-conv');
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteConversation(conv.id);
             });
+            
+            chatHistory.appendChild(historyItem);
+        });
+    }
 
-            // Event listener untuk tombol hamburger di mobile
-            sidebarToggle.addEventListener('click', toggleSidebar);
-            closeSidebar.addEventListener('click', toggleSidebar);
-            overlay.addEventListener('click', toggleSidebar);
+    function deleteConversation(id) {
+        conversations = conversations.filter(conv => conv.id !== id);
+        if (currentConversationId === id) {
+            currentConversationId = null;
+            chatContainer.innerHTML = `
+                <div class="message ai-message">
+                    <div class="profile-image">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div>
+                        Welcome to Eberardos AI. How can I help you today?
+                    </div>
+                </div>
+            `;
+        }
+        localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
+        updateChatHistory();
+    }
 
-            // Hide/show sidebar untuk desktop
-            desktopSidebarToggle.addEventListener('click', function() {
-                const sidebar = document.getElementById('mainSidebar');
-                if (sidebar.classList.contains('d-md-flex')) {
-                    sidebar.classList.remove('d-md-flex');
-                    sidebar.classList.add('d-md-none');
-                } else {
-                    sidebar.classList.remove('d-md-none');
-                    sidebar.classList.add('d-md-flex');
-                }
+    function loadConversation(id) {
+        currentConversationId = id;
+        const conversation = conversations.find(conv => conv.id === id);
+        chatContainer.innerHTML = '';
+        
+        if (conversation && conversation.messages) {
+            conversation.messages.forEach(msg => {
+                appendMessage(msg.text, msg.sender);
             });
+        }
+        updateChatHistory();
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
 
+    function createNewConversation() {
+        currentConversationId = null;
+        chatContainer.innerHTML = `
+            <div class="message ai-message">
+                <div class="profile-image">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div>
+                    Welcome to Eberardos AI. How can I help you today?
+                </div>
+            </div>
+        `;
+        updateChatHistory();
+    }
+
+    function appendMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
+        
+        const contentContainer = document.createElement('div');
+        contentContainer.className = 'message-content';
+        
+        const contentParts = extractCodeBlocks(text);
+        
+        contentParts.forEach(part => {
+            if (part.type === 'code') {
+                contentContainer.appendChild(createCodeBlock(part.content, part.language));
+            } else {
+                const textNode = document.createElement('div');
+                textNode.innerHTML = part.content.replace(/\n/g, '<br>');
+                contentContainer.appendChild(textNode);
+            }
+        });
+
+        if (sender === 'ai') {
+            const profileImage = document.createElement('div');
+            profileImage.className = 'profile-image';
+            profileImage.innerHTML = '<i class="fas fa-robot"></i>';
+            messageDiv.appendChild(profileImage);
+        }
+
+        messageDiv.appendChild(contentContainer);
+        
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function saveMessage(text, sender) {
+        let conversation = conversations.find(conv => conv.id === currentConversationId);
+        if (!conversation) {
+            const newConv = { id: Date.now(), messages: [] };
+            conversations.unshift(newConv);
+            currentConversationId = newConv.id;
+            conversation = newConv;
+        }
+        
+        if (conversation) {
+            conversation.messages.push({ text, sender });
+            localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
             updateChatHistory();
+        }
+    }
+
+    function adjustTextareaHeight() {
+        userInput.style.height = 'auto';
+        userInput.style.height = (userInput.scrollHeight) + 'px';
+    }
+
+    async function sendMessage() {
+        const message = userInput.value.trim();
+        if (!message) return;
+
+        appendMessage(message, 'user');
+        saveMessage(message, 'user');
+        
+        userInput.value = '';
+        userInput.style.height = 'auto';
+        userInput.focus();
+
+        const prompt = "ingat, namamu adalah Eberardos AI, Eberardos AI tidak formal. " + message;
+        const apiUrl = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=gemini`;
+
+        try {
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'message ai-message typing-indicator';
+            typingIndicator.innerHTML = `
+                <div class="profile-image">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div>Thinking...</div>
+            `;
+            chatContainer.appendChild(typingIndicator);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.text();
+            
+            chatContainer.removeChild(typingIndicator);
+            appendMessage(data, 'ai');
+            saveMessage(data, 'ai');
+        } catch (error) {
+            console.error('Error:', error);
+            const typingIndicator = document.querySelector('.typing-indicator');
+            if (typingIndicator) {
+                chatContainer.removeChild(typingIndicator);
+            }
+            appendMessage('Sorry, there was an error processing your request.', 'ai');
+            saveMessage('Sorry, there was an error processing your request.', 'ai');
+        }
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+    userInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+    userInput.addEventListener('input', adjustTextareaHeight);
+
+    clearHistoryBtn.addEventListener('click', function() {
+        if (confirm('Are you sure you want to clear all chat history?')) {
+            conversations = [];
+            localStorage.removeItem('eberardosConversations');
+            updateChatHistory();
+            chatContainer.innerHTML = `
+                <div class="message ai-message">
+                    <div class="profile-image">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div>
+                        Welcome to Eberardos AI. How can I help you today?
+                    </div>
+                </div>
+            `;
+            currentConversationId = null;
+        }
+    });
+
+    sidebarToggle.addEventListener('click', toggleSidebar);
+    closeSidebar.addEventListener('click', toggleSidebar);
+    overlay.addEventListener('click', toggleSidebar);
+
+    desktopSidebarToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('d-md-none');
+        sidebar.classList.toggle('d-md-flex');
+    });
+
+    updateChatHistory();
             if (conversations.length > 0) {
                 loadConversation(conversations[0].id);
             }
