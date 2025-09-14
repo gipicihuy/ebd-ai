@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            background-color: #242729; /* Latar belakang lebih gelap */
+            background-color: #242729;
             color: #f0f0f0;
             min-height: 100vh;
             font-family: 'Inter', sans-serif;
@@ -24,7 +24,7 @@
             scrollbar-color: #4a4a4a transparent;
             display: flex;
             flex-direction: column;
-            gap: 15px; /* Jarak antar pesan */
+            gap: 15px;
             padding: 20px;
         }
         .chat-container::-webkit-scrollbar {
@@ -36,7 +36,7 @@
         }
         .sidebar {
             transition: all 0.3s ease;
-            background-color: #2d3133; /* Warna sidebar lebih seragam */
+            background-color: #2d3133;
             border-right: 1px solid #444;
             height: 100vh;
             overflow-y: auto;
@@ -55,7 +55,7 @@
             max-width: 85%;
         }
         .user-message {
-            align-self: flex-end; /* Pesan pengguna di kanan */
+            align-self: flex-end;
             justify-content: flex-end;
             background-color: #0B84FE;
             color: #ffffff;
@@ -63,7 +63,7 @@
             padding: 10px 15px;
         }
         .ai-message {
-            align-self: flex-start; /* Pesan AI di kiri */
+            align-self: flex-start;
             background-color: #3a3d40;
             color: #f0f0f0;
             border-radius: 12px 12px 12px 0;
@@ -81,7 +81,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0; /* Mencegah gambar menyusut */
+            flex-shrink: 0;
         }
         .input-container {
             background-color: #3a3d40;
@@ -130,7 +130,7 @@
         .code-block {
             background-color: #2d2d2d;
             border: 1px solid #444;
-            border-radius: 8px; /* Sudut lebih lembut */
+            border-radius: 8px;
             padding: 12px;
             margin: 10px 0;
             position: relative;
@@ -163,7 +163,7 @@
             background-color: #6a6a6a;
         }
         .navbar {
-            background-color: #2d3133 !important; /* Warna navbar seragam dengan sidebar */
+            background-color: #2d3133 !important;
             border-bottom: 1px solid #444 !important;
         }
         .navbar-brand {
@@ -516,7 +516,7 @@
                         contentContainer.appendChild(createCodeBlock(part.content, part.language));
                     } else {
                         const textNode = document.createElement('div');
-                        textNode.innerHTML = part.content.replace(/\n/g, '<br>'); // Mengganti newline dengan <br>
+                        textNode.innerHTML = part.content.replace(/\n/g, '<br>');
                         contentContainer.appendChild(textNode);
                     }
                 });
