@@ -8,128 +8,180 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-bg: #121212;
+            --secondary-bg: #1e1e1e;
+            --accent-red: #d90429;
+            --text-color: #e0e0e0;
+            --input-bg: #2d2d2d;
+            --border-color: #333;
+        }
+
         body {
-            background-color: #242729;
-            color: #f0f0f0;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
             min-height: 100vh;
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-        .chat-container {
-            height: calc(100vh - 140px);
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #4a4a4a transparent;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            padding: 20px;
         }
-        .chat-container::-webkit-scrollbar {
-            width: 6px;
+
+        .navbar {
+            background-color: var(--secondary-bg) !important;
+            border-bottom: 1px solid var(--border-color) !important;
         }
-        .chat-container::-webkit-scrollbar-thumb {
-            background-color: #4a4a4a;
-            border-radius: 3px;
+
+        .navbar-brand {
+            color: var(--text-color) !important;
         }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+        }
+
         .sidebar {
-            transition: all 0.3s ease;
-            background-color: #2d3133;
-            border-right: 1px solid #444;
-            height: 100vh;
+            background-color: var(--secondary-bg);
+            border-right: 1px solid var(--border-color);
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(0);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+        }
+
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            background-color: var(--primary-bg);
+        }
+
+        .chat-container {
+            flex: 1;
             overflow-y: auto;
             scrollbar-width: thin;
+            scrollbar-color: var(--accent-red) transparent;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
         }
-        .sidebar::-webkit-scrollbar {
-            width: 6px;
+
+        .chat-container::-webkit-scrollbar {
+            width: 8px;
         }
-        .sidebar::-webkit-scrollbar-thumb {
-            background-color: #5a5a5a;
-            border-radius: 3px;
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background-color: var(--accent-red);
+            border-radius: 4px;
         }
+
         .message {
             display: flex;
             align-items: flex-start;
+            margin-bottom: 15px;
             max-width: 85%;
+            word-wrap: break-word;
         }
+
         .user-message {
             align-self: flex-end;
             justify-content: flex-end;
-            background-color: #0B84FE;
-            color: #ffffff;
-            border-radius: 12px 12px 0 12px;
-            padding: 10px 15px;
+            background-color: var(--accent-red);
+            color: #fff;
+            border-radius: 20px 20px 4px 20px;
+            padding: 12px 18px;
         }
+
         .ai-message {
             align-self: flex-start;
-            background-color: #3a3d40;
-            color: #f0f0f0;
-            border-radius: 12px 12px 12px 0;
-            padding: 10px 15px;
+            background-color: var(--secondary-bg);
+            color: var(--text-color);
+            border-radius: 20px 20px 20px 4px;
+            padding: 12px 18px;
         }
-        .user-message .message-content, .ai-message .message-content {
-            flex: none;
-        }
+
         .profile-image {
-            width: 28px;
-            height: 28px;
-            border-radius: 4px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             margin-right: 12px;
-            background-color: #5a5a5a;
+            background-color: var(--input-bg);
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
         }
+
+        .user-message .profile-image {
+            display: none;
+        }
+
         .input-container {
-            background-color: #3a3d40;
-            border-radius: 20px;
-            padding: 10px 15px;
+            background-color: var(--input-bg);
+            border-radius: 25px;
+            padding: 12px 20px;
             display: flex;
             align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+            margin: 20px;
         }
+
         .input-field {
             background-color: transparent;
             border: none;
-            color: white;
+            color: var(--text-color);
             width: 100%;
             resize: none;
             outline: none;
             max-height: 200px;
         }
+
         .send-button {
-            background-color: #0B84FE;
+            background-color: var(--accent-red);
             border: none;
             border-radius: 50%;
             color: white;
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-left: 10px;
+            margin-left: 15px;
+            transition: background-color 0.2s;
         }
+
         .send-button:hover {
-            background-color: #0975e5;
+            background-color: #a80322;
         }
+
         .history-item {
             padding: 12px;
-            border-radius: 6px;
+            border-radius: 10px;
             margin-bottom: 8px;
             cursor: pointer;
             transition: background-color 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
+
         .history-item:hover {
-            background-color: #3a3d40;
+            background-color: var(--input-bg);
         }
+
         .active-chat {
-            background-color: #3a3d40;
+            background-color: var(--input-bg);
+            box-shadow: 0 0 10px rgba(217, 4, 41, 0.5);
         }
+
         .code-block {
-            background-color: #2d2d2d;
-            border: 1px solid #444;
+            background-color: #2a2a2a;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 12px;
             margin: 10px 0;
@@ -139,6 +191,7 @@
             overflow-x: auto;
             white-space: pre-wrap;
         }
+
         .code-toolbar {
             position: absolute;
             top: 8px;
@@ -146,8 +199,9 @@
             display: flex;
             gap: 5px;
         }
+
         .code-btn {
-            background-color: #5a5a5a;
+            background-color: #4a4a4a;
             border: none;
             border-radius: 4px;
             color: white;
@@ -159,29 +213,25 @@
             cursor: pointer;
             font-size: 0.8em;
         }
+
         .code-btn:hover {
             background-color: #6a6a6a;
         }
-        .navbar {
-            background-color: #2d3133 !important;
-            border-bottom: 1px solid #444 !important;
-        }
-        .navbar-brand {
-            color: #f0f0f0 !important;
-        }
+
         @media (max-width: 768px) {
             .sidebar {
                 position: fixed;
                 left: -100%;
                 z-index: 1000;
-                height: 100vh;
-                top: 0;
                 width: 80%;
                 max-width: 300px;
+                height: 100vh;
+                top: 0;
+                box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
             }
             .sidebar.active {
                 left: 0;
-                box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
+                transform: translateX(0);
             }
             .overlay {
                 display: none;
@@ -190,11 +240,19 @@
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background-color: rgba(0,0,0,0.7);
+                background-color: rgba(0, 0, 0, 0.7);
                 z-index: 999;
             }
             .overlay.active {
                 display: block;
+            }
+            .main-content {
+                height: calc(100vh - 56px);
+            }
+        }
+        @media (min-width: 769px) {
+            .main-content {
+                height: calc(100vh - 56px);
             }
         }
     </style>
@@ -213,41 +271,39 @@
         </div>
     </nav>
 
-    <div class="container-fluid">
-        <div class="row">
-            <div class="sidebar col-md-3 p-3" id="mainSidebar">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Chat History</h5>
-                    <div>
-                        <button class="btn btn-sm btn-outline-danger me-2" id="clearHistory" title="Clear history">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-secondary d-md-none" id="closeSidebar">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
+    <div class="main-content">
+        <div class="sidebar d-none d-md-flex flex-column" id="mainSidebar">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Chat History</h5>
+                <div>
+                    <button class="btn btn-sm btn-outline-danger me-2" id="clearHistory" title="Clear history">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary d-md-none" id="closeSidebar">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <div id="chatHistory">
-                    </div>
             </div>
-            <div class="col-md-9 p-0 d-flex flex-column" id="chatArea">
-                <div class="chat-container p-3" id="chatContainer">
-                    <div class="ai-message">
-                        <div class="profile-image">
-                            <i class="fas fa-robot"></i>
-                        </div>
-                        <div class="message-content">
-                            Welcome to Eberardos AI. How can I help you today?
-                        </div>
+            <div id="chatHistory" class="flex-grow-1">
+                </div>
+        </div>
+        <div class="chat-area">
+            <div class="chat-container" id="chatContainer">
+                <div class="message ai-message">
+                    <div class="profile-image">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div>
+                        Welcome to Eberardos AI. How can I help you today?
                     </div>
                 </div>
-                <div class="p-3 bg-dark border-top border-secondary">
-                    <div class="input-container d-flex align-items-center">
-                        <textarea class="input-field" placeholder="Type your message..." id="userInput" rows="1"></textarea>
-                        <button class="send-button ms-2" id="sendButton">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
+            </div>
+            <div class="p-3">
+                <div class="input-container">
+                    <textarea class="input-field" placeholder="Type your message..." id="userInput" rows="1"></textarea>
+                    <button class="send-button" id="sendButton">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -269,7 +325,6 @@
 
             let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || [];
             let currentConversationId = null;
-            let sidebarVisible = window.innerWidth >= 768;
 
             // Sanitize HTML to prevent XSS
             function sanitizeHtml(text) {
@@ -296,7 +351,7 @@
                     }
                     
                     // Add code block
-                    const codeContent = match[1].replace(/^(\w+)\n/, ''); // Remove language identifier if present
+                    const codeContent = match[1].replace(/^(\w+)\n/, '');
                     parts.push({
                         type: 'code',
                         content: codeContent,
@@ -352,7 +407,6 @@
             // Copy code to clipboard
             function copyCodeToClipboard(code) {
                 navigator.clipboard.writeText(code).then(() => {
-                    // Show feedback (you could add a toast notification here)
                     console.log('Code copied to clipboard');
                 }).catch(err => {
                     console.error('Failed to copy code: ', err);
@@ -376,43 +430,16 @@
             // Get file extension for language
             function getExtensionForLanguage(language) {
                 const extensions = {
-                    javascript: 'js',
-                    typescript: 'ts',
-                    python: 'py',
-                    java: 'java',
-                    c: 'c',
-                    cpp: 'cpp',
-                    html: 'html',
-                    css: 'css',
-                    php: 'php',
-                    ruby: 'rb',
-                    go: 'go',
-                    rust: 'rs',
-                    sql: 'sql',
-                    json: 'json',
-                    xml: 'xml',
-                    markdown: 'md'
+                    javascript: 'js', typescript: 'ts', python: 'py', java: 'java', c: 'c', cpp: 'cpp',
+                    html: 'html', css: 'css', php: 'php', ruby: 'rb', go: 'go', rust: 'rs', sql: 'sql',
+                    json: 'json', xml: 'xml', markdown: 'md'
                 };
-                
                 return extensions[language.toLowerCase()] || 'txt';
             }
 
             function toggleSidebar() {
-                if (window.innerWidth < 768) {
-                    sidebar.classList.toggle('active');
-                    overlay.classList.toggle('active');
-                } else {
-                    sidebarVisible = !sidebarVisible;
-                    if (sidebarVisible) {
-                        sidebar.classList.remove('d-none');
-                        chatArea.classList.remove('col-md-12');
-                        chatArea.classList.add('col-md-9');
-                    } else {
-                        sidebar.classList.add('d-none');
-                        chatArea.classList.remove('col-md-9');
-                        chatArea.classList.add('col-md-12');
-                    }
-                }
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
             }
 
             function updateChatHistory() {
@@ -456,11 +483,11 @@
                 if (currentConversationId === id) {
                     currentConversationId = null;
                     chatContainer.innerHTML = `
-                        <div class="ai-message">
+                        <div class="message ai-message">
                             <div class="profile-image">
                                 <i class="fas fa-robot"></i>
                             </div>
-                            <div class="message-content">
+                            <div>
                                 Welcome to Eberardos AI. How can I help you today?
                             </div>
                         </div>
@@ -499,11 +526,7 @@
 
             function appendMessage(text, sender) {
                 const messageDiv = document.createElement('div');
-                messageDiv.className = `${sender === 'user' ? 'user-message' : 'ai-message'}`;
-                
-                const profileImage = document.createElement('div');
-                profileImage.className = 'profile-image';
-                profileImage.innerHTML = sender === 'ai' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
+                messageDiv.className = `message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
                 
                 const contentContainer = document.createElement('div');
                 contentContainer.className = 'message-content';
@@ -520,13 +543,15 @@
                         contentContainer.appendChild(textNode);
                     }
                 });
-                
+
                 if (sender === 'ai') {
+                    const profileImage = document.createElement('div');
+                    profileImage.className = 'profile-image';
+                    profileImage.innerHTML = '<i class="fas fa-robot"></i>';
                     messageDiv.appendChild(profileImage);
-                    messageDiv.appendChild(contentContainer);
-                } else {
-                    messageDiv.appendChild(contentContainer);
                 }
+
+                messageDiv.appendChild(contentContainer);
                 
                 chatContainer.appendChild(messageDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -570,12 +595,12 @@
 
                 try {
                     const typingIndicator = document.createElement('div');
-                    typingIndicator.className = 'ai-message';
+                    typingIndicator.className = 'message ai-message';
                     typingIndicator.innerHTML = `
                         <div class="profile-image">
                             <i class="fas fa-robot"></i>
                         </div>
-                        <div class="message-content">Thinking...</div>
+                        <div>Thinking...</div>
                     `;
                     chatContainer.appendChild(typingIndicator);
                     chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -589,8 +614,8 @@
                     saveMessage(data, 'ai');
                 } catch (error) {
                     console.error('Error:', error);
-                    const typingIndicator = document.querySelector('.ai-message:last-child');
-                    if (typingIndicator && typingIndicator.querySelector('.message-content').textContent === 'Thinking...') {
+                    const typingIndicator = document.querySelector('.message.ai-message:last-child');
+                    if (typingIndicator && typingIndicator.textContent.includes('Thinking...')) {
                         chatContainer.removeChild(typingIndicator);
                     }
                     appendMessage('Sorry, there was an error processing your request.', 'ai');
@@ -613,11 +638,11 @@
                     localStorage.removeItem('eberardosConversations');
                     updateChatHistory();
                     chatContainer.innerHTML = `
-                        <div class="ai-message">
+                        <div class="message ai-message">
                             <div class="profile-image">
                                 <i class="fas fa-robot"></i>
                             </div>
-                            <div class="message-content">
+                            <div>
                                 Welcome to Eberardos AI. How can I help you today?
                             </div>
                         </div>
@@ -627,25 +652,22 @@
             });
 
             sidebarToggle.addEventListener('click', toggleSidebar);
-            desktopSidebarToggle.addEventListener('click', toggleSidebar);
             closeSidebar.addEventListener('click', toggleSidebar);
             overlay.addEventListener('click', toggleSidebar);
 
-            window.addEventListener('resize', function() {
-                if (window.innerWidth >= 768) {
-                    sidebar.classList.remove('active');
-                    overlay.classList.remove('active');
-                    sidebarVisible = true;
-                    sidebar.classList.remove('d-none');
-                    chatArea.classList.remove('col-md-12');
-                    chatArea.classList.add('col-md-9');
-                } else {
-                    sidebarVisible = false;
-                    if (!sidebar.classList.contains('active')) {
-                        sidebar.classList.add('d-none');
-                    }
+            // Hide/show sidebar for desktop
+            desktopSidebarToggle.addEventListener('click', function() {
+                const sidebar = document.getElementById('mainSidebar');
+                if (sidebar.classList.contains('d-md-flex')) {
+                    sidebar.classList.remove('d-md-flex');
+                    sidebar.classList.add('d-md-none');
                     chatArea.classList.remove('col-md-9');
                     chatArea.classList.add('col-md-12');
+                } else {
+                    sidebar.classList.remove('d-md-none');
+                    sidebar.classList.add('d-md-flex');
+                    chatArea.classList.remove('col-md-12');
+                    chatArea.classList.add('col-md-9');
                 }
             });
 
