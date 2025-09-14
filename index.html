@@ -11,225 +11,209 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /*
-         * Tema Eberardos AI - Modern Dark Red
-         * -----------------------------------
-         * Menggunakan variabel CSS untuk konsistensi.
-         * Font: Inter (tetap)
-         * Palet warna:
-         * - Abu-abu gelap (untuk latar belakang dan elemen UI)
-         * - Merah marun (untuk aksen)
-         * - Putih keabu-abuan (untuk teks)
+         * Eberardos AI - Versi Redesain Responsif
+         * --------------------------------------
+         * Fokus pada desain mobile-first, dengan transisi yang lebih halus.
          */
 
         :root {
-            --background-dark: #121212;
-            --surface-dark: #1e1e1e;
-            --surface-light: #2c2c2c;
-            --primary-red: #b71c1c;
-            --primary-red-hover: #9e1b1b;
-            --text-light: #e0e0e0;
-            --text-secondary: #a0a0a0;
-            --border-color: #333333;
+            --color-primary: #b71c1c;
+            --color-primary-hover: #9e1b1b;
+            --color-bg-dark: #0d0d0d;
+            --color-bg-light: #1a1a1a;
+            --color-bg-input: #2a2a2a;
+            --color-text-light: #f0f0f0;
+            --color-text-secondary: #888;
+            --color-border: #333;
         }
 
         body {
-            background-color: var(--background-dark);
-            color: var(--text-light);
-            min-height: 100vh;
             font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s ease;
+            background-color: var(--color-bg-dark);
+            color: var(--color-text-light);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Layout Umum --- */
+        .app-container {
+            display: flex;
+            flex-grow: 1;
+        }
+        
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- Navbar --- */
+        .navbar {
+            background-color: var(--color-bg-light);
+            border-bottom: 1px solid var(--color-border);
+            padding: 1rem;
+        }
+        .navbar-brand {
+            color: var(--color-primary) !important;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        .btn-nav {
+            color: var(--color-primary);
+            border-color: var(--color-primary);
+            transition: all 0.2s ease;
+        }
+        .btn-nav:hover {
+            background-color: var(--color-primary);
+            color: var(--color-text-light);
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 300px;
+            background-color: var(--color-bg-light);
+            border-right: 1px solid var(--color-border);
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            transition: transform 0.3s ease-in-out;
+            z-index: 10;
+        }
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .sidebar-body {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 1rem;
+        }
+
+        .sidebar-body::-webkit-scrollbar { width: 6px; }
+        .sidebar-body::-webkit-scrollbar-thumb {
+            background-color: var(--color-text-secondary);
+            border-radius: 3px;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .history-item:hover { background-color: var(--color-bg-input); }
+        .active-chat {
+            background-color: var(--color-primary);
+            color: var(--color-text-light);
+        }
+        .active-chat:hover { background-color: var(--color-primary-hover); }
+
+        /* --- Chat Area --- */
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .chat-container {
-            height: calc(100vh - 140px);
+            flex-grow: 1;
             overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: var(--surface-light) transparent;
-        }
-
-        .chat-container::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .chat-container::-webkit-scrollbar-thumb {
-            background-color: var(--surface-light);
-            border-radius: 4px;
-            border: 2px solid var(--background-dark);
-        }
-
-        .sidebar {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            background-color: var(--surface-dark);
-            border-right: 1px solid var(--border-color);
-            height: 100vh;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: var(--surface-light) transparent;
-            padding: 1.5rem;
-        }
-
-        .sidebar::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background-color: var(--surface-light);
-            border-radius: 4px;
-            border: 2px solid var(--surface-dark);
-        }
-
-        .navbar {
-            background-color: var(--surface-dark) !important;
-            border-bottom: 1px solid var(--border-color) !important;
-            color: var(--text-light);
-        }
-
-        .navbar-brand {
-            font-weight: bold;
-            color: var(--primary-red) !important;
-            font-size: 1.5rem;
-            letter-spacing: 1px;
+            padding: 1rem;
         }
 
         .message {
+            display: flex;
             padding: 1.5rem 0;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--color-border);
         }
-
-        .user-message .profile-image {
-            background-color: var(--primary-red);
-            color: #fff;
+        .message-content {
+            flex-grow: 1;
+            padding-left: 1rem;
         }
-
-        .ai-message .profile-image {
-            background-color: var(--surface-light);
-            color: var(--primary-red);
-        }
-
         .profile-image {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            margin-right: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .user-message .profile-image { background-color: var(--color-primary); }
+        .ai-message .profile-image { background-color: var(--color-bg-input); }
+
+        /* --- Input Area --- */
+        .input-area {
+            background-color: var(--color-bg-light);
+            padding: 1rem;
+            border-top: 1px solid var(--color-border);
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
         }
-
         .input-container {
-            background-color: var(--surface-dark);
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--color-bg-input);
             border-radius: 12px;
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
         }
-
         .input-field {
+            flex-grow: 1;
             background-color: transparent;
             border: none;
-            color: var(--text-light);
-            width: 100%;
-            resize: none;
+            color: var(--color-text-light);
             outline: none;
+            resize: none;
             max-height: 200px;
-            padding: 0.5rem;
+            padding: 0.5rem 0;
         }
-
-        .input-field::placeholder {
-            color: var(--text-secondary);
-        }
+        .input-field::placeholder { color: var(--color-text-secondary); }
 
         .send-button {
-            background-color: var(--primary-red);
+            background-color: var(--color-primary);
+            color: var(--color-text-light);
             border: none;
             border-radius: 50%;
-            color: #fff;
             width: 44px;
             height: 44px;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             transition: background-color 0.2s ease, transform 0.2s ease;
         }
-
         .send-button:hover {
-            background-color: var(--primary-red-hover);
+            background-color: var(--color-primary-hover);
             transform: translateY(-2px);
         }
 
-        .btn-outline-light {
-            color: var(--primary-red);
-            border-color: var(--primary-red);
-            transition: all 0.2s ease;
-        }
-
-        .btn-outline-light:hover {
-            background-color: var(--primary-red);
-            color: #fff;
-        }
-
-        .btn-outline-danger {
-            color: var(--primary-red);
-            border-color: var(--primary-red);
-        }
-
-        .btn-outline-danger:hover {
-            background-color: var(--primary-red);
-            color: #fff;
-        }
-
-        .btn-outline-secondary {
-            color: var(--text-secondary);
-            border-color: var(--text-secondary);
-        }
-
-        .btn-outline-secondary:hover {
-            background-color: var(--text-secondary);
-            color: var(--background-dark);
-        }
-
-        .history-item {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .history-item:hover {
-            background-color: var(--surface-light);
-        }
-
-        .active-chat {
-            background-color: var(--primary-red);
-            color: #fff;
-        }
-
-        .active-chat .delete-conv {
-            color: #fff;
-            border-color: #fff;
-        }
-
-        .active-chat .delete-conv:hover {
-            background-color: #fff;
-            color: var(--primary-red);
-        }
-
+        /* --- Code Blocks & Utils --- */
         .code-block {
-            background-color: var(--surface-dark);
-            border: 1px solid var(--border-color);
-            border-left: 4px solid var(--primary-red);
+            background-color: var(--color-bg-input);
+            border-left: 4px solid var(--color-primary);
             border-radius: 8px;
-            padding: 1.5rem 1rem 1rem 1rem;
-            margin: 1.25rem 0;
+            padding: 1rem;
+            margin: 1rem 0;
             position: relative;
-            font-family: 'Fira Code', 'Monaco', 'Menlo', monospace;
-            font-size: 0.9em;
-            line-height: 1.6;
+        }
+        .code-block pre {
+            margin: 0;
+            padding: 0;
             overflow-x: auto;
             white-space: pre-wrap;
         }
-
         .code-toolbar {
             position: absolute;
             top: 0.5rem;
@@ -237,113 +221,110 @@
             display: flex;
             gap: 5px;
         }
-
         .code-btn {
-            background-color: var(--surface-light);
+            background-color: var(--color-bg-light);
+            color: var(--color-text-secondary);
             border: none;
             border-radius: 6px;
-            color: var(--text-secondary);
-            width: 36px;
-            height: 36px;
+            width: 30px;
+            height: 30px;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             cursor: pointer;
-            font-size: 0.8em;
             transition: background-color 0.2s ease, color 0.2s ease;
         }
-
         .code-btn:hover {
-            background-color: var(--primary-red);
-            color: #fff;
+            background-color: var(--color-primary);
+            color: var(--color-text-light);
         }
+        .text-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* Responsiveness */
+        /* --- Responsiveness --- */
         @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
             .sidebar {
-                transform: translateX(-100%);
                 position: fixed;
                 top: 0;
                 left: 0;
-                z-index: 1000;
-                width: 85%;
-                max-width: 320px;
+                height: 100%;
+                width: 80%;
+                transform: translateX(-100%);
                 box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
             }
-
             .sidebar.active {
                 transform: translateX(0);
             }
-
             .overlay {
-                display: none;
                 position: fixed;
                 top: 0;
                 left: 0;
                 right: 0;
                 bottom: 0;
                 background-color: rgba(0, 0, 0, 0.7);
-                z-index: 999;
+                z-index: 9;
+                display: none;
             }
-
             .overlay.active {
                 display: block;
             }
-
-            .d-md-none {
-                display: block !important;
+            .navbar-brand {
+                flex-grow: 1;
+                text-align: center;
             }
+            .btn-nav.d-none.d-md-block { display: none !important; }
         }
     </style>
 </head>
 <body>
     <div class="overlay"></div>
-    <nav class="navbar navbar-dark bg-dark px-3 py-2">
+    <nav class="navbar navbar-dark px-3 py-2">
         <div class="container-fluid">
-            <button class="btn btn-outline-light d-md-none" type="button" id="sidebarToggle">
+            <button class="btn btn-nav d-md-none" type="button" id="sidebarToggle">
                 <i class="fas fa-bars"></i>
             </button>
-            <span class="navbar-brand mb-0 h1 mx-auto fw-bold">Eberardos AI</span>
-            <button class="btn btn-outline-light d-none d-md-block" type="button" id="desktopSidebarToggle">
+            <span class="navbar-brand mb-0 h1">Eberardos AI</span>
+            <button class="btn btn-nav d-none d-md-block" type="button" id="desktopSidebarToggle">
                 <i class="fas fa-history"></i>
             </button>
         </div>
     </nav>
 
-    <div class="container-fluid">
-        <div class="row">
-            <div class="sidebar col-md-3 p-3" id="mainSidebar">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Chat History</h5>
-                    <div>
-                        <button class="btn btn-sm btn-outline-danger me-2" id="clearHistory" title="Clear history">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-secondary d-md-none" id="closeSidebar">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
+    <div class="app-container">
+        <div class="sidebar" id="mainSidebar">
+            <div class="sidebar-header">
+                <h5 class="mb-0">Chat History</h5>
+                <div>
+                    <button class="btn btn-sm btn-nav me-2" id="clearHistory" title="Clear history">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="btn btn-sm btn-nav d-md-none" id="closeSidebar">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <div id="chatHistory">
-                    </div>
             </div>
-            <div class="col-md-9 p-0 d-flex flex-column" id="chatArea">
-                <div class="chat-container p-3" id="chatContainer">
+            <div class="sidebar-body" id="chatHistory">
+                </div>
+        </div>
+
+        <div class="main-content">
+            <div class="chat-area">
+                <div class="chat-container" id="chatContainer">
                     <div class="message ai-message">
-                        <div class="d-flex">
-                            <div class="profile-image">
-                                <i class="fas fa-robot"></i>
-                            </div>
-                            <div class="message-content">
-                                Welcome to Eberardos AI. How can I help you today?
-                            </div>
+                        <div class="profile-image">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            Welcome to Eberardos AI. How can I help you today?
                         </div>
                     </div>
                 </div>
-                <div class="p-3 bg-dark">
-                    <div class="input-container d-flex align-items-center">
+                <div class="input-area">
+                    <div class="input-container">
                         <textarea class="input-field" placeholder="Type your message..." id="userInput" rows="1"></textarea>
-                        <button class="send-button ms-2" id="sendButton">
+                        <button class="send-button" id="sendButton">
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
@@ -364,20 +345,17 @@
             const closeSidebar = document.getElementById('closeSidebar');
             const overlay = document.querySelector('.overlay');
             const sidebar = document.getElementById('mainSidebar');
-            const chatArea = document.getElementById('chatArea');
+            const chatArea = document.querySelector('.main-content');
 
             let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || [];
             let currentConversationId = null;
-            let sidebarVisible = window.innerWidth >= 768;
 
-            // Sanitize HTML to prevent XSS
             function sanitizeHtml(text) {
                 const div = document.createElement('div');
                 div.textContent = text;
                 return div.innerHTML;
             }
 
-            // Extract code blocks from text
             function extractCodeBlocks(text) {
                 const codeBlockRegex = /```([\s\S]*?)```/g;
                 const matches = [];
@@ -386,7 +364,6 @@
                 const parts = [];
 
                 while ((match = codeBlockRegex.exec(text)) !== null) {
-                    // Add text before code block
                     if (match.index > lastIndex) {
                         parts.push({
                             type: 'text',
@@ -394,8 +371,7 @@
                         });
                     }
 
-                    // Add code block
-                    const codeContent = match[1].replace(/^(\w+)\n/, ''); // Remove language identifier if present
+                    const codeContent = match[1].replace(/^(\w+)\n/, '');
                     parts.push({
                         type: 'code',
                         content: codeContent,
@@ -405,18 +381,15 @@
                     lastIndex = match.index + match[0].length;
                 }
 
-                // Add remaining text after last code block
                 if (lastIndex < text.length) {
                     parts.push({
                         type: 'text',
                         content: text.substring(lastIndex)
                     });
                 }
-
                 return parts.length > 0 ? parts : [{ type: 'text', content: text }];
             }
 
-            // Create code block element with copy and download buttons
             function createCodeBlock(code, language = 'text') {
                 const codeBlock = document.createElement('div');
                 codeBlock.className = 'code-block';
@@ -448,7 +421,6 @@
                 return codeBlock;
             }
 
-            // Copy code to clipboard
             function copyCodeToClipboard(code) {
                 navigator.clipboard.writeText(code).then(() => {
                     console.log('Code copied to clipboard');
@@ -457,7 +429,6 @@
                 });
             }
 
-            // Download code as file
             function downloadCode(code, language) {
                 const extension = getExtensionForLanguage(language);
                 const blob = new Blob([code], { type: 'text/plain' });
@@ -471,45 +442,18 @@
                 URL.revokeObjectURL(url);
             }
 
-            // Get file extension for language
             function getExtensionForLanguage(language) {
                 const extensions = {
-                    javascript: 'js',
-                    typescript: 'ts',
-                    python: 'py',
-                    java: 'java',
-                    c: 'c',
-                    cpp: 'cpp',
-                    html: 'html',
-                    css: 'css',
-                    php: 'php',
-                    ruby: 'rb',
-                    go: 'go',
-                    rust: 'rs',
-                    sql: 'sql',
-                    json: 'json',
-                    xml: 'xml',
-                    markdown: 'md'
+                    javascript: 'js', typescript: 'ts', python: 'py', java: 'java', c: 'c', cpp: 'cpp',
+                    html: 'html', css: 'css', php: 'php', ruby: 'rb', go: 'go', rust: 'rs',
+                    sql: 'sql', json: 'json', xml: 'xml', markdown: 'md'
                 };
                 return extensions[language.toLowerCase()] || 'txt';
             }
 
             function toggleSidebar() {
-                if (window.innerWidth < 768) {
-                    sidebar.classList.toggle('active');
-                    overlay.classList.toggle('active');
-                } else {
-                    sidebarVisible = !sidebarVisible;
-                    if (sidebarVisible) {
-                        sidebar.style.display = 'block';
-                        chatArea.classList.remove('col-md-12');
-                        chatArea.classList.add('col-md-9');
-                    } else {
-                        sidebar.style.display = 'none';
-                        chatArea.classList.remove('col-md-9');
-                        chatArea.classList.add('col-md-12');
-                    }
-                }
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
             }
 
             function updateChatHistory() {
@@ -523,16 +467,14 @@
                     const historyItem = document.createElement('div');
                     historyItem.className = `history-item ${currentConversationId === conv.id ? 'active-chat' : ''}`;
                     historyItem.innerHTML = `
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="text-truncate">${sanitizeHtml(conv.messages[0]?.text?.substring(0, 30) + '...' || 'New conversation')}</div>
-                            <button class="btn btn-sm btn-outline-danger delete-conv" data-id="${conv.id}">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
+                        <div class="text-truncate">${sanitizeHtml(conv.messages[0]?.text?.substring(0, 30) || 'New conversation')}</div>
+                        <button class="btn btn-sm btn-outline-danger delete-conv" data-id="${conv.id}">
+                            <i class="fas fa-times"></i>
+                        </button>
                     `;
                     
                     historyItem.addEventListener('click', (e) => {
-                        if (!e.target.classList.contains('delete-conv') && !e.target.parentElement.classList.contains('delete-conv')) {
+                        if (!e.target.closest('.delete-conv')) {
                             loadConversation(conv.id);
                             if (window.innerWidth < 768) toggleSidebar();
                         }
@@ -554,13 +496,11 @@
                     currentConversationId = null;
                     chatContainer.innerHTML = `
                         <div class="message ai-message">
-                            <div class="d-flex">
-                                <div class="profile-image">
-                                    <i class="fas fa-robot"></i>
-                                </div>
-                                <div class="message-content">
-                                    Welcome to Eberardos AI. How can I help you today?
-                                </div>
+                            <div class="profile-image">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                Welcome to Eberardos AI. How can I help you today?
                             </div>
                         </div>
                     `;
@@ -588,7 +528,7 @@
                     id: Date.now(),
                     messages: []
                 };
-                conversations.push(newConv);
+                conversations.unshift(newConv);
                 currentConversationId = newConv.id;
                 localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
                 updateChatHistory();
@@ -600,20 +540,13 @@
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
                 
-                const messageContentDiv = document.createElement('div');
-                messageContentDiv.className = 'd-flex';
-                
                 const profileImage = document.createElement('div');
                 profileImage.className = 'profile-image';
                 profileImage.innerHTML = sender === 'ai' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
                 
-                messageContentDiv.appendChild(profileImage);
-                
                 const contentContainer = document.createElement('div');
                 contentContainer.className = 'message-content';
-                contentContainer.style.flex = '1';
                 
-                // Process message content for code blocks
                 const contentParts = extractCodeBlocks(text);
                 
                 contentParts.forEach(part => {
@@ -626,8 +559,8 @@
                     }
                 });
                 
-                messageContentDiv.appendChild(contentContainer);
-                messageDiv.appendChild(messageContentDiv);
+                messageDiv.appendChild(profileImage);
+                messageDiv.appendChild(contentContainer);
                 
                 chatContainer.appendChild(messageDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -663,7 +596,7 @@
                 appendMessage(message, 'user');
                 saveMessage(message, 'user');
                 userInput.value = '';
-                userInput.style.height = 'auto';
+                adjustTextareaHeight();
                 userInput.focus();
 
                 const prompt = "ingat, namamu adalah Eberardos AI, Eberardos AI tidak formal. " + message;
@@ -673,12 +606,10 @@
                     const typingIndicator = document.createElement('div');
                     typingIndicator.className = 'message ai-message';
                     typingIndicator.innerHTML = `
-                        <div class="d-flex">
-                            <div class="profile-image">
-                                <i class="fas fa-robot"></i>
-                            </div>
-                            <div class="message-content">Thinking...</div>
+                        <div class="profile-image">
+                            <i class="fas fa-robot"></i>
                         </div>
+                        <div class="message-content">Thinking...</div>
                     `;
                     chatContainer.appendChild(typingIndicator);
                     chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -717,13 +648,11 @@
                     updateChatHistory();
                     chatContainer.innerHTML = `
                         <div class="message ai-message">
-                            <div class="d-flex">
-                                <div class="profile-image">
-                                    <i class="fas fa-robot"></i>
-                                </div>
-                                <div class="message-content">
-                                    Welcome to Eberardos AI. How can I help you today?
-                                </div>
+                            <div class="profile-image">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                Welcome to Eberardos AI. How can I help you today?
                             </div>
                         </div>
                     `;
@@ -740,17 +669,6 @@
                 if (window.innerWidth >= 768) {
                     sidebar.classList.remove('active');
                     overlay.classList.remove('active');
-                    sidebarVisible = true;
-                    sidebar.style.display = 'block';
-                    chatArea.classList.remove('col-md-12');
-                    chatArea.classList.add('col-md-9');
-                } else {
-                    sidebarVisible = false;
-                    if (!sidebar.classList.contains('active')) {
-                        sidebar.style.display = 'none';
-                    }
-                    chatArea.classList.remove('col-md-9');
-                    chatArea.classList.add('col-md-12');
                 }
             });
 
