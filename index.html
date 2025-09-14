@@ -5,21 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eberardos AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            min-height: 100vh;
             font-family: 'Inter', sans-serif;
-            background-color: #1e1e2d;
-            color: #e0e0e0;
+            display: flex; /* Tambahkan ini */
+            flex-direction: column; /* Tambahkan ini */
         }
-        .sidebar {
-            transition: transform 0.3s ease-in-out;
+        .main-container {
+            display: flex;
+            flex: 1; /* Tambahkan ini */
         }
         .chat-container {
+            height: calc(100vh - 140px);
+            overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: #4a4a4a transparent;
+            flex-grow: 1; /* Tambahkan ini */
         }
         .chat-container::-webkit-scrollbar {
             width: 6px;
@@ -28,96 +34,209 @@
             background-color: #4a4a4a;
             border-radius: 3px;
         }
-        .history-item {
-            transition: background-color 0.2s;
+        .sidebar {
+            transition: all 0.3s ease;
+            background-color: #1e1e1e;
+            border-right: 1px solid #333;
+            height: 100vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
         }
-        .active-chat {
-            background-color: #2a2a3e !important;
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
         }
-        .code-block {
-            background-color: #2d2d3f;
-            border: 1px solid #3a3a4c;
-            font-family: 'Fira Code', 'Monaco', 'Menlo', monospace;
-            white-space: pre-wrap;
-            word-wrap: break-word;
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: #4a4a4a;
+            border-radius: 3px;
+        }
+        .message {
+            padding: 16px 0;
+            border-bottom: 1px solid #2d2d2d;
+        }
+        .user-message {
+            background-color: #1a1a1a;
+        }
+        .ai-message {
+            background-color: #1a1a1a;
+        }
+        .profile-image {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            margin-right: 12px;
+            background-color: #3a3a3a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Perbaikan CSS untuk Input Container */
+        .input-container {
+            background-color: #2d2d2d;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            width: 100%;
         }
         .input-field {
-            min-height: 44px;
+            background-color: transparent;
+            border: none;
+            color: white;
+            width: 100%; /* Pastikan ini 100% dari parent */
+            resize: none;
+            outline: none;
+            max-height: 200px;
+            flex-grow: 1; /* Tambahkan ini */
+            padding-right: 10px; /* Jarak agar tidak terlalu mepet dengan tombol */
         }
-        @media (max-width: 767px) {
-            .sidebar.translate-x-full {
-                transform: translateX(0) !important;
+        .send-button {
+            background-color: #3a3a3a;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8em;
+            flex-shrink: 0; /* Pastikan tombol tidak menyusut */
+        }
+        .send-button:hover {
+            background-color: #4a4a4a;
+        }
+        .history-item {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .history-item:hover {
+            background-color: #2d2d2d;
+        }
+        .active-chat {
+            background-color: #2d2d2d;
+        }
+        .code-block {
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+            position: relative;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .code-toolbar {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 5px;
+        }
+        .code-btn {
+            background-color: #3a3a3a;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        .code-btn:hover {
+            background-color: #4a4a4a;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                z-index: 1000;
+                height: 100vh;
+                top: 0;
+                width: 80%;
+                max-width: 300px;
+            }
+            .sidebar.active {
+                left: 0;
+                box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
+            }
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0,0,0,0.7);
+                z-index: 999;
+            }
+            .overlay.active {
+                display: block;
             }
         }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden">
-
-    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden hidden"></div>
-
-    <aside id="mainSidebar" class="sidebar fixed inset-y-0 left-0 w-64 bg-[#1e1e2d] shadow-lg z-50 transform -translate-x-full md:relative md:translate-x-0 md:flex md:flex-col p-4 border-r border-[#3a3a4c]">
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-xl font-semibold text-white">Eberardos AI</h1>
-            <button id="closeSidebar" class="md:hidden text-gray-400 hover:text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+<body class="d-flex flex-column">
+    <div class="overlay"></div>
+    <nav class="navbar navbar-dark bg-black px-3 py-2 border-bottom border-secondary">
+        <div class="container-fluid">
+            <button class="btn btn-outline-light d-md-none" type="button" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <span class="navbar-brand mb-0 h1 mx-auto fw-bold">Eberardos AI</span>
+            <button class="btn btn-outline-light d-none d-md-block" type="button" id="desktopSidebarToggle">
+                <i class="fas fa-history"></i>
             </button>
         </div>
-        
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-md font-medium text-gray-300">Riwayat Chat</h2>
-            <button id="clearHistory" class="text-gray-400 hover:text-red-500 transition-colors duration-200" title="Hapus semua riwayat">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-            </button>
-        </div>
-        
-        <div id="chatHistory" class="flex-1 overflow-y-auto space-y-2">
-            </div>
+    </nav>
 
-        <button id="newChatButton" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition-colors duration-200">
-            + Chat Baru
-        </button>
-    </aside>
-
-    <main class="flex-1 flex flex-col bg-[#161623]">
-        <header class="p-4 bg-[#1e1e2d] md:hidden flex items-center justify-between shadow-md">
-            <button id="sidebarToggle" class="text-gray-400 hover:text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
-            <h1 class="text-xl font-bold text-white">Eberardos AI</h1>
-            <div class="w-6"></div> </header>
-        
-        <div id="chatContainer" class="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
-            <div class="flex items-start gap-4 p-4 rounded-lg bg-[#1e1e2d] animate-fade-in">
-                <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-md bg-blue-600 text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z" />
-                        <path d="M13 9h-2V7h2v2zm0 4h-2v-2h2v2zm-2 4h2v-2h-2v2z" />
-                    </svg>
+    <div class="container-fluid d-flex flex-grow-1">
+        <div class="sidebar col-md-3 p-3" id="mainSidebar">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Chat History</h5>
+                <div>
+                    <button class="btn btn-sm btn-outline-danger me-2" id="clearHistory" title="Clear history">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary d-md-none" id="closeSidebar">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-gray-200 leading-relaxed">Selamat datang di Eberardos AI. Saya siap membantu. Ada yang bisa saya bantu hari ini?</p>
+            </div>
+            <div id="chatHistory">
+                </div>
+        </div>
+        <div class="col-md-9 p-0 d-flex flex-column" id="chatArea">
+            <div class="chat-container p-3" id="chatContainer">
+                <div class="message ai-message">
+                    <div class="d-flex">
+                        <div class="profile-image">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            Welcome to Eberardos AI. How can I help you today?
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 bg-dark border-top border-secondary">
+                <div class="input-container d-flex align-items-center">
+                    <textarea class="input-field" placeholder="Type your message..." id="userInput" rows="1"></textarea>
+                    <button class="send-button ms-2" id="sendButton">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </div>
             </div>
         </div>
-
-        <div class="p-4 md:p-6 bg-[#1e1e2d] border-t border-[#3a3a4c]">
-            <div class="relative flex items-end w-full max-w-3xl mx-auto bg-[#2a2a3e] rounded-xl shadow-lg border border-[#3a3a4c]">
-                <textarea id="userInput" class="w-full pl-5 pr-14 py-3 bg-transparent text-white placeholder-gray-500 rounded-xl resize-none outline-none overflow-hidden" placeholder="Ketik pesan..." rows="1"></textarea>
-                <button id="sendButton" class="absolute right-3 bottom-3 text-blue-400 hover:text-blue-200 transition-colors duration-200 p-1.5 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M2.01 21L23 12 2.01 3v6l15 3-15 3z" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </main>
-    
+    </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const chatContainer = document.getElementById('chatContainer');
@@ -126,91 +245,96 @@
             const chatHistory = document.getElementById('chatHistory');
             const clearHistoryBtn = document.getElementById('clearHistory');
             const sidebarToggle = document.getElementById('sidebarToggle');
+            const desktopSidebarToggle = document.getElementById('desktopSidebarToggle');
             const closeSidebar = document.getElementById('closeSidebar');
-            const overlay = document.getElementById('overlay');
+            const overlay = document.querySelector('.overlay');
             const sidebar = document.getElementById('mainSidebar');
-            const newChatButton = document.getElementById('newChatButton');
+            const chatArea = document.getElementById('chatArea');
 
             let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || [];
             let currentConversationId = null;
+            let sidebarVisible = window.innerWidth >= 768;
 
-            // Sanitize HTML to prevent XSS
             function sanitizeHtml(text) {
                 const div = document.createElement('div');
                 div.textContent = text;
                 return div.innerHTML;
             }
 
-            // Extract and format code blocks from text
-            function formatMessage(text) {
-                const parts = text.split(/```(\w+)?\n([\s\S]+?)```/g);
-                const container = document.createElement('div');
-                container.className = 'message-content';
-
-                for (let i = 0; i < parts.length; i++) {
-                    if (i % 3 === 0) { // Text part
-                        const p = document.createElement('p');
-                        p.textContent = parts[i];
-                        if (p.textContent.trim()) {
-                             container.appendChild(p);
-                        }
-                    } else if (i % 3 === 1) { // Language part, not used here but for reference
-                        // Skip, handled in next part
-                    } else if (i % 3 === 2) { // Code part
-                        const codeBlock = createCodeBlock(parts[i]);
-                        container.appendChild(codeBlock);
+            function extractCodeBlocks(text) {
+                const codeBlockRegex = /```([\s\S]*?)```/g;
+                const matches = [];
+                let match;
+                let lastIndex = 0;
+                const parts = [];
+                
+                while ((match = codeBlockRegex.exec(text)) !== null) {
+                    if (match.index > lastIndex) {
+                        parts.push({
+                            type: 'text',
+                            content: text.substring(lastIndex, match.index)
+                        });
                     }
+                    
+                    const codeContent = match[1].replace(/^(\w+)\n/, ''); 
+                    parts.push({
+                        type: 'code',
+                        content: codeContent,
+                        language: match[1].split('\n')[0] || 'text'
+                    });
+                    
+                    lastIndex = match.index + match[0].length;
                 }
-                return container;
+                
+                if (lastIndex < text.length) {
+                    parts.push({
+                        type: 'text',
+                        content: text.substring(lastIndex)
+                    });
+                }
+                
+                return parts.length > 0 ? parts : [{ type: 'text', content: text }];
             }
 
-            // Create code block element with copy and download buttons
             function createCodeBlock(code, language = 'text') {
                 const codeBlock = document.createElement('div');
-                codeBlock.className = 'code-block p-4 rounded-lg my-4 relative group';
-
+                codeBlock.className = 'code-block';
+                
                 const codeContent = document.createElement('pre');
-                codeContent.textContent = code.trim();
+                codeContent.textContent = code;
                 
                 const toolbar = document.createElement('div');
-                toolbar.className = 'absolute top-2 right-2 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300';
-
+                toolbar.className = 'code-toolbar';
+                
                 const copyBtn = document.createElement('button');
-                copyBtn.className = 'text-gray-400 hover:text-white transition-colors duration-200';
-                copyBtn.title = 'Salin kode';
-                copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z" />
-                </svg>`;
+                copyBtn.className = 'code-btn';
+                copyBtn.title = 'Copy code';
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
                 copyBtn.addEventListener('click', () => copyCodeToClipboard(code));
-
+                
                 const downloadBtn = document.createElement('button');
-                downloadBtn.className = 'text-gray-400 hover:text-white transition-colors duration-200';
-                downloadBtn.title = 'Unduh kode';
-                downloadBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18h14v2H5z" />
-                </svg>`;
+                downloadBtn.className = 'code-btn';
+                downloadBtn.title = 'Download code';
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
                 downloadBtn.addEventListener('click', () => downloadCode(code, language));
-
+                
                 toolbar.appendChild(copyBtn);
                 toolbar.appendChild(downloadBtn);
-
+                
                 codeBlock.appendChild(codeContent);
                 codeBlock.appendChild(toolbar);
-
+                
                 return codeBlock;
             }
 
-            // Copy code to clipboard
             function copyCodeToClipboard(code) {
                 navigator.clipboard.writeText(code).then(() => {
-                    // Could add a small toast notification here
                     console.log('Code copied to clipboard');
                 }).catch(err => {
                     console.error('Failed to copy code: ', err);
                 });
             }
 
-            // Download code as file
             function downloadCode(code, language) {
                 const extension = getExtensionForLanguage(language);
                 const blob = new Blob([code], { type: 'text/plain' });
@@ -224,54 +348,75 @@
                 URL.revokeObjectURL(url);
             }
 
-            // Get file extension for language
             function getExtensionForLanguage(language) {
                 const extensions = {
-                    javascript: 'js', typescript: 'ts', python: 'py', java: 'java', c: 'c', cpp: 'cpp',
-                    html: 'html', css: 'css', php: 'php', ruby: 'rb', go: 'go', rust: 'rs', sql: 'sql',
-                    json: 'json', xml: 'xml', markdown: 'md'
+                    javascript: 'js',
+                    typescript: 'ts',
+                    python: 'py',
+                    java: 'java',
+                    c: 'c',
+                    cpp: 'cpp',
+                    html: 'html',
+                    css: 'css',
+                    php: 'php',
+                    ruby: 'rb',
+                    go: 'go',
+                    rust: 'rs',
+                    sql: 'sql',
+                    json: 'json',
+                    xml: 'xml',
+                    markdown: 'md'
                 };
+                
                 return extensions[language.toLowerCase()] || 'txt';
             }
 
-            // Toggle sidebar visibility
             function toggleSidebar() {
-                sidebar.classList.toggle('-translate-x-full');
-                overlay.classList.toggle('hidden');
+                if (window.innerWidth < 768) {
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                } else {
+                    sidebarVisible = !sidebarVisible;
+                    if (sidebarVisible) {
+                        sidebar.classList.remove('d-none');
+                        chatArea.classList.remove('col-md-12');
+                        chatArea.classList.add('col-md-9');
+                    } else {
+                        sidebar.classList.add('d-none');
+                        chatArea.classList.remove('col-md-9');
+                        chatArea.classList.add('col-md-12');
+                    }
+                }
             }
 
             function updateChatHistory() {
                 chatHistory.innerHTML = '';
                 if (conversations.length === 0) {
-                    chatHistory.innerHTML = '<div class="text-center text-gray-500 py-3 text-sm">Belum ada percakapan.</div>';
+                    chatHistory.innerHTML = '<div class="text-center text-secondary py-3">No conversations yet</div>';
                     return;
                 }
                 
                 conversations.forEach(conv => {
-                    const firstMessage = conv.messages.find(msg => msg.sender === 'user');
-                    const previewText = firstMessage ? firstMessage.text.substring(0, 25) + (firstMessage.text.length > 25 ? '...' : '') : 'Percakapan Baru';
-                    
                     const historyItem = document.createElement('div');
-                    historyItem.className = `history-item p-3 rounded-lg cursor-pointer hover:bg-[#2a2a3e] ${currentConversationId === conv.id ? 'active-chat' : ''}`;
+                    historyItem.className = `history-item ${currentConversationId === conv.id ? 'active-chat' : ''}`;
                     historyItem.innerHTML = `
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-gray-300 truncate">${sanitizeHtml(previewText)}</span>
-                            <button class="delete-conv text-gray-500 hover:text-red-500 transition-colors duration-200" data-id="${conv.id}">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-truncate">${sanitizeHtml(conv.messages[0]?.text?.substring(0, 30) + '...' || 'New conversation')}</div>
+                            <button class="btn btn-sm btn-outline-danger delete-conv" data-id="${conv.id}">
+                                <i class="fas fa-times"></i>
                             </button>
                         </div>
                     `;
                     
                     historyItem.addEventListener('click', (e) => {
-                        if (!e.target.closest('.delete-conv')) {
+                        if (!e.target.classList.contains('delete-conv') && !e.target.parentElement.classList.contains('delete-conv')) {
                             loadConversation(conv.id);
                             if (window.innerWidth < 768) toggleSidebar();
                         }
                     });
                     
-                    historyItem.querySelector('.delete-conv').addEventListener('click', (e) => {
+                    const deleteBtn = historyItem.querySelector('.delete-conv');
+                    deleteBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         deleteConversation(conv.id);
                     });
@@ -285,15 +430,14 @@
                 if (currentConversationId === id) {
                     currentConversationId = null;
                     chatContainer.innerHTML = `
-                        <div class="flex items-start gap-4 p-4 rounded-lg bg-[#1e1e2d] animate-fade-in">
-                            <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-md bg-blue-600 text-white">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z" />
-                                    <path d="M13 9h-2V7h2v2zm0 4h-2v-2h2v2zm-2 4h2v-2h-2v2z" />
-                                </svg>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-gray-200 leading-relaxed">Selamat datang di Eberardos AI. Saya siap membantu. Ada yang bisa saya bantu hari ini?</p>
+                        <div class="message ai-message">
+                            <div class="d-flex">
+                                <div class="profile-image">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div class="message-content">
+                                    Welcome to Eberardos AI. How can I help you today?
+                                </div>
                             </div>
                         </div>
                     `;
@@ -321,40 +465,44 @@
                     id: Date.now(),
                     messages: []
                 };
-                conversations.unshift(newConv); // Add to the beginning
+                conversations.push(newConv);
                 currentConversationId = newConv.id;
                 localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
                 updateChatHistory();
-                chatContainer.innerHTML = `
-                    <div class="flex items-start gap-4 p-4 rounded-lg bg-[#1e1e2d] animate-fade-in">
-                        <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-md bg-blue-600 text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z" />
-                                <path d="M13 9h-2V7h2v2zm0 4h-2v-2h2v2zm-2 4h2v-2h-2v2z" />
-                            </svg>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-gray-200 leading-relaxed">Halo! Ayo kita mulai percakapan baru. Ada yang bisa saya bantu?</p>
-                        </div>
-                    </div>
-                `;
+                chatContainer.innerHTML = '';
                 return newConv.id;
             }
 
             function appendMessage(text, sender) {
                 const messageDiv = document.createElement('div');
-                messageDiv.className = `flex items-start gap-4 p-4 rounded-lg ${sender === 'user' ? 'bg-[#2a2a3e] justify-end' : 'bg-[#1e1e2d]'} animate-fade-in`;
+                messageDiv.className = `message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
                 
                 const messageContentDiv = document.createElement('div');
-                messageContentDiv.className = `flex-1 min-w-0 ${sender === 'user' ? 'order-1' : ''}`;
+                messageContentDiv.className = 'd-flex';
                 
                 const profileImage = document.createElement('div');
-                profileImage.className = `flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-md ${sender === 'user' ? 'bg-white text-gray-800' : 'bg-blue-600 text-white'}`;
-                profileImage.innerHTML = sender === 'user' ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 105 5 5.006 5.006 0 00-5-5zm-3 8a3 3 0 113 3 3.003 3.003 0 01-3-3zm8.932 5.071l-.791-1.071c-.742-.997-1.956-1.572-3.141-1.624-1.229-.052-2.39.467-3.13 1.34l-.8.95c-.75.9-1.921 1.48-3.111 1.51-1.2.04-2.39-.53-3.12-1.51l-.8-.95c-.74-.873-1.9-1.392-3.13-1.34-1.185.052-2.399.627-3.141 1.624l-.791 1.071c-1.334 1.802-1.989 3.99-1.989 6.079v.85c0 .54.44 1 1 1h22c.56 0 1-.46 1-1v-.85c0-2.089-.655-4.277-1.989-6.079zM12 17a5 5 0 10-5-5 5.006 5.006 0 015 5z" /></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z" /><path d="M13 9h-2V7h2v2zm0 4h-2v-2h2v2zm-2 4h2v-2h-2v2z" /></svg>`;
+                profileImage.className = 'profile-image';
+                profileImage.innerHTML = sender === 'ai' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
                 
-                const contentContainer = formatMessage(text);
+                messageContentDiv.appendChild(profileImage);
+                
+                const contentContainer = document.createElement('div');
+                contentContainer.className = 'message-content';
+                contentContainer.style.flex = '1';
+                
+                const contentParts = extractCodeBlocks(text);
+                
+                contentParts.forEach(part => {
+                    if (part.type === 'code') {
+                        contentContainer.appendChild(createCodeBlock(part.content, part.language));
+                    } else {
+                        const textNode = document.createElement('div');
+                        textNode.textContent = part.content;
+                        contentContainer.appendChild(textNode);
+                    }
+                });
+                
                 messageContentDiv.appendChild(contentContainer);
-                messageDiv.appendChild(profileImage);
                 messageDiv.appendChild(messageContentDiv);
                 
                 chatContainer.appendChild(messageDiv);
@@ -391,28 +539,26 @@
                 appendMessage(message, 'user');
                 saveMessage(message, 'user');
                 userInput.value = '';
-                adjustTextareaHeight();
+                userInput.style.height = 'auto';
                 userInput.focus();
 
                 const prompt = "ingat, namamu adalah Eberardos AI, Eberardos AI tidak formal. " + message;
                 const apiUrl = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=gemini`;
 
-                const typingIndicator = document.createElement('div');
-                typingIndicator.className = 'flex items-start gap-4 p-4 rounded-lg bg-[#1e1e2d] animate-pulse';
-                typingIndicator.innerHTML = `
-                    <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-md bg-blue-600 text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z" />
-                        </svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-gray-400">Mengetik...</p>
-                    </div>
-                `;
-                chatContainer.appendChild(typingIndicator);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-
                 try {
+                    const typingIndicator = document.createElement('div');
+                    typingIndicator.className = 'message ai-message';
+                    typingIndicator.innerHTML = `
+                        <div class="d-flex">
+                            <div class="profile-image">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">Thinking...</div>
+                        </div>
+                    `;
+                    chatContainer.appendChild(typingIndicator);
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+
                     const response = await fetch(apiUrl);
                     if (!response.ok) throw new Error('Network response was not ok');
                     const data = await response.text();
@@ -422,17 +568,16 @@
                     saveMessage(data, 'ai');
                 } catch (error) {
                     console.error('Error:', error);
-                    if (chatContainer.lastChild === typingIndicator) {
+                    const typingIndicator = document.querySelector('.message:last-child');
+                    if (typingIndicator && typingIndicator.querySelector('.message-content').textContent === 'Thinking...') {
                         chatContainer.removeChild(typingIndicator);
                     }
-                    appendMessage('Maaf, ada kesalahan saat memproses permintaan Anda.', 'ai');
-                    saveMessage('Maaf, ada kesalahan saat memproses permintaan Anda.', 'ai');
+                    appendMessage('Sorry, there was an error processing your request.', 'ai');
+                    saveMessage('Sorry, there was an error processing your request.', 'ai');
                 }
             }
 
             sendButton.addEventListener('click', sendMessage);
-            newChatButton.addEventListener('click', createNewConversation);
-            
             userInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
@@ -442,20 +587,19 @@
             userInput.addEventListener('input', adjustTextareaHeight);
 
             clearHistoryBtn.addEventListener('click', function() {
-                if (confirm('Yakin ingin menghapus semua riwayat percakapan?')) {
+                if (confirm('Are you sure you want to clear all chat history?')) {
                     conversations = [];
                     localStorage.removeItem('eberardosConversations');
                     updateChatHistory();
                     chatContainer.innerHTML = `
-                        <div class="flex items-start gap-4 p-4 rounded-lg bg-[#1e1e2d] animate-fade-in">
-                            <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-md bg-blue-600 text-white">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z" />
-                                    <path d="M13 9h-2V7h2v2zm0 4h-2v-2h2v2zm-2 4h2v-2h-2v2z" />
-                                </svg>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-gray-200 leading-relaxed">Selamat datang di Eberardos AI. Saya siap membantu. Ada yang bisa saya bantu hari ini?</p>
+                        <div class="message ai-message">
+                            <div class="d-flex">
+                                <div class="profile-image">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div class="message-content">
+                                    Welcome to Eberardos AI. How can I help you today?
+                                </div>
                             </div>
                         </div>
                     `;
@@ -464,10 +608,28 @@
             });
 
             sidebarToggle.addEventListener('click', toggleSidebar);
+            desktopSidebarToggle.addEventListener('click', toggleSidebar);
             closeSidebar.addEventListener('click', toggleSidebar);
             overlay.addEventListener('click', toggleSidebar);
 
-            // Initial load
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                    sidebarVisible = true;
+                    sidebar.classList.remove('d-none');
+                    chatArea.classList.remove('col-md-12');
+                    chatArea.classList.add('col-md-9');
+                } else {
+                    sidebarVisible = false;
+                    if (!sidebar.classList.contains('active')) {
+                        sidebar.classList.add('d-none');
+                    }
+                    chatArea.classList.remove('col-md-9');
+                    chatArea.classList.add('col-md-12');
+                }
+            });
+
             updateChatHistory();
             if (conversations.length > 0) {
                 loadConversation(conversations[0].id);
