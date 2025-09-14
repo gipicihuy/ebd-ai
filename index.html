@@ -437,7 +437,9 @@
                 return extensions[language.toLowerCase()] || 'txt';
             }
 
+            // --- FUNGSI TOGGLE SIDEBAR YANG DIPERBAIKI ---
             function toggleSidebar() {
+                // Fungsi ini hanya untuk tampilan mobile (lebar < 768px)
                 sidebar.classList.toggle('active');
                 overlay.classList.toggle('active');
             }
@@ -531,7 +533,6 @@
                 const contentContainer = document.createElement('div');
                 contentContainer.className = 'message-content';
                 
-                // Process message content for code blocks
                 const contentParts = extractCodeBlocks(text);
                 
                 contentParts.forEach(part => {
@@ -651,23 +652,20 @@
                 }
             });
 
+            // Event listener untuk tombol hamburger di mobile
             sidebarToggle.addEventListener('click', toggleSidebar);
             closeSidebar.addEventListener('click', toggleSidebar);
             overlay.addEventListener('click', toggleSidebar);
 
-            // Hide/show sidebar for desktop
+            // Hide/show sidebar untuk desktop
             desktopSidebarToggle.addEventListener('click', function() {
                 const sidebar = document.getElementById('mainSidebar');
                 if (sidebar.classList.contains('d-md-flex')) {
                     sidebar.classList.remove('d-md-flex');
                     sidebar.classList.add('d-md-none');
-                    chatArea.classList.remove('col-md-9');
-                    chatArea.classList.add('col-md-12');
                 } else {
                     sidebar.classList.remove('d-md-none');
                     sidebar.classList.add('d-md-flex');
-                    chatArea.classList.remove('col-md-12');
-                    chatArea.classList.add('col-md-9');
                 }
             });
 
