@@ -41,6 +41,7 @@
         .app-container {
             display: flex;
             flex-grow: 1;
+            height: calc(100vh - 66px); /* Mengisi sisa ruang setelah navbar */
         }
         
         .main-content {
@@ -122,12 +123,12 @@
         .chat-area {
             display: flex;
             flex-direction: column;
-            height: 100%;
+            height: 100%; /* Penting: agar flexbox dapat mengatur ukuran anak-anaknya dengan benar */
         }
 
         .chat-container {
             flex-grow: 1;
-            overflow-y: auto;
+            overflow-y: auto; /* Penting: agar riwayat chat dapat digulir */
             padding: 1rem;
         }
 
@@ -158,8 +159,11 @@
             padding: 1rem;
             border-top: 1px solid var(--color-border);
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            position: sticky;
+            bottom: 0;
+            z-index: 5; 
         }
         .input-container {
             display: flex;
@@ -244,6 +248,7 @@
         @media (max-width: 768px) {
             .app-container {
                 flex-direction: column;
+                height: calc(100vh - 66px); /* Menyesuaikan untuk tinggi navbar di HP */
             }
             .sidebar {
                 position: fixed;
