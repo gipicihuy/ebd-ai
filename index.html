@@ -48,6 +48,7 @@
 
         /* --- Layout Umum --- */
         .app-container {
+            padding-top: 50px; /* Tambahan padding untuk notifikasi API */
             display: flex;
             flex-grow: 1;
             height: calc(100vh - 66px); 
@@ -84,6 +85,23 @@
         .btn-nav:hover {
             background-color: var(--color-primary);
             color: var(--color-text-light);
+        }
+
+        /* --- Notifikasi Status API --- */
+        .api-status-notification {
+            background-color: var(--color-bg-light);
+            color: var(--color-text-secondary);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            position: fixed;
+            top: 66px;
+            left: 0;
+            right: 0;
+            z-index: 9;
         }
 
         /* --- Sidebar --- */
@@ -153,11 +171,11 @@
             padding: 1.5rem 0;
             border-bottom: 1px solid var(--color-border);
         }
-.message-content {
-    flex-grow: 1;
-    padding-left: 1rem;
-    word-break: break-word !important; /* Tambahkan !important di sini */
-}
+        .message-content {
+            flex-grow: 1;
+            padding-left: 1rem;
+            word-break: break-word !important; /* Tambahkan !important di sini */
+        }
         .profile-image {
             width: 40px;
             height: 40px;
@@ -236,13 +254,13 @@
             margin: 1rem 0;
             position: relative;
         }
-.code-block pre {
-    margin: 0;
-    padding: 0;
-    overflow-x: auto;
-    white-space: pre-wrap; /* Mengizinkan pemecahan baris */
-    word-break: break-word; /* Memecah kata yang terlalu panjang */
-}
+        .code-block pre {
+            margin: 0;
+            padding: 0;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Mengizinkan pemecahan baris */
+            word-break: break-word; /* Memecah kata yang terlalu panjang */
+        }
         .code-toolbar {
             position: absolute;
             top: 0.5rem;
@@ -435,6 +453,11 @@
             </button>
         </div>
     </nav>
+    
+    <div class="api-status-notification">
+        <i class="fas fa-info-circle me-2"></i>
+        <span>Kalo error, kemungkinan ada masalah pada API.</span>
+    </div>
 
     <div class="app-container">
         <div class="sidebar" id="mainSidebar">
