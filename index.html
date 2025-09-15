@@ -569,13 +569,29 @@
             function convertMarkdownToHtml(markdownText) {
     let html = markdownText;
 
+    // Tambahkan baris ini untuk menangani kode inline (backtick tunggal)
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    // Perbaiki baris baru di dalam list
     html = html.replace(/\n\s*([*-] )/g, '\n$1');
+
+    // Ubah list dengan simbol * atau -
     html = html.replace(/^[*-] (.*)/gm, '<li>$1</li>');
+
+    // Bungkus semua <li> dengan <ul>
     html = html.replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>');
+    
+    // Konversi bold dan italic
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Konversi link
     html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+    
+    // Konversi baris baru menjadi <br>
     html = html.replace(/\n/g, '<br>');
+    
+    // Hapus <br> yang tidak perlu di dalam <ul>
     html = html.replace(/<ul><br>/g, '<ul>');
 
     return html;
