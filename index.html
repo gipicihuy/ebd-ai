@@ -1,602 +1,588 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eberardos AI</title>
-    <link rel="icon" href="https://eberardos.my.id/eberardos.jpg" type="image/jpeg">
-    <meta property="og:title" content="Eberardos - Community since 2021">
-    <meta property="og:description" content="Discover our community, projects, and contacts.">
-    <meta property="og:image" content="https://eberardos.my.id/eberardos.jpg">
-    <meta property="og:url" content="https://eberardos.my.id">
-    <meta property="og:type" content="website">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        /* CSS yang disesuaikan */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #1a1a1a;
-            color: #ffffff;
-            overflow-x: hidden;
-            height: 100vh;
-            display: flex;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eberardos AI</title>
+    <link rel="icon" href="https://eberardos.my.id/eberardos.jpg" type="image/jpeg">
+    <meta property="og:title" content="Eberardos - Community since 2021">
+    <meta property="og:description" content="Discover our community, projects, and contacts.">
+    <meta property="og:image" content="https://eberardos.my.id/eberardos.jpg">
+    <meta property="og:url" content="https://eberardos.my.id">
+    <meta property="og:type" content="website">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Eberardos AI - Versi Redesain Responsif */
+        :root {
+            --color-primary: #b71c1c; /* Merah */
+            --color-bg-dark: #0d0d0d;
+            --color-bg-light: #1a1a1a;
+            --color-text: #ffffff;
+            --color-text-secondary: #999999;
+            --color-border: #333333;
+            --color-bubble-user: var(--color-primary);
+            --color-bubble-bot: #3a3a3a;
+            --color-sidebar: #1f1f1f;
+            --color-sidebar-item: #2a2a2a;
+            --color-sidebar-item-hover: #3a3a3a;
+            --color-input-bg: #3a3a3a;
+        }
 
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-        }
-
-        .chat-area {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 20px;
-            scroll-behavior: smooth;
-            background-color: #2a2a2a;
-        }
-
-        .chat-message {
-            display: flex;
-            margin-bottom: 20px;
-            align-items: flex-start;
-        }
-
-        .chat-message.user .message-bubble {
-            background-color: #0d6efd;
-            border-radius: 15px 15px 0 15px;
-            margin-left: auto;
-            text-align: right;
-        }
-
-        .chat-message.bot .message-bubble {
-            background-color: #3a3a3a;
-            border-radius: 15px 15px 15px 0;
-            margin-right: auto;
-        }
-
-        .chat-message .profile-pic {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin: 0 10px;
-        }
-
-        .message-bubble {
-            max-width: 70%;
-            padding: 15px;
-            color: #ffffff;
-            word-wrap: break-word;
-        }
-
-        .input-area {
-            padding: 20px;
-            background-color: #1a1a1a;
-            border-top: 1px solid #333333;
-            display: flex;
-            align-items: flex-end;
-            position: relative;
-        }
-
-        .input-area textarea {
-            width: 100%;
-            background-color: #3a3a3a;
-            border: none;
-            color: #ffffff;
-            border-radius: 20px;
-            padding: 10px 45px 10px 15px;
-            resize: none;
-            overflow: hidden;
-            height: 44px;
-        }
-
-        .input-area button {
-            background: none;
-            border: none;
-            color: #0d6efd;
-            position: absolute;
-            right: 30px;
-            bottom: 30px;
-            font-size: 20px;
-        }
-
-        .input-area button:hover {
-            color: #fff;
-        }
-
-        .chat-prompt {
-            text-align: center;
-            padding: 20px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .chat-prompt .logo {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 10px;
-        }
-
-        .suggestion-chips {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-
-        .suggestion-chip {
-            background-color: #3a3a3a;
-            color: #ffffff;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            margin: 5px;
-            font-size: 14px;
-            transition: background-color 0.3s;
-        }
-
-        .suggestion-chip:hover {
-            background-color: #4a4a4a;
-        }
-
-        .sidebar {
-            width: 280px;
-            background-color: #2a2a2a;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar.active {
-            transform: translateX(0);
-        }
-
-        .sidebar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .sidebar-header button {
-            background: none;
-            border: none;
-            color: #ffffff;
-            font-size: 20px;
-        }
-
-        .sidebar-content {
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-
-        .new-chat-btn {
-            background-color: #0d6efd;
-            color: #ffffff;
-            padding: 10px;
-            border-radius: 25px;
-            text-align: center;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-bottom: 15px;
-        }
-
-        .new-chat-btn:hover {
-            background-color: #0b5ed7;
-        }
-
-        .conversation-list {
-            list-style: none;
-            padding: 0;
-            margin-bottom: 20px;
-        }
-
-        .conversation-list li {
-            background-color: #3a3a3a;
-            border-radius: 10px;
-            padding: 10px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .conversation-list li:hover {
-            background-color: #4a4a4a;
-        }
-
-        .delete-btn {
-            background: none;
-            border: none;
-            color: #ff4d4d;
-            font-size: 16px;
-        }
-
-        .sidebar-footer {
-            border-top: 1px solid #4a4a4a;
-            padding-top: 20px;
-            text-align: center;
-            font-size: 12px;
-            color: #999999;
-        }
-
-        .sidebar-footer a {
-            color: #0d6efd;
-            text-decoration: none;
-        }
-
-        #loading-indicator {
-            display: none;
-            text-align: center;
-            margin: 20px 0;
-            color: #999999;
-        }
-
-        #typing-indicator {
-            display: none;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .typing-dots {
-            display: inline-block;
-            animation: bounce 1s infinite;
-        }
-
-        .typing-dots span {
-            display: inline-block;
-            background-color: #999999;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin: 0 2px;
-            animation: bounce 1s infinite;
-        }
-
-        .typing-dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .typing-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-5px);
-            }
-        }
-
-        @media (max-width: 767px) {
-            .sidebar {
-                position: fixed;
-                z-index: 1000;
-                transform: translateX(-100%);
-            }
-
-            .sidebar.active {
-                transform: translateX(0);
-            }
-
-            .overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.5);
-                z-index: 999;
-                display: none;
-            }
-
-            .overlay.active {
-                display: block;
-            }
-
-            .desktop-toggle {
-                display: none;
-            }
-        }
-    </style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-bg-light);
+            color: var(--color-text);
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+            margin: 0;
+        }
+        .sidebar {
+            width: 280px;
+            background-color: var(--color-sidebar);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .sidebar-header h5 {
+            margin: 0;
+        }
+        .sidebar-content {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        .new-chat-btn {
+            background-color: var(--color-primary);
+            color: var(--color-text);
+            padding: 10px;
+            border-radius: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 15px;
+        }
+        .new-chat-btn:hover {
+            background-color: #a41b1b;
+        }
+        .conversation-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+        .conversation-list li {
+            background-color: var(--color-sidebar-item);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .conversation-list li:hover {
+            background-color: var(--color-sidebar-item-hover);
+        }
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #ff4d4d;
+            font-size: 16px;
+        }
+        .sidebar-footer {
+            border-top: 1px solid var(--color-border);
+            padding-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+        .sidebar-footer a {
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+        .chat-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scroll-behavior: smooth;
+            background-color: var(--color-bg-light);
+        }
+        .chat-message {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+        .chat-message.user .message-bubble {
+            background-color: var(--color-bubble-user);
+            border-radius: 15px 15px 0 15px;
+            margin-left: auto;
+            text-align: right;
+        }
+        .chat-message.bot .message-bubble {
+            background-color: var(--color-bubble-bot);
+            border-radius: 15px 15px 15px 0;
+            margin-right: auto;
+        }
+        .chat-message .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 10px;
+        }
+        .message-bubble {
+            max-width: 70%;
+            padding: 15px;
+            color: var(--color-text);
+            word-wrap: break-word;
+        }
+        .input-area {
+            padding: 20px;
+            background-color: var(--color-bg-dark);
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            align-items: flex-end;
+            position: relative;
+        }
+        .input-area textarea {
+            width: 100%;
+            background-color: var(--color-input-bg);
+            border: none;
+            color: var(--color-text);
+            border-radius: 20px;
+            padding: 10px 45px 10px 15px;
+            resize: none;
+            overflow: hidden;
+            height: 44px;
+        }
+        .input-area button {
+            background: none;
+            border: none;
+            color: var(--color-primary);
+            position: absolute;
+            right: 30px;
+            bottom: 30px;
+            font-size: 20px;
+        }
+        .input-area button:hover {
+            color: var(--color-text);
+        }
+        .chat-prompt {
+            text-align: center;
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .chat-prompt .logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 10px;
+        }
+        .suggestion-chips {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .suggestion-chip {
+            background-color: var(--color-input-bg);
+            color: var(--color-text);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .suggestion-chip:hover {
+            background-color: #4a4a4a;
+        }
+        #loading-indicator {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--color-text-secondary);
+        }
+        #typing-indicator {
+            display: none;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .typing-dots {
+            display: inline-block;
+            animation: bounce 1s infinite;
+        }
+        .typing-dots span {
+            display: inline-block;
+            background-color: var(--color-text-secondary);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1s infinite;
+        }
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+        @media (max-width: 767px) {
+            .sidebar {
+                position: fixed;
+                z-index: 1000;
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+                display: none;
+            }
+            .overlay.active {
+                display: block;
+            }
+            .desktop-toggle {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="overlay"></div>
-    <div class="sidebar d-none d-md-flex">
-        <div class="sidebar-header">
-            <h5 class="m-0">Riwayat</h5>
-            <button class="btn btn-sm btn-outline-light d-md-none" id="closeSidebar"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="sidebar-content">
-            <ul class="conversation-list" id="conversationList">
-                </ul>
-        </div>
-        <div class="sidebar-footer">
-            <a href="https://github.com/Eberardos" target="_blank">Eberardos - <span id="currentYear"></span></a>
-        </div>
-    </div>
+    <div class="overlay"></div>
+    <div class="sidebar d-none d-md-flex">
+        <div class="sidebar-header">
+            <h5 class="m-0">Riwayat</h5>
+            <button class="btn btn-sm btn-outline-light d-md-none" id="closeSidebar"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sidebar-content">
+            <div class="new-chat-btn" id="newChatBtn">
+                <i class="fas fa-plus"></i> Obrolan Baru
+            </div>
+            <ul class="conversation-list" id="conversationList">
+            </ul>
+            <div class="new-chat-btn mt-3" id="deleteHistoryBtn">
+                <i class="fas fa-trash-alt"></i> Hapus Riwayat
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <a href="https://github.com/Eberardos" target="_blank">Eberardos - <span id="currentYear"></span></a>
+        </div>
+    </div>
 
-    <div class="chat-container">
-        <div class="chat-area" id="chatArea">
-            <div class="chat-prompt" id="chatPrompt">
-                <img src="https://eberardos.my.id/eberardos.jpg" alt="Logo" class="logo rounded-circle">
-                <h2>Selamat Datang di Eberardos AI</h2>
-                <p>Bagaimana saya bisa membantu Anda hari ini?</p>
-                <div class="suggestion-chips">
-                    <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
-                    <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
-                    <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
-                </div>
-            </div>
-        </div>
-        <div id="typing-indicator" class="chat-message bot">
-            <img src="https://eberardos.my.id/eberardos.jpg" alt="Bot" class="profile-pic">
-            <div class="message-bubble">
-                <div class="typing-dots">
-                    <span></span><span></span><span></span>
-                </div>
-            </div>
-        </div>
-        <div class="input-area">
-            <textarea id="promptInput" rows="1" placeholder="Ketik pesan Anda..."></textarea>
-            <button id="sendBtn" class="btn"><i class="fas fa-paper-plane"></i></button>
-        </div>
-    </div>
+    <div class="chat-container">
+        <div class="chat-area" id="chatArea">
+            <div class="chat-prompt" id="chatPrompt">
+                <img src="https://eberardos.my.id/eberardos.jpg" alt="Logo" class="logo rounded-circle">
+                <h2>Selamat Datang di Eberardos AI</h2>
+                <p>Bagaimana saya bisa membantu Anda hari ini?</p>
+                <div class="suggestion-chips">
+                    <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                    <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                    <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                </div>
+            </div>
+        </div>
+        <div id="typing-indicator" class="chat-message bot">
+            <img src="https://eberardos.my.id/eberardos.jpg" alt="Bot" class="profile-pic">
+            <div class="message-bubble">
+                <div class="typing-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        </div>
+        <div class="input-area">
+            <textarea id="promptInput" rows="1" placeholder="Ketik pesan Anda..."></textarea>
+            <button id="sendBtn" class="btn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const promptInput = document.getElementById('promptInput');
-            const sendBtn = document.getElementById('sendBtn');
-            const chatArea = document.getElementById('chatArea');
-            const chatPrompt = document.getElementById('chatPrompt');
-            const typingIndicator = document.getElementById('typing-indicator');
-            const sidebar = document.querySelector('.sidebar');
-            const overlay = document.querySelector('.overlay');
-            const suggestionChips = document.querySelector('.suggestion-chips');
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const promptInput = document.getElementById('promptInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const chatArea = document.getElementById('chatArea');
+            const chatPrompt = document.getElementById('chatPrompt');
+            const typingIndicator = document.getElementById('typing-indicator');
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.overlay');
+            const suggestionChips = document.querySelector('.suggestion-chips');
 
-            let conversations = JSON.parse(localStorage.getItem('conversations')) || [];
-            let currentConversationId = null;
+            let conversations = JSON.parse(localStorage.getItem('conversations')) || [];
+            let currentConversationId = null;
 
-            function showToast(message) {
-                // Implementasi toast message (opsional)
-                console.log(message);
-            }
+            function showToast(message) {
+                // Implementasi toast message (opsional)
+                console.log(message);
+            }
 
-            function addMessage(sender, message) {
-                const chatMessage = document.createElement('div');
-                chatMessage.classList.add('chat-message', sender);
-                let profilePicSrc = '';
-                if (sender === 'user') {
-                    profilePicSrc = 'https://eberardos.my.id/eberardos.jpg';
-                } else {
-                    profilePicSrc = 'https://eberardos.my.id/eberardos.jpg';
-                }
-                chatMessage.innerHTML = `
-                    <img src="${profilePicSrc}" alt="${sender}" class="profile-pic">
-                    <div class="message-bubble">${message}</div>
-                `;
-                chatArea.appendChild(chatMessage);
-                chatArea.scrollTop = chatArea.scrollHeight;
-            }
+            function addMessage(sender, message) {
+                const chatMessage = document.createElement('div');
+                chatMessage.classList.add('chat-message', sender);
+                let profilePicSrc = '';
+                if (sender === 'user') {
+                    profilePicSrc = 'https://eberardos.my.id/eberardos.jpg';
+                } else {
+                    profilePicSrc = 'https://eberardos.my.id/eberardos.jpg';
+                }
+                chatMessage.innerHTML = `
+                    <img src="${profilePicSrc}" alt="${sender}" class="profile-pic">
+                    <div class="message-bubble">${message}</div>
+                `;
+                chatArea.appendChild(chatMessage);
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }
 
-            async function sendMessage() {
-                const prompt = promptInput.value.trim();
-                if (prompt === '') return;
+            async function sendMessage() {
+                const prompt = promptInput.value.trim();
+                if (prompt === '') return;
 
-                // Tampilkan prompt sebagai pesan pengguna
-                addMessage('user', prompt);
-                promptInput.value = '';
-                chatPrompt.style.display = 'none';
-                typingIndicator.style.display = 'flex';
-                chatArea.scrollTop = chatArea.scrollHeight;
+                // Tampilkan prompt sebagai pesan pengguna
+                addMessage('user', prompt);
+                promptInput.value = '';
+                chatPrompt.style.display = 'none';
+                typingIndicator.style.display = 'flex';
+                chatArea.scrollTop = chatArea.scrollHeight;
 
-                try {
-                    const response = await fetch('/api/chat', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ prompt: prompt }),
-                    });
+                try {
+                    const response = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ prompt: prompt }),
+                    });
 
-                    const data = await response.json();
-                    typingIndicator.style.display = 'none';
+                    const data = await response.json();
+                    typingIndicator.style.display = 'none';
 
-                    if (response.ok) {
-                        const botResponse = data.candidates[0].content.parts[0].text;
-                        addMessage('bot', botResponse);
-                        // Simpan percakapan ke localStorage
-                        saveConversation(prompt, botResponse);
-                    } else {
-                        addMessage('bot', `Maaf, terjadi kesalahan dalam memproses permintaan. Detail: ${JSON.stringify(data)}`);
-                    }
-                } catch (error) {
-                    typingIndicator.style.display = 'none';
-                    addMessage('bot', `Maaf, terjadi kesalahan dalam memproses permintaan. ${error.message}`);
-                    console.error('Error:', error);
-                }
-            }
+                    if (response.ok) {
+                        const botResponse = data.candidates[0].content.parts[0].text;
+                        addMessage('bot', botResponse);
+                        // Simpan percakapan ke localStorage
+                        saveConversation(prompt, botResponse);
+                    } else {
+                        addMessage('bot', `Maaf, terjadi kesalahan dalam memproses permintaan. Detail: ${JSON.stringify(data)}`);
+                    }
+                } catch (error) {
+                    typingIndicator.style.display = 'none';
+                    addMessage('bot', `Maaf, terjadi kesalahan dalam memproses permintaan. ${error.message}`);
+                    console.error('Error:', error);
+                }
+            }
 
-            function saveConversation(userMessage, botMessage) {
-                if (!currentConversationId) {
-                    const newConversation = {
-                        id: Date.now(),
-                        title: userMessage.substring(0, 30),
-                        history: [{ role: 'user', content: userMessage }, { role: 'bot', content: botMessage }]
-                    };
-                    conversations.unshift(newConversation);
-                    currentConversationId = newConversation.id;
-                } else {
-                    const currentConversation = conversations.find(conv => conv.id === currentConversationId);
-                    if (currentConversation) {
-                        currentConversation.history.push({ role: 'user', content: userMessage });
-                        currentConversation.history.push({ role: 'bot', content: botMessage });
-                    }
-                }
-                localStorage.setItem('conversations', JSON.stringify(conversations));
-                updateChatHistory();
-            }
+            function saveConversation(userMessage, botMessage) {
+                if (!currentConversationId) {
+                    const newConversation = {
+                        id: Date.now(),
+                        title: userMessage.substring(0, 30),
+                        history: [{ role: 'user', content: userMessage }, { role: 'bot', content: botMessage }]
+                    };
+                    conversations.unshift(newConversation);
+                    currentConversationId = newConversation.id;
+                } else {
+                    const currentConversation = conversations.find(conv => conv.id === currentConversationId);
+                    if (currentConversation) {
+                        currentConversation.history.push({ role: 'user', content: userMessage });
+                        currentConversation.history.push({ role: 'bot', content: botMessage });
+                    }
+                }
+                localStorage.setItem('conversations', JSON.stringify(conversations));
+                updateChatHistory();
+            }
 
-            function updateChatHistory() {
-                const conversationList = document.getElementById('conversationList');
-                conversationList.innerHTML = '';
-                conversations.forEach(conv => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <span>${conv.title}...</span>
-                        <button class="delete-btn" data-id="${conv.id}"><i class="fas fa-trash"></i></button>
-                    `;
-                    li.addEventListener('click', () => loadConversation(conv.id));
-                    conversationList.appendChild(li);
-                });
+            function updateChatHistory() {
+                const conversationList = document.getElementById('conversationList');
+                conversationList.innerHTML = '';
+                conversations.forEach(conv => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span>${conv.title}...</span>
+                        <button class="delete-btn" data-id="${conv.id}"><i class="fas fa-trash"></i></button>
+                    `;
+                    li.addEventListener('click', () => loadConversation(conv.id));
+                    conversationList.appendChild(li);
+                });
 
-                document.querySelectorAll('.delete-btn').forEach(button => {
-                    button.addEventListener('click', (event) => {
-                        event.stopPropagation();
-                        deleteConversation(parseInt(button.dataset.id));
-                    });
-                });
-            }
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        deleteConversation(parseInt(button.dataset.id));
+                    });
+                });
+            }
 
-            function loadConversation(id) {
-                const conversation = conversations.find(conv => conv.id === id);
-                if (conversation) {
-                    chatArea.innerHTML = '';
-                    chatPrompt.style.display = 'none';
-                    conversation.history.forEach(item => {
-                        if (item.role === 'user') {
-                            addMessage('user', item.content);
-                        } else {
-                            addMessage('bot', item.content);
-                        }
-                    });
-                    currentConversationId = id;
-                    chatArea.scrollTop = chatArea.scrollHeight;
-                }
-            }
+            function loadConversation(id) {
+                const conversation = conversations.find(conv => conv.id === id);
+                if (conversation) {
+                    chatArea.innerHTML = '';
+                    chatPrompt.style.display = 'none';
+                    conversation.history.forEach(item => {
+                        if (item.role === 'user') {
+                            addMessage('user', item.content);
+                        } else {
+                            addMessage('bot', item.content);
+                        }
+                    });
+                    currentConversationId = id;
+                    chatArea.scrollTop = chatArea.scrollHeight;
+                }
+            }
 
-            function deleteConversation(id) {
-                conversations = conversations.filter(conv => conv.id !== id);
-                localStorage.setItem('conversations', JSON.stringify(conversations));
-                updateChatHistory();
-                if (currentConversationId === id) {
-                    currentConversationId = null;
-                    chatArea.innerHTML = `
-                        <div class="chat-prompt" id="chatPrompt">
-                            <img src="https://eberardos.my.id/eberardos.jpg" alt="Logo" class="logo rounded-circle">
-                            <h2>Selamat Datang di Eberardos AI</h2>
-                            <p>Bagaimana saya bisa membantu Anda hari ini?</p>
-                            <div class="suggestion-chips">
-                                <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
-                                <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
-                                <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
-                            </div>
-                        </div>
-                    `;
-                    addSuggestionChipsListeners();
-                }
-                showToast('Percakapan dihapus');
-            }
+            function deleteConversation(id) {
+                conversations = conversations.filter(conv => conv.id !== id);
+                localStorage.setItem('conversations', JSON.stringify(conversations));
+                updateChatHistory();
+                if (currentConversationId === id) {
+                    currentConversationId = null;
+                    chatArea.innerHTML = `
+                        <div class="chat-prompt" id="chatPrompt">
+                            <img src="https://eberardos.my.id/eberardos.jpg" alt="Logo" class="logo rounded-circle">
+                            <h2>Selamat Datang di Eberardos AI</h2>
+                            <p>Bagaimana saya bisa membantu Anda hari ini?</p>
+                            <div class="suggestion-chips">
+                                <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                                <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                                <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                            </div>
+                        </div>
+                    `;
+                    addSuggestionChipsListeners();
+                }
+                showToast('Percakapan dihapus');
+            }
 
-            function addSuggestionChipsListeners() {
-                document.querySelectorAll('.suggestion-chip').forEach(chip => {
-                    chip.addEventListener('click', () => {
-                        promptInput.value = chip.dataset.prompt;
-                        sendMessage();
-                    });
-                });
-            }
+            function addSuggestionChipsListeners() {
+                document.querySelectorAll('.suggestion-chip').forEach(chip => {
+                    chip.addEventListener('click', () => {
+                        promptInput.value = chip.dataset.prompt;
+                        sendMessage();
+                    });
+                });
+            }
 
-            function toggleSidebar() {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
-            }
+            function toggleSidebar() {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            }
 
-            sendBtn.addEventListener('click', sendMessage);
-            promptInput.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter' && !event.shiftKey) {
-                    event.preventDefault();
-                    sendMessage();
-                }
-            });
+            sendBtn.addEventListener('click', sendMessage);
+            promptInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    sendMessage();
+                }
+            });
 
-            document.getElementById('newChatBtn').addEventListener('click', () => {
-                chatArea.innerHTML = `
-                    <div class="chat-prompt" id="chatPrompt">
-                        <img src="https://eberardos.my.id/eberardos.jpg" alt="Logo" class="logo rounded-circle">
-                        <h2>Selamat Datang di Eberardos AI</h2>
-                        <p>Bagaimana saya bisa membantu Anda hari ini?</p>
-                        <div class="suggestion-chips">
-                            <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
-                            <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
-                            <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
-                        </div>
-                    </div>
-                `;
-                addSuggestionChipsListeners();
-                currentConversationId = null;
-                showToast('Percakapan baru dibuat');
-            });
-            
-            document.getElementById('deleteHistoryBtn').addEventListener('click', () => {
-                const confirmDelete = confirm('Apakah Anda yakin ingin menghapus semua riwayat percakapan?');
-                if (confirmDelete) {
-                    localStorage.removeItem('conversations');
-                    conversations = [];
-                    updateChatHistory();
-                    chatArea.innerHTML = `
-                        <div class="chat-prompt" id="chatPrompt">
-                            <img src="https://eberardos.my.id/eberardos.jpg" alt="Logo" class="logo rounded-circle">
-                            <h2>Selamat Datang di Eberardos AI</h2>
-                            <p>Bagaimana saya bisa membantu Anda hari ini?</p>
-                            <div class="suggestion-chips">
-                                <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
-                                <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
-                                <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
-                            </div>
-                        </div>
-                    `;
-                    addSuggestionChipsListeners();
-                    currentConversationId = null;
-                    showToast('Semua riwayat dihapus');
-                }
-            });
+            document.getElementById('newChatBtn').addEventListener('click', () => {
+                chatArea.innerHTML = `
+                    <div class="chat-prompt" id="chatPrompt">
+                        <img src="https://eberardos.my.id/eberardos.jpg" alt="Logo" class="logo rounded-circle">
+                        <h2>Selamat Datang di Eberardos AI</h2>
+                        <p>Bagaimana saya bisa membantu Anda hari ini?</p>
+                        <div class="suggestion-chips">
+                            <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                            <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                            <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                        </div>
+                    </div>
+                `;
+                addSuggestionChipsListeners();
+                currentConversationId = null;
+                showToast('Percakapan baru dibuat');
+            });
+            
+            document.getElementById('deleteHistoryBtn').addEventListener('click', () => {
+                const confirmDelete = confirm('Apakah Anda yakin ingin menghapus semua riwayat percakapan?');
+                if (confirmDelete) {
+                    localStorage.removeItem('conversations');
+                    conversations = [];
+                    updateChatHistory();
+                    chatArea.innerHTML = `
+                        <div class="chat-prompt" id="chatPrompt">
+                            <img src="https://eberardos.my.id/eberardos.jpg" alt="Logo" class="logo rounded-circle">
+                            <h2>Selamat Datang di Eberardos AI</h2>
+                            <p>Bagaimana saya bisa membantu Anda hari ini?</p>
+                            <div class="suggestion-chips">
+                                <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                                <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                                <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                            </div>
+                        </div>
+                    `;
+                    addSuggestionChipsListeners();
+                    currentConversationId = null;
+                    showToast('Semua riwayat dihapus');
+                }
+            });
 
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            const desktopSidebarToggle = document.getElementById('desktopSidebarToggle');
-            const closeSidebar = document.getElementById('closeSidebar');
-            
-            if (sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
-            if (desktopSidebarToggle) desktopSidebarToggle.addEventListener('click', toggleSidebar);
-            if (closeSidebar) closeSidebar.addEventListener('click', toggleSidebar);
-            overlay.addEventListener('click', toggleSidebar);
+            // Perbaikan: Tambahkan tombol toggle di dalam chat-container untuk layar mobile
+            const chatContainer = document.querySelector('.chat-container');
+            const toggleButton = document.createElement('button');
+            toggleButton.id = 'sidebarToggle';
+            toggleButton.classList.add('btn', 'btn-sm', 'btn-outline-light', 'd-md-none', 'm-3', 'position-absolute', 'top-0', 'start-0');
+            toggleButton.innerHTML = '<i class="fas fa-bars"></i>';
+            chatContainer.prepend(toggleButton);
 
-            window.addEventListener('resize', function() {
-                if (window.innerWidth >= 768) {
-                    sidebar.classList.remove('active');
-                    overlay.classList.remove('active');
-                }
-            });
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const closeSidebar = document.getElementById('closeSidebar');
+            const desktopSidebarToggle = document.getElementById('desktopSidebarToggle');
+            
+            if (sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
+            if (desktopSidebarToggle) desktopSidebarToggle.addEventListener('click', toggleSidebar);
+            if (closeSidebar) closeSidebar.addEventListener('click', toggleSidebar);
+            overlay.addEventListener('click', toggleSidebar);
 
-            // Initialize
-            document.getElementById('currentYear').textContent = new Date().getFullYear();
-            updateChatHistory();
-            addSuggestionChipsListeners();
-        });
-    </script>
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                }
+            });
+
+            // Initialize
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            updateChatHistory();
+            addSuggestionChipsListeners();
+        });
+    </script>
 </body>
 </html>
