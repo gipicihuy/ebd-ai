@@ -33,6 +33,7 @@
             --color-border: #333;
             --color-success: #28a745;
             --color-warning: #ffc107;
+            --color-error: #dc3545;
         }
 
         body {
@@ -152,10 +153,11 @@
             padding: 1.5rem 0;
             border-bottom: 1px solid var(--color-border);
         }
-        .message-content {
-            flex-grow: 1;
-            padding-left: 1rem;
-        }
+.message-content {
+    flex-grow: 1;
+    padding-left: 1rem;
+    word-break: break-word !important; /* Tambahkan !important di sini */
+}
         .profile-image {
             width: 40px;
             height: 40px;
@@ -234,13 +236,13 @@
             margin: 1rem 0;
             position: relative;
         }
-        .code-block pre {
-            margin: 0;
-            padding: 0;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
+.code-block pre {
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+    white-space: pre-wrap; /* Mengizinkan pemecahan baris */
+    word-break: break-word; /* Memecah kata yang terlalu panjang */
+}
         .code-toolbar {
             position: absolute;
             top: 0.5rem;
@@ -319,24 +321,68 @@
             border-color: var(--color-primary);
         }
 
+        /* KODE TOAST BARU */
         .toast {
             position: fixed;
-            bottom: 20px;
+            top: 20px;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) translateY(-100px); /* Mulai dari atas, tersembunyi */
             background-color: var(--color-success);
             color: white;
-            padding: 10px 20px;
+            padding: 12px 20px;
             border-radius: 8px;
             z-index: 1000;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            flex-direction: column;
+            text-align: center;
         }
-
+        
         .toast.show {
             opacity: 1;
+            transform: translateX(-50%) translateY(0); /* Meluncur ke posisi akhir */
+        }
+        
+        .toast-icon {
+            margin-right: 10px;
         }
 
+        .toast-content {
+            display: flex;
+            align-items: center;
+            padding-bottom: 4px; /* Ruang untuk timer bar */
+        }
+
+        /* --- KODE TIMER BAR BARU --- */
+        .toast-timer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.4); /* Putih dengan transparansi 40% */
+            width: 100%;
+            animation: toastTimer 3s linear forwards;
+        }
+
+        .toast.error {
+            background-color: var(--color-error);
+        }
+        
+        .toast.error .toast-timer {
+            background-color: rgba(255, 255, 255, 0.4); /* Warna yang sama untuk kontras yang bagus */
+        }
+
+        @keyframes toastTimer {
+            from {
+                width: 100%;
+            }
+            to {
+                width: 0%;
+            }
+        }
         /* --- Responsiveness --- */
         @media (max-width: 768px) {
             .app-container {
@@ -439,7 +485,9 @@
         </div>
     </div>
 
-    <div class="toast" id="toast"></div>
+    <div class="toast" id="toast" role="alert" aria-live="polite">
+        <div class="toast-timer"></div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -459,9 +507,36 @@
             let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || [];
             let currentConversationId = null;
 
+            // FUNGSI showToast yang sudah diperbarui dengan timer bar
             function showToast(message, isError = false) {
-                toast.textContent = message;
-                toast.style.backgroundColor = isError ? '#dc3545' : '#28a745';
+                // Ambil elemen toast
+                const toast = document.getElementById('toast');
+                
+                // Tambahkan ikon dan pesan
+                const icon = isError 
+                    ? '<i class="fas fa-exclamation-circle toast-icon"></i>'
+                    : '<i class="fas fa-check-circle toast-icon"></i>';
+                
+                // Buat elemen konten toast
+                const toastContent = document.createElement('div');
+                toastContent.className = 'toast-content';
+                toastContent.innerHTML = icon + message;
+                
+                // Buat elemen timer bar
+                const timerBar = document.createElement('div');
+                timerBar.className = 'toast-timer';
+
+                // Bersihkan konten toast sebelumnya
+                toast.innerHTML = '';
+                toast.appendChild(toastContent);
+                toast.appendChild(timerBar);
+
+                toast.classList.remove('show', 'error');
+                
+                if (isError) {
+                    toast.classList.add('error');
+                }
+                
                 toast.classList.add('show');
                 
                 setTimeout(() => {
@@ -696,7 +771,9 @@
                         contentContainer.appendChild(createCodeBlock(part.content, part.language));
                     } else {
                         const textNode = document.createElement('div');
-                        textNode.innerHTML = convertMarkdownToHtml(part.content);
+                        const sanitizedText = sanitizeHtml(part.content);
+                        const htmlContent = convertMarkdownToHtml(sanitizedText);
+                        textNode.innerHTML = htmlContent;
                         contentContainer.appendChild(textNode);
                     }
                 });
@@ -706,9 +783,9 @@
                     const chipsContainer = document.createElement('div');
                     chipsContainer.className = 'suggestion-chips';
                     chipsContainer.innerHTML = `
-                        <div class="suggestion-chip" data-prompt="Terima kasih">総 Terima kasih</div>
-                        <div class="suggestion-chip" data-prompt="Jelaskan lebih detail">剥 Jelaskan lebih detail</div>
-                        <div class="suggestion-chip" data-prompt="Beri contoh lainnya">庁 Contoh lainnya</div>
+                        <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                        <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                        <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
                     `;
                     contentContainer.appendChild(chipsContainer);
                     
@@ -815,6 +892,7 @@
                     }
                     appendMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai');
                     saveMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai');
+                    showToast('Maaf, terjadi kesalahan.', true); // Tambahkan notifikasi error
                 } finally {
                     // Re-enable input and reset button state
                     userInput.disabled = false;
