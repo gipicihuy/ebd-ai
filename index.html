@@ -865,66 +865,79 @@
             }
 
             async function sendMessage() {
-                const message = userInput.value.trim();
-                if (!message) return;
+    const message = userInput.value.trim();
+    if (!message) return;
 
-                if (!currentConversationId) {
-                    createNewConversation();
-                }
+    // Pastikan ada percakapan aktif
+    if (!currentConversationId) {
+        createNewConversation();
+    }
+    
+    // Ambil percakapan saat ini dari array
+    const conversation = conversations.find(conv => conv.id === currentConversationId);
+    if (!conversation) return;
 
-                appendMessage(message, 'user');
-                saveMessage(message, 'user');
-                userInput.value = '';
-                adjustTextareaHeight();
-                userInput.focus();
+    appendMessage(message, 'user');
+    saveMessage(message, 'user');
+    userInput.value = '';
+    adjustTextareaHeight();
+    userInput.focus();
 
-                userInput.disabled = true;
-                sendButton.disabled = true;
-                sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    userInput.disabled = true;
+    sendButton.disabled = true;
+    sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-                const prompt = "ingat, namamu adalah Eberardos AI, Eberardos AI tidak formal. " + message;
+    const thinkingIndicator = simulateThinking();
 
-                // --- KODE LAMA ANDA, JANGAN DIGUNAKAN LAGI ---
-                // const apiUrl = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=gemini`;
+    // Ubah cara membuat payload
+    const payload = {
+        messages: [
+            // Tambahkan instruksi awal
+            { role: "system", content: "ingat, namamu adalah Eberardos AI, Eberardos AI tidak formal. " },
+            // Tambahkan riwayat percakapan yang ada
+            ...conversation.messages.map(msg => ({ 
+                role: msg.sender === 'user' ? 'user' : 'model',
+                content: msg.text 
+            }))
+        ],
+        // Tambahkan pesan terbaru dari pengguna
+        newMessage: message
+    };
 
-                // --- KODE BARU UNTUK VERCEL API ROUTE ---
-                const apiUrl = '/api/chat';
-                
-                try {
-                    const thinkingIndicator = simulateThinking();
+    const apiUrl = '/api/chat';
+    
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        
+        const data = await response.json();
+        
+        chatContainer.removeChild(thinkingIndicator);
+        
+        const aiResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan dalam memproses permintaan.";
+        
+        appendMessage(aiResponseText, 'ai');
+        saveMessage(aiResponseText, 'ai');
 
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ prompt: prompt }) // Kirim prompt sebagai JSON
-                    });
-                    
-                    const data = await response.json();
-                    
-                    chatContainer.removeChild(thinkingIndicator);
-                    
-                    // Ekstrak teks dari respons Gemini
-                    const aiResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan dalam memproses permintaan.";
-                    
-                    appendMessage(aiResponseText, 'ai');
-                    saveMessage(aiResponseText, 'ai');
-                } catch (error) {
-                    console.error('Error:', error);
-                    const thinkingIndicator = document.querySelector('.typing-indicator');
-                    if (thinkingIndicator && thinkingIndicator.closest('.message')) {
-                        chatContainer.removeChild(thinkingIndicator.closest('.message'));
-                    }
-                    appendMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai');
-                    saveMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai');
-                    showToast('Maaf, terjadi kesalahan.', true);
-                } finally {
-                    userInput.disabled = false;
-                    sendButton.disabled = false;
-                    sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
-                }
-            }
+    } catch (error) {
+        console.error('Error:', error);
+        if (thinkingIndicator && thinkingIndicator.closest('.message')) {
+            chatContainer.removeChild(thinkingIndicator.closest('.message'));
+        }
+        appendMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai');
+        saveMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai');
+        showToast('Maaf, terjadi kesalahan.', true);
+    } finally {
+        userInput.disabled = false;
+        sendButton.disabled = false;
+        sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+    }
+}
 
             // Event listeners
             sendButton.addEventListener('click', sendMessage);
