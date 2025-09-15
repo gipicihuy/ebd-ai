@@ -9,7 +9,9 @@ export default async function handler(req, res) {
     
     // Pastikan kunci API disimpan di Vercel sebagai Environment Variable
     const apiKey = process.env.GOOGLE_API_KEY;
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+    
+    // PERBAIKAN: Ganti 'gemini-pro' dengan 'gemini-1.0-pro'
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${apiKey}`;
     
     try {
         const { prompt } = req.body;
