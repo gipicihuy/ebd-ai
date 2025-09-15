@@ -884,9 +884,12 @@
 
                 const prompt = "ingat, namamu adalah Eberardos AI, Eberardos AI tidak formal. " + message;
 
+                // --- KODE LAMA ANDA, JANGAN DIGUNAKAN LAGI ---
+                // const apiUrl = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=gemini`;
+
                 // --- KODE BARU UNTUK VERCEL API ROUTE ---
                 const apiUrl = '/api/chat';
-
+                
                 try {
                     const thinkingIndicator = simulateThinking();
 
@@ -895,18 +898,18 @@
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ prompt: prompt })
+                        body: JSON.stringify({ prompt: prompt }) // Kirim prompt sebagai JSON
                     });
                     
                     const data = await response.json();
                     
                     chatContainer.removeChild(thinkingIndicator);
-
+                    
+                    // Ekstrak teks dari respons Gemini
                     const aiResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan dalam memproses permintaan.";
                     
                     appendMessage(aiResponseText, 'ai');
                     saveMessage(aiResponseText, 'ai');
-                    
                 } catch (error) {
                     console.error('Error:', error);
                     const thinkingIndicator = document.querySelector('.typing-indicator');
