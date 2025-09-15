@@ -530,26 +530,19 @@
             let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || [];
             let currentConversationId = null;
 
-            // FUNGSI showToast yang sudah diperbarui dengan timer bar
             function showToast(message, isError = false) {
-                // Ambil elemen toast
                 const toast = document.getElementById('toast');
-                
-                // Tambahkan ikon dan pesan
                 const icon = isError 
                     ? '<i class="fas fa-exclamation-circle toast-icon"></i>'
                     : '<i class="fas fa-check-circle toast-icon"></i>';
                 
-                // Buat elemen konten toast
                 const toastContent = document.createElement('div');
                 toastContent.className = 'toast-content';
                 toastContent.innerHTML = icon + message;
                 
-                // Buat elemen timer bar
                 const timerBar = document.createElement('div');
                 timerBar.className = 'toast-timer';
 
-                // Bersihkan konten toast sebelumnya
                 toast.innerHTML = '';
                 toast.appendChild(toastContent);
                 toast.appendChild(timerBar);
@@ -575,12 +568,9 @@
 
             function convertMarkdownToHtml(markdownText) {
                 let html = markdownText;
-                // Simple bold and italic
                 html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-                // Simple link
                 html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
-                // Newlines to <br> for proper spacing
                 html = html.replace(/\n/g, '<br>');
                 return html;
             }
@@ -801,7 +791,6 @@
                     }
                 });
                 
-                // Add suggestion chips for AI messages
                 if (sender === 'ai' && !currentConversationId) {
                     const chipsContainer = document.createElement('div');
                     chipsContainer.className = 'suggestion-chips';
@@ -809,10 +798,10 @@
                         <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
                         <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
                         <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                    </div>
                     `;
                     contentContainer.appendChild(chipsContainer);
                     
-                    // Add event listeners to the new chips
                     setTimeout(() => {
                         addSuggestionChipsListeners();
                     }, 100);
@@ -889,24 +878,35 @@
                 adjustTextareaHeight();
                 userInput.focus();
 
-                // Disable input and show loading state
                 userInput.disabled = true;
                 sendButton.disabled = true;
                 sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
                 const prompt = "ingat, namamu adalah Eberardos AI, Eberardos AI tidak formal. " + message;
-                const apiUrl = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=gemini`;
+
+                // --- KODE BARU UNTUK VERCEL API ROUTE ---
+                const apiUrl = '/api/chat';
 
                 try {
                     const thinkingIndicator = simulateThinking();
 
-                    const response = await fetch(apiUrl);
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    const data = await response.text();
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ prompt: prompt })
+                    });
+                    
+                    const data = await response.json();
                     
                     chatContainer.removeChild(thinkingIndicator);
-                    appendMessage(data, 'ai');
-                    saveMessage(data, 'ai');
+
+                    const aiResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan dalam memproses permintaan.";
+                    
+                    appendMessage(aiResponseText, 'ai');
+                    saveMessage(aiResponseText, 'ai');
+                    
                 } catch (error) {
                     console.error('Error:', error);
                     const thinkingIndicator = document.querySelector('.typing-indicator');
@@ -915,9 +915,8 @@
                     }
                     appendMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai');
                     saveMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai');
-                    showToast('Maaf, terjadi kesalahan.', true); // Tambahkan notifikasi error
+                    showToast('Maaf, terjadi kesalahan.', true);
                 } finally {
-                    // Re-enable input and reset button state
                     userInput.disabled = false;
                     sendButton.disabled = false;
                     sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
