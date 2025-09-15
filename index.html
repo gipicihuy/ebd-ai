@@ -374,7 +374,7 @@
             padding-bottom: 4px; /* Ruang untuk timer bar */
         }
 
-        /* --- KODE TIMER BARU --- */
+        /* --- KODE TIMER BAR BARU --- */
         .toast-timer {
             position: absolute;
             bottom: 0;
@@ -887,14 +887,10 @@
 
                 const thinkingIndicator = simulateThinking();
 
-                // Gabungkan riwayat menjadi satu string
-                const conversationHistory = conversation.messages.map(msg => {
-                    const sender = msg.sender === 'user' ? 'User' : 'Eberardos AI';
-                    return `${sender}: ${msg.text}`;
-                }).join('\n');
-
-                // Buat prompt gabungan, tambahkan instruksi awal dan riwayat
-                const combinedPrompt = `ingat, namamu adalah Eberardos AI, Eberardos AI tidak formal. \n\n${conversationHistory}\nUser: ${message}`;
+                // --- PERBAIKAN DI SINI ---
+                // Hapus format `User: ` atau `Eberardos AI: ` dari prompt
+                const conversationHistory = conversation.messages.map(msg => msg.text).join('\n');
+                const combinedPrompt = `ingat, namamu adalah Eberardos AI, Eberardos AI tidak formal. \n\n${conversationHistory}\n\nUser: ${message}`;
                 
                 const apiUrl = '/api/chat';
                 
@@ -911,8 +907,9 @@
                     
                     chatContainer.removeChild(thinkingIndicator);
                     
-                    let aiResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan dalam memproses permintaan.";
-
+                    const aiResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan dalam memproses permintaan.";
+                    
+                    // Tidak perlu menghapus label "Eberardos AI:" lagi karena sudah tidak dikirim
                     appendMessage(aiResponseText, 'ai');
                     saveMessage(aiResponseText, 'ai');
 
