@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js"
   },
+  "type": "module",
   "dependencies": {
     "node-fetch": "^3.3.2"
   }
