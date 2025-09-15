@@ -7,11 +7,10 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
     
-    // Pastikan kunci API disimpan di Vercel sebagai Environment Variable
     const apiKey = process.env.GOOGLE_API_KEY;
     
-    // PERBAIKAN: Ganti kembali model ke gemini-pro
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+    // PERBAIKAN: Gunakan model 'gemini-2.0-flash'
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
     
     try {
         const { prompt } = req.body;
