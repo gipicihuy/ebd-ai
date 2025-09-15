@@ -567,13 +567,19 @@
             }
 
             function convertMarkdownToHtml(markdownText) {
-                let html = markdownText;
-                html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-                html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
-                html = html.replace(/\n/g, '<br>');
-                return html;
-            }
+    let html = markdownText;
+
+    html = html.replace(/\n\s*([*-] )/g, '\n$1');
+    html = html.replace(/^[*-] (.*)/gm, '<li>$1</li>');
+    html = html.replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>');
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+    html = html.replace(/\n/g, '<br>');
+    html = html.replace(/<ul><br>/g, '<ul>');
+
+    return html;
+}
 
             function extractCodeBlocks(text) {
                 const codeBlockRegex = /```([\s\S]*?)```/g;
