@@ -887,7 +887,7 @@
 
                 const thinkingIndicator = simulateThinking();
 
-                // -- Perbaikan di sini: gabungkan riwayat menjadi satu string --
+                // Gabungkan riwayat menjadi satu string
                 const conversationHistory = conversation.messages.map(msg => {
                     const sender = msg.sender === 'user' ? 'User' : 'Eberardos AI';
                     return `${sender}: ${msg.text}`;
@@ -911,8 +911,8 @@
                     
                     chatContainer.removeChild(thinkingIndicator);
                     
-                    const aiResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan dalam memproses permintaan.";
-                    
+                    let aiResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan dalam memproses permintaan.";
+
                     appendMessage(aiResponseText, 'ai');
                     saveMessage(aiResponseText, 'ai');
 
