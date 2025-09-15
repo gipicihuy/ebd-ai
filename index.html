@@ -31,6 +31,8 @@
             --color-text-light: #f0f0f0;
             --color-text-secondary: #888;
             --color-border: #333;
+            --color-success: #28a745;
+            --color-warning: #ffc107;
         }
 
         body {
@@ -265,6 +267,76 @@
         }
         .text-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+        /* --- New Features --- */
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--color-bg-input);
+            padding: 0.5rem 1rem;
+            border-radius: 18px;
+            margin-top: 0.5rem;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--color-text-secondary);
+            margin: 0 2px;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .suggestion-chip {
+            background-color: var(--color-bg-input);
+            color: var(--color-text-light);
+            border: 1px solid var(--color-border);
+            border-radius: 18px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .suggestion-chip:hover {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--color-success);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
         /* --- Responsiveness --- */
         @media (max-width: 768px) {
             .app-container {
@@ -346,7 +418,12 @@
                             <i class="fas fa-robot"></i>
                         </div>
                         <div class="message-content">
-                            Welcome to Eberardos AI. How can I help you today?
+                            <p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p>
+                            <div class="suggestion-chips">
+                                <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                                <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                                <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -355,12 +432,14 @@
     </div>
     <div class="input-area">
         <div class="input-container">
-            <textarea class="input-field" placeholder="Type your message..." id="userInput" rows="1"></textarea>
+            <textarea class="input-field" placeholder="Ketik pesan Anda..." id="userInput" rows="1"></textarea>
             <button class="send-button" id="sendButton">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
     </div>
+
+    <div class="toast" id="toast"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -375,10 +454,20 @@
             const closeSidebar = document.getElementById('closeSidebar');
             const overlay = document.querySelector('.overlay');
             const sidebar = document.getElementById('mainSidebar');
-            const chatArea = document.querySelector('.main-content');
+            const toast = document.getElementById('toast');
 
             let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || [];
             let currentConversationId = null;
+
+            function showToast(message, isError = false) {
+                toast.textContent = message;
+                toast.style.backgroundColor = isError ? '#dc3545' : '#28a745';
+                toast.classList.add('show');
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
 
             function sanitizeHtml(text) {
                 const div = document.createElement('div');
@@ -446,7 +535,10 @@
                 copyBtn.className = 'code-btn';
                 copyBtn.title = 'Copy code';
                 copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
-                copyBtn.addEventListener('click', () => copyCodeToClipboard(code));
+                copyBtn.addEventListener('click', () => {
+                    copyCodeToClipboard(code);
+                    showToast('Kode disalin!');
+                });
 
                 const downloadBtn = document.createElement('button');
                 downloadBtn.className = 'code-btn';
@@ -477,11 +569,12 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `code.${extension}`;
+                a.download = `eberardos-code.${extension}`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
+                showToast('Kode didownload!');
             }
 
             function getExtensionForLanguage(language) {
@@ -501,7 +594,7 @@
             function updateChatHistory() {
                 chatHistory.innerHTML = '';
                 if (conversations.length === 0) {
-                    chatHistory.innerHTML = '<div class="text-center text-secondary py-3">No conversations yet</div>';
+                    chatHistory.innerHTML = '<div class="text-center text-secondary py-3">Belum ada percakapan</div>';
                     return;
                 }
                 
@@ -509,7 +602,7 @@
                     const historyItem = document.createElement('div');
                     historyItem.className = `history-item ${currentConversationId === conv.id ? 'active-chat' : ''}`;
                     historyItem.innerHTML = `
-                        <div class="text-truncate">${sanitizeHtml(conv.messages[0]?.text?.substring(0, 30) || 'New conversation')}</div>
+                        <div class="text-truncate">${sanitizeHtml(conv.messages[0]?.text?.substring(0, 30) || 'Percakapan baru')}</div>
                         <button class="btn btn-sm btn-outline-danger delete-conv" data-id="${conv.id}">
                             <i class="fas fa-times"></i>
                         </button>
@@ -542,13 +635,20 @@
                                 <i class="fas fa-robot"></i>
                             </div>
                             <div class="message-content">
-                                Welcome to Eberardos AI. How can I help you today?
+                                <p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p>
+                                <div class="suggestion-chips">
+                                    <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                                    <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                                    <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                                </div>
                             </div>
                         </div>
                     `;
+                    addSuggestionChipsListeners();
                 }
                 localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
                 updateChatHistory();
+                showToast('Percakapan dihapus');
             }
 
             function loadConversation(id) {
@@ -601,11 +701,38 @@
                     }
                 });
                 
+                // Add suggestion chips for AI messages
+                if (sender === 'ai' && !currentConversationId) {
+                    const chipsContainer = document.createElement('div');
+                    chipsContainer.className = 'suggestion-chips';
+                    chipsContainer.innerHTML = `
+                        <div class="suggestion-chip" data-prompt="Terima kasih">総 Terima kasih</div>
+                        <div class="suggestion-chip" data-prompt="Jelaskan lebih detail">剥 Jelaskan lebih detail</div>
+                        <div class="suggestion-chip" data-prompt="Beri contoh lainnya">庁 Contoh lainnya</div>
+                    `;
+                    contentContainer.appendChild(chipsContainer);
+                    
+                    // Add event listeners to the new chips
+                    setTimeout(() => {
+                        addSuggestionChipsListeners();
+                    }, 100);
+                }
+                
                 messageDiv.appendChild(profileImage);
                 messageDiv.appendChild(contentContainer);
                 
                 chatContainer.appendChild(messageDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            function addSuggestionChipsListeners() {
+                document.querySelectorAll('.suggestion-chip').forEach(chip => {
+                    chip.addEventListener('click', function() {
+                        const prompt = this.getAttribute('data-prompt');
+                        userInput.value = prompt;
+                        sendMessage();
+                    });
+                });
             }
 
             function saveMessage(text, sender) {
@@ -625,6 +752,27 @@
             function adjustTextareaHeight() {
                 userInput.style.height = 'auto';
                 userInput.style.height = (userInput.scrollHeight) + 'px';
+            }
+
+            function simulateThinking() {
+                const thinkingDiv = document.createElement('div');
+                thinkingDiv.className = 'message ai-message';
+                thinkingDiv.innerHTML = `
+                    <div class="profile-image">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="typing-indicator">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                `;
+                chatContainer.appendChild(thinkingDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                return thinkingDiv;
             }
 
             async function sendMessage() {
@@ -650,32 +798,23 @@
                 const apiUrl = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=gemini`;
 
                 try {
-                    const typingIndicator = document.createElement('div');
-                    typingIndicator.className = 'message ai-message';
-                    typingIndicator.innerHTML = `
-                        <div class="profile-image">
-                            <i class="fas fa-robot"></i>
-                        </div>
-                        <div class="message-content">Thinking...</div>
-                    `;
-                    chatContainer.appendChild(typingIndicator);
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                    const thinkingIndicator = simulateThinking();
 
                     const response = await fetch(apiUrl);
                     if (!response.ok) throw new Error('Network response was not ok');
                     const data = await response.text();
                     
-                    chatContainer.removeChild(typingIndicator);
+                    chatContainer.removeChild(thinkingIndicator);
                     appendMessage(data, 'ai');
                     saveMessage(data, 'ai');
                 } catch (error) {
                     console.error('Error:', error);
-                    const typingIndicator = document.querySelector('.message:last-child');
-                    if (typingIndicator && typingIndicator.querySelector('.message-content').textContent === 'Thinking...') {
-                        chatContainer.removeChild(typingIndicator);
+                    const thinkingIndicator = document.querySelector('.typing-indicator');
+                    if (thinkingIndicator && thinkingIndicator.closest('.message')) {
+                        chatContainer.removeChild(thinkingIndicator.closest('.message'));
                     }
-                    appendMessage('Sorry, there was an error processing your request.', 'ai');
-                    saveMessage('Sorry, there was an error processing your request.', 'ai');
+                    appendMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai');
+                    saveMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai');
                 } finally {
                     // Re-enable input and reset button state
                     userInput.disabled = false;
@@ -684,11 +823,12 @@
                 }
             }
 
+            // Event listeners
             sendButton.addEventListener('click', sendMessage);
             userInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    if (!sendButton.disabled) { // Prevent sending if disabled
+                    if (!sendButton.disabled) {
                         sendMessage();
                     }
                 }
@@ -703,19 +843,26 @@
                             <i class="fas fa-robot"></i>
                         </div>
                         <div class="message-content">
-                            Welcome to Eberardos AI. How can I help you today?
+                            <p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p>
+                            <div class="suggestion-chips">
+                                <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                                <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                                <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                            </div>
                         </div>
                     </div>
                 `;
+                addSuggestionChipsListeners();
                 userInput.value = '';
                 userInput.focus();
                 if (window.innerWidth < 768) {
                     toggleSidebar();
                 }
+                showToast('Percakapan baru dibuat');
             });
 
             clearHistoryBtn.addEventListener('click', function() {
-                if (confirm('Are you sure you want to clear all chat history?')) {
+                if (confirm('Apakah Anda yakin ingin menghapus semua riwayat percakapan?')) {
                     conversations = [];
                     localStorage.removeItem('eberardosConversations');
                     updateChatHistory();
@@ -725,11 +872,18 @@
                                 <i class="fas fa-robot"></i>
                             </div>
                             <div class="message-content">
-                                Welcome to Eberardos AI. How can I help you today?
+                                <p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p>
+                                <div class="suggestion-chips">
+                                    <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                                    <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                                    <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                                </div>
                             </div>
                         </div>
                     `;
+                    addSuggestionChipsListeners();
                     currentConversationId = null;
+                    showToast('Semua riwayat dihapus');
                 }
             });
 
@@ -745,10 +899,13 @@
                 }
             });
 
+            // Initialize
             updateChatHistory();
             if (conversations.length > 0) {
                 loadConversation(conversations[0].id);
             }
+            
+            addSuggestionChipsListeners();
         });
     </script>
 </body>
