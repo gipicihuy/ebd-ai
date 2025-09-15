@@ -4,9 +4,5 @@
       "source": "/api/chat",
       "destination": "/api/chat.js"
     }
-  ],
-  "build": {
-    "src": "api/chat.js",
-    "use": "@vercel/node"
-  }
+  ]
 }
