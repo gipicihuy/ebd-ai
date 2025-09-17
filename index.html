@@ -571,31 +571,34 @@
             function convertMarkdownToHtml(markdownText) {
     let html = markdownText;
 
-    // Tambahkan baris ini untuk menangani kode inline (backtick tunggal)
+    // Menangani kode inline (backtick tunggal)
     html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-    // Perbaiki baris baru di dalam list
-    html = html.replace(/\n\s*([*-] )/g, '\n$1');
-
-    // Ubah list dengan simbol * atau -
-    html = html.replace(/^[*-] (.*)/gm, '<li>$1</li>');
-    
-    // Bungkus semua <li> dengan <ul>
-    html = html.replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>');
-    
-    // Konversi bold dan italic
+    // Menangani bold dan italic
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
     
-    // Konversi link
-    html = html.replace(/\[(.*?)\]$$(.*?)$$/g, '<a href="$2" target="_blank">$1</a>');
-    
-    // Konversi baris baru menjadi <br>
-    html = html.replace(/\n/g, '<br>');
-    
-    // Hapus <br> yang tidak perlu di dalam <ul>
-    html = html.replace(/<ul><br>/g, '<ul>');
+    // Menangani link
+    html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
 
+    // Mengubah bullet points menjadi tag <li>
+    // Pastikan ini dijalankan sebelum mengubah baris baru
+    html = html.replace(/^[*-] (.*)/gm, '<li>$1</li>');
+
+    // Menggabungkan tag <li> yang berurutan ke dalam satu tag <ul>
+    // Ini adalah bagian kunci perbaikan.
+    html = html.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$&</ul>');
+
+    // Menghapus baris baru yang tidak perlu di dalam daftar
+    html = html.replace(/<\/li>\n<li>/g, '</li><li>');
+    
+    // Konversi baris baru menjadi <br> di luar blok kode
+    html = html.replace(/\n/g, '<br>');
+
+    // Menghapus <br> yang tidak perlu di dalam <ul> dan <li>
+    html = html.replace(/<ul><br><li>/g, '<ul><li>');
+    html = html.replace(/<\/li><br><\/ul>/g, '</li></ul>');
+    
     return html;
 }
 
