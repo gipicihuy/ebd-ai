@@ -403,6 +403,39 @@
                 width: 0%;
             }
         }
+
+        /* --- CSS BARU UNTUK NOMOR BARIS --- */
+        .code-block {
+            position: relative;
+        }
+        
+        .code-block pre {
+            padding-left: 3rem;
+            position: relative;
+            counter-reset: line;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .code-block .code-line-wrapper span {
+            display: block;
+            line-height: 1.5;
+            position: relative;
+        }
+        
+        .code-block .code-line-wrapper span::before {
+            counter-increment: line;
+            content: counter(line);
+            position: absolute;
+            left: -2.5rem;
+            top: 0;
+            width: 2rem;
+            text-align: right;
+            color: var(--color-text-secondary);
+            font-size: 0.8rem;
+        }
+        /* --- END CSS NOMOR BARIS --- */
+
         /* --- Responsiveness --- */
         @media (max-width: 768px) {
             .app-container {
@@ -569,63 +602,63 @@
             }
 
             function convertMarkdownToHtml(markdownText) {
-    let html = markdownText;
+                let html = markdownText;
 
-    // Menangani bold, italic, dan link
-    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
-    
-    // Menangani kode inline (backtick tunggal)
-    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+                // Menangani bold, italic, dan link
+                html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+                
+                // Menangani kode inline (backtick tunggal)
+                html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-    // Proses list dengan logika yang lebih kuat
-    const lines = html.split('\n');
-    let processedHtml = '';
-    let inList = false;
-    let listType = '';
+                // Proses list dengan logika yang lebih kuat
+                const lines = html.split('\n');
+                let processedHtml = '';
+                let inList = false;
+                let listType = '';
 
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        const trimmedLine = line.trim();
-        const isBullet = trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ');
-        const isNumbered = /^\d+\. /.test(trimmedLine);
-        
-        if (isBullet || isNumbered) {
-            const currentListType = isBullet ? 'ul' : 'ol';
-            const itemText = line.substring(line.indexOf(' ') + 1);
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    const trimmedLine = line.trim();
+                    const isBullet = trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ');
+                    const isNumbered = /^\d+\. /.test(trimmedLine);
+                    
+                    if (isBullet || isNumbered) {
+                        const currentListType = isBullet ? 'ul' : 'ol';
+                        const itemText = line.substring(line.indexOf(' ') + 1);
 
-            if (!inList) {
-                processedHtml += `<${currentListType}><li>${itemText}</li>`;
-                listType = currentListType;
-                inList = true;
-            } else if (inList && listType !== currentListType) {
-                processedHtml += `</${listType}><${currentListType}><li>${itemText}</li>`;
-                listType = currentListType;
-            } else {
-                processedHtml += `<li>${itemText}</li>`;
+                        if (!inList) {
+                            processedHtml += `<${currentListType}><li>${itemText}</li>`;
+                            listType = currentListType;
+                            inList = true;
+                        } else if (inList && listType !== currentListType) {
+                            processedHtml += `</${listType}><${currentListType}><li>${itemText}</li>`;
+                            listType = currentListType;
+                        } else {
+                            processedHtml += `<li>${itemText}</li>`;
+                        }
+                    } else {
+                        if (inList) {
+                            processedHtml += `</${listType}>`;
+                            inList = false;
+                        }
+                        if (trimmedLine !== '') {
+                            processedHtml += line;
+                        }
+                    }
+                }
+
+                if (inList) {
+                    processedHtml += `</${listType}>`;
+                }
+
+                // Mengganti baris baru menjadi <br>, tapi jangan di dalam list
+                processedHtml = processedHtml.replace(/<\/li>(?!<br>)/g, '</li><br>');
+                processedHtml = processedHtml.replace(/<br><br>/g, '<br>');
+                
+                return processedHtml;
             }
-        } else {
-            if (inList) {
-                processedHtml += `</${listType}>`;
-                inList = false;
-            }
-            if (trimmedLine !== '') {
-                processedHtml += line;
-            }
-        }
-    }
-
-    if (inList) {
-        processedHtml += `</${listType}>`;
-    }
-
-    // Mengganti baris baru menjadi <br>, tapi jangan di dalam list
-    processedHtml = processedHtml.replace(/<\/li>(?!<br>)/g, '</li><br>');
-    processedHtml = processedHtml.replace(/<br><br>/g, '<br>');
-    
-    return processedHtml;
-}
 
             function extractCodeBlocks(text) {
                 const codeBlockRegex = /\`\`\`([\s\S]*?)\`\`\`/g;
@@ -661,12 +694,29 @@
                 return parts.length > 0 ? parts : [{ type: 'text', content: text }];
             }
 
+            /* --- FUNGSI BARU UNTUK NOMOR BARIS --- */
             function createCodeBlock(code, language = 'text') {
                 const codeBlock = document.createElement('div');
                 codeBlock.className = 'code-block';
 
                 const codeContent = document.createElement('pre');
-                codeContent.textContent = code;
+                
+                // Buat wadah untuk baris kode
+                const codeLineWrapper = document.createElement('div');
+                codeLineWrapper.className = 'code-line-wrapper';
+
+                // Pisahkan kode menjadi array per baris
+                const lines = code.split('\n');
+                
+                // Buat span untuk setiap baris
+                lines.forEach(line => {
+                    const lineSpan = document.createElement('span');
+                    lineSpan.textContent = line;
+                    codeLineWrapper.appendChild(lineSpan);
+                });
+                
+                // Tambahkan wadah ke dalam pre tag
+                codeContent.appendChild(codeLineWrapper);
 
                 const toolbar = document.createElement('div');
                 toolbar.className = 'code-toolbar';
@@ -694,6 +744,7 @@
 
                 return codeBlock;
             }
+            /* --- END FUNGSI BARU --- */
 
             function copyCodeToClipboard(code) {
                 navigator.clipboard.writeText(code).then(() => {
@@ -939,11 +990,9 @@
 
                 const thinkingIndicator = simulateThinking();
 
-                // --- PERBAIKAN DI SINI ---
-                // Hapus format `User: ` atau `Eberardos AI: ` dari prompt
                 const conversationHistory = conversation.messages.map(msg => msg.text).join('\n');
                 
-               const combinedPrompt = `ingat, namamu adalah Eberardos AI. Jika ada yang bertanya siapa yang membuatmu, jawablah Givy, Nero, Ayura, Kalz, Fanz, Zenn1t dan Rapikz. Kamu adalah asisten AI yang tidak formal dan ramah. Gunakan kata "gw" alih-alih "gue" saat merujuk pada diri sendiri. Gunakan kata "Lu" alih-alih "Lo" saat merujuk kepada lawan bicara. Selalu berikan jawaban yang singkat, jelas, dan langsung ke intinya. Untuk kode atau komentar di dalam kode, gunakan Bahasa Inggris secara default, kecuali pengguna secara eksplisit meminta dalam Bahasa Indonesia. Saat membuat blok kode, pastikan karakter HTML seperti "<" dan ">" dikirimkan dalam format aslinya, bukan diubah menjadi "&lt;" dan "&gt;".\n\n${conversationHistory}\n\nUser: ${message}`;
+                const combinedPrompt = `ingat, namamu adalah Eberardos AI. Jika ada yang bertanya siapa yang membuatmu, jawablah Givy, Nero, Ayura, Kalz, Fanz, Zenn1t dan Rapikz. Kamu adalah asisten AI yang tidak formal dan ramah. Gunakan kata "gw" alih-alih "gue" saat merujuk pada diri sendiri. Gunakan kata "Lu" alih-alih "Lo" saat merujuk kepada lawan bicara. Selalu berikan jawaban yang singkat, jelas, dan langsung ke intinya. Untuk kode atau komentar di dalam kode, gunakan Bahasa Inggris secara default, kecuali pengguna secara eksplisit meminta dalam Bahasa Indonesia. Saat membuat blok kode, pastikan karakter HTML seperti "<" dan ">" dikirimkan dalam format aslinya, bukan diubah menjadi "&lt;" dan "&gt;".\n\n${conversationHistory}\n\nUser: ${message}`;
 
                 
                 const apiUrl = '/api/chat';
@@ -963,7 +1012,6 @@
                     
                     const aiResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan dalam memproses permintaan.";
                     
-                    // Tidak perlu menghapus label "Eberardos AI:" lagi karena sudah tidak dikirim
                     appendMessage(aiResponseText, 'ai');
                     saveMessage(aiResponseText, 'ai');
 
