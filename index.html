@@ -571,57 +571,64 @@
             function convertMarkdownToHtml(markdownText) {
     let html = markdownText;
 
-    // Menangani kode inline (backtick tunggal)
+    // Menangani kode inline dan bold/italic
     html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-    // Menangani bold dan italic
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
     
     // Menangani link
     html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
 
-    // Proses untuk menangani list dengan benar
-    let inList = false;
+    // Proses list
     const lines = html.split('\n');
-    const processedLines = lines.map(line => {
+    let processedHtml = '';
+    let inList = false;
+    let listType = '';
+
+    lines.forEach(line => {
         const trimmedLine = line.trim();
-        const isBulletPoint = trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ');
-        const isNumberedList = /^\d+\. /.test(trimmedLine);
+        const isBullet = trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ');
+        const isNumbered = /^\d+\. /.test(trimmedLine);
         
-        if (isBulletPoint || isNumberedList) {
+        if (isBullet || isNumbered) {
+            const currentListType = isBullet ? 'ul' : 'ol';
             if (!inList) {
-                inList = isBulletPoint ? 'ul' : 'ol';
-                return `<${inList}>\n<li>${line.substring(line.indexOf(' ') + 1)}</li>`;
-            } else {
-                return `<li>${line.substring(line.indexOf(' ') + 1)}</li>`;
+                processedHtml += `<${currentListType}>`;
+                listType = currentListType;
+                inList = true;
+            } else if (inList && listType !== currentListType) {
+                processedHtml += `</${listType}><${currentListType}>`;
+                listType = currentListType;
             }
+            processedHtml += `<li>${line.substring(line.indexOf(' ') + 1)}</li>`;
         } else {
             if (inList) {
-                const closingTag = `</${inList}>`;
+                processedHtml += `</${listType}>\n`;
                 inList = false;
-                return `${closingTag}\n${line}`;
+            }
+            if (trimmedLine !== '') {
+                processedHtml += `${line}\n`;
             } else {
-                return line;
+                processedHtml += '\n';
             }
         }
     });
 
     if (inList) {
-        processedLines.push(`</${inList}>`);
+        processedHtml += `</${listType}>`;
     }
 
-    html = processedLines.join('\n');
-    
-    // Konversi baris baru menjadi <br> di luar blok kode
-    html = html.replace(/\n(?!<br>|<ul>|<li>)/g, '<br>');
+    // Konversi baris baru menjadi <br>
+    processedHtml = processedHtml.replace(/\n/g, '<br>');
     
     // Membersihkan <br> yang tidak perlu
-    html = html.replace(/<br><br>/g, '<br>');
-    html = html.replace(/<br>\n/g, '<br>');
-    html = html.replace(/<br><br><li>/g, '<br><li>');
-
-    return html;
+    processedHtml = processedHtml.replace(/<br><br>/g, '<br>');
+    processedHtml = processedHtml.replace(/<ul><br><li>/g, '<ul><li>');
+    processedHtml = processedHtml.replace(/<\/li><br><\/ul>/g, '</li></ul>');
+    processedHtml = processedHtml.replace(/<ol><br><li>/g, '<ol><li>');
+    processedHtml = processedHtml.replace(/<\/li><br><\/ol>/g, '</li></ol>');
+    
+    return processedHtml;
 }
             function extractCodeBlocks(text) {
                 const codeBlockRegex = /\`\`\`([\s\S]*?)\`\`\`/g;
