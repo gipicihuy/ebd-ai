@@ -175,6 +175,8 @@
             flex-grow: 1;
             padding-left: 1rem;
             word-break: break-word !important; /* Tambahkan !important di sini */
+            font-size: 0.875rem; /* 14px, sama seperti text yang saya kirim */
+            line-height: 1.5;
         }
         .profile-image {
             width: 40px;
@@ -279,7 +281,7 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transition: background-color 0.2s ease, color 0.2s ease;
+            transition: all 0.2s ease;
         }
         .code-btn:hover {
             background-color: var(--color-primary);
@@ -577,7 +579,7 @@
 
     // Ubah list dengan simbol * atau -
     html = html.replace(/^[*-] (.*)/gm, '<li>$1</li>');
-
+    
     // Bungkus semua <li> dengan <ul>
     html = html.replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>');
     
@@ -586,7 +588,7 @@
     html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
     
     // Konversi link
-    html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+    html = html.replace(/\[(.*?)\]$$(.*?)$$/g, '<a href="$2" target="_blank">$1</a>');
     
     // Konversi baris baru menjadi <br>
     html = html.replace(/\n/g, '<br>');
@@ -598,7 +600,7 @@
 }
 
             function extractCodeBlocks(text) {
-                const codeBlockRegex = /```([\s\S]*?)```/g;
+                const codeBlockRegex = /\`\`\`([\s\S]*?)\`\`\`/g;
                 const matches = [];
                 let match;
                 let lastIndex = 0;
