@@ -582,26 +582,44 @@
     html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
 
     // Mengubah bullet points menjadi tag <li>
-    // Pastikan ini dijalankan sebelum mengubah baris baru
-    html = html.replace(/^[*-] (.*)/gm, '<li>$1</li>');
+    // Ekspresi reguler ini mencari semua baris yang dimulai dengan * atau -
+    // dan mengonversinya menjadi <li>
+    const lines = html.split('\n');
+    let inList = false;
+    const processedLines = lines.map(line => {
+        if (line.trim().startsWith('* ') || line.trim().startsWith('- ')) {
+            if (!inList) {
+                inList = true;
+                return `<ul>\n<li>${line.trim().substring(2)}</li>`;
+            } else {
+                return `<li>${line.trim().substring(2)}</li>`;
+            }
+        } else {
+            if (inList) {
+                inList = false;
+                return `</ul>\n${line}`;
+            } else {
+                return line;
+            }
+        }
+    });
 
-    // Menggabungkan tag <li> yang berurutan ke dalam satu tag <ul>
-    // Ini adalah bagian kunci perbaikan.
-    html = html.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$&</ul>');
-
-    // Menghapus baris baru yang tidak perlu di dalam daftar
-    html = html.replace(/<\/li>\n<li>/g, '</li><li>');
+    // Tambahkan </ul> penutup jika daftar berada di akhir teks
+    if (inList) {
+        processedLines.push('</ul>');
+    }
+    html = processedLines.join('\n');
     
     // Konversi baris baru menjadi <br> di luar blok kode
     html = html.replace(/\n/g, '<br>');
 
-    // Menghapus <br> yang tidak perlu di dalam <ul> dan <li>
+    // Menghilangkan <br> yang tidak perlu
+    html = html.replace(/<br><br>/g, '<br>');
     html = html.replace(/<ul><br><li>/g, '<ul><li>');
     html = html.replace(/<\/li><br><\/ul>/g, '</li></ul>');
     
     return html;
 }
-
             function extractCodeBlocks(text) {
                 const codeBlockRegex = /\`\`\`([\s\S]*?)\`\`\`/g;
                 const matches = [];
