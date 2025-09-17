@@ -581,43 +581,46 @@
     // Menangani link
     html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
 
-    // Mengubah bullet points menjadi tag <li>
-    // Ekspresi reguler ini mencari semua baris yang dimulai dengan * atau -
-    // dan mengonversinya menjadi <li>
-    const lines = html.split('\n');
+    // Proses untuk menangani list dengan benar
     let inList = false;
+    const lines = html.split('\n');
     const processedLines = lines.map(line => {
-        if (line.trim().startsWith('* ') || line.trim().startsWith('- ')) {
+        const trimmedLine = line.trim();
+        const isBulletPoint = trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ');
+        const isNumberedList = /^\d+\. /.test(trimmedLine);
+        
+        if (isBulletPoint || isNumberedList) {
             if (!inList) {
-                inList = true;
-                return `<ul>\n<li>${line.trim().substring(2)}</li>`;
+                inList = isBulletPoint ? 'ul' : 'ol';
+                return `<${inList}>\n<li>${line.substring(line.indexOf(' ') + 1)}</li>`;
             } else {
-                return `<li>${line.trim().substring(2)}</li>`;
+                return `<li>${line.substring(line.indexOf(' ') + 1)}</li>`;
             }
         } else {
             if (inList) {
+                const closingTag = `</${inList}>`;
                 inList = false;
-                return `</ul>\n${line}`;
+                return `${closingTag}\n${line}`;
             } else {
                 return line;
             }
         }
     });
 
-    // Tambahkan </ul> penutup jika daftar berada di akhir teks
     if (inList) {
-        processedLines.push('</ul>');
+        processedLines.push(`</${inList}>`);
     }
+
     html = processedLines.join('\n');
     
     // Konversi baris baru menjadi <br> di luar blok kode
-    html = html.replace(/\n/g, '<br>');
-
-    // Menghilangkan <br> yang tidak perlu
-    html = html.replace(/<br><br>/g, '<br>');
-    html = html.replace(/<ul><br><li>/g, '<ul><li>');
-    html = html.replace(/<\/li><br><\/ul>/g, '</li></ul>');
+    html = html.replace(/\n(?!<br>|<ul>|<li>)/g, '<br>');
     
+    // Membersihkan <br> yang tidak perlu
+    html = html.replace(/<br><br>/g, '<br>');
+    html = html.replace(/<br>\n/g, '<br>');
+    html = html.replace(/<br><br><li>/g, '<br><li>');
+
     return html;
 }
             function extractCodeBlocks(text) {
