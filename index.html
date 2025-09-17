@@ -569,62 +569,55 @@
             }
 
             function convertMarkdownToHtml(markdownText) {
-    let html = markdownText;
+    // Tangani kode inline (backtick tunggal) terlebih dahulu
+    let html = markdownText.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-    // Menangani bold dan italic
+    // Tangani bold dan italic
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
     
-    // Menangani link
+    // Tangani link
     html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
 
-    // Mengubah kode inline (backtick tunggal) menjadi tag <code>
-    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-    // Proses untuk menangani list dengan benar dan rapi
-    const lines = html.split('\n');
+    // Proses list dengan logika yang lebih kuat
+    let lines = html.split('\n');
     let processedHtml = '';
     let inList = false;
-    let listType = '';
 
-    lines.forEach(line => {
-        const trimmedLine = line.trim();
-        const isBullet = trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ');
-        const isNumbered = /^\d+\. /.test(trimmedLine);
-        
-        if (isBullet || isNumbered) {
-            const currentListType = isBullet ? 'ul' : 'ol';
-            const itemText = line.substring(line.indexOf(' ') + 1);
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        const isListStart = line.startsWith('* ') || line.startsWith('- ');
+        const isListEnd = !isListStart && inList;
 
+        if (isListStart) {
             if (!inList) {
-                processedHtml += `<${currentListType}><li>${itemText}</li>`;
-                listType = currentListType;
+                processedHtml += '<ul>';
                 inList = true;
-            } else if (inList && listType !== currentListType) {
-                processedHtml += `</${listType}><${currentListType}><li>${itemText}</li>`;
-                listType = currentListType;
-            } else {
-                processedHtml += `<li>${itemText}</li>`;
+            }
+            processedHtml += `<li>${line.substring(2)}</li>`;
+        } else if (isListEnd) {
+            processedHtml += '</ul>';
+            inList = false;
+            if (line.length > 0) {
+                processedHtml += `<br>${line}`;
             }
         } else {
-            if (inList) {
-                processedHtml += `</${listType}>`;
-                inList = false;
-            }
-            if (trimmedLine !== '') {
-                processedHtml += line;
+            if (line.length > 0) {
+                processedHtml += `<br>${line}`;
             }
         }
-    });
-
-    if (inList) {
-        processedHtml += `</${listType}>`;
     }
 
-    // Mengganti baris baru menjadi <br>, tapi jangan di dalam list
-    processedHtml = processedHtml.replace(/<\/li>(?!<br>)/g, '</li><br>');
-    processedHtml = processedHtml.replace(/<br><br>/g, '<br>');
-    
+    if (inList) {
+        processedHtml += '</ul>';
+    }
+
+    // Menghilangkan <br> ganda dan <br> di awal
+    processedHtml = processedHtml.replace(/<br><br>/g, '<br>').trim();
+    if (processedHtml.startsWith('<br>')) {
+        processedHtml = processedHtml.substring(4);
+    }
+
     return processedHtml;
 }
             function extractCodeBlocks(text) {
