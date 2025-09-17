@@ -571,15 +571,17 @@
             function convertMarkdownToHtml(markdownText) {
     let html = markdownText;
 
-    // Menangani kode inline dan bold/italic
-    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    // Menangani bold dan italic
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
     
     // Menangani link
     html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
 
-    // Proses list
+    // Mengubah kode inline (backtick tunggal) menjadi tag <code>
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    // Proses untuk menangani list dengan benar dan rapi
     const lines = html.split('\n');
     let processedHtml = '';
     let inList = false;
@@ -592,24 +594,25 @@
         
         if (isBullet || isNumbered) {
             const currentListType = isBullet ? 'ul' : 'ol';
+            const itemText = line.substring(line.indexOf(' ') + 1);
+
             if (!inList) {
-                processedHtml += `<${currentListType}>`;
+                processedHtml += `<${currentListType}><li>${itemText}</li>`;
                 listType = currentListType;
                 inList = true;
             } else if (inList && listType !== currentListType) {
-                processedHtml += `</${listType}><${currentListType}>`;
+                processedHtml += `</${listType}><${currentListType}><li>${itemText}</li>`;
                 listType = currentListType;
+            } else {
+                processedHtml += `<li>${itemText}</li>`;
             }
-            processedHtml += `<li>${line.substring(line.indexOf(' ') + 1)}</li>`;
         } else {
             if (inList) {
-                processedHtml += `</${listType}>\n`;
+                processedHtml += `</${listType}>`;
                 inList = false;
             }
             if (trimmedLine !== '') {
-                processedHtml += `${line}\n`;
-            } else {
-                processedHtml += '\n';
+                processedHtml += line;
             }
         }
     });
@@ -618,15 +621,9 @@
         processedHtml += `</${listType}>`;
     }
 
-    // Konversi baris baru menjadi <br>
-    processedHtml = processedHtml.replace(/\n/g, '<br>');
-    
-    // Membersihkan <br> yang tidak perlu
+    // Mengganti baris baru menjadi <br>, tapi jangan di dalam list
+    processedHtml = processedHtml.replace(/<\/li>(?!<br>)/g, '</li><br>');
     processedHtml = processedHtml.replace(/<br><br>/g, '<br>');
-    processedHtml = processedHtml.replace(/<ul><br><li>/g, '<ul><li>');
-    processedHtml = processedHtml.replace(/<\/li><br><\/ul>/g, '</li></ul>');
-    processedHtml = processedHtml.replace(/<ol><br><li>/g, '<ol><li>');
-    processedHtml = processedHtml.replace(/<\/li><br><\/ol>/g, '</li></ol>');
     
     return processedHtml;
 }
