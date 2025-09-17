@@ -1,1 +1,1039 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Eberardos AI</title><link rel="icon" href="https://eberardos.my.id/eberardos.jpg" type="image/jpeg"><meta property="og:title" content="Eberardos - Community since 2021"><meta property="og:description" content="Discover our community, projects, and contacts."><meta property="og:image" content="https://eberardos.my.id/eberardos.jpg"><meta property="og:url" content="https://eberardos.my.id"><meta property="og:type" content="website"><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"><style> /* * Eberardos AI - Versi Redesain Responsif * -------------------------------------- * Fokus pada desain mobile-first, dengan transisi yang lebih halus. */ :root { --color-primary: #b71c1c; --color-primary-hover: #9e1b1b; --color-bg-dark: #0d0d0d; --color-bg-light: #1a1a1a; --color-bg-input: #2a2a2a; --color-text-light: #f0f0f0; --color-text-secondary: #888; --color-border: #333; --color-success: #28a745; --color-warning: #ffc107; --color-error: #dc3545; } body { font-family: 'Inter', sans-serif; background-color: var(--color-bg-dark); color: var(--color-text-light); margin: 0; display: flex; flex-direction: column; min-height: 100vh; } /* --- Layout Umum --- */ .app-container { padding-top: 50px; /* Tambahan padding untuk notifikasi API */ display: flex; flex-grow: 1; height: calc(100vh - 66px); } .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; } /* --- Navbar --- */ .navbar { background-color: var(--color-bg-light); border-bottom: 1px solid var(--color-border); padding: 1rem; position: fixed; top: 0; left: 0; right: 0; z-index: 10; } .navbar-brand { color: var(--color-primary) !important; font-weight: 700; font-size: 1.5rem; } .btn-nav { color: var(--color-primary); border-color: var(--color-primary); transition: all 0.2s ease; } .btn-nav:hover { background-color: var(--color-primary); color: var(--color-text-light); } /* --- Notifikasi Status API --- */ .api-status-notification { background-color: var(--color-bg-light); color: var(--color-text-secondary); padding: 0.75rem 1rem; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; position: fixed; top: 55px; left: 0; right: 0; z-index: 9; } /* --- Sidebar --- */ .sidebar { width: 300px; background-color: var(--color-bg-light); border-right: 1px solid var(--color-border); flex-shrink: 0; display: flex; flex-direction: column; padding: 1rem; transition: transform 0.3s ease-in-out; z-index: 10; } .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; } .sidebar-body { flex-grow: 1; overflow-y: auto; padding-right: 1rem; } .sidebar-body::-webkit-scrollbar { width: 6px; } .sidebar-body::-webkit-scrollbar-thumb { background-color: var(--color-text-secondary); border-radius: 3px; } .history-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; margin-bottom: 0.5rem; border-radius: 8px; cursor: pointer; transition: background-color 0.2s ease; } .history-item:hover { background-color: var(--color-bg-input); } .active-chat { background-color: var(--color-primary); color: var(--color-text-light); } .active-chat:hover { background-color: var(--color-primary-hover); } /* --- Chat Area --- */ .chat-area { display: flex; flex-direction: column; height: 100%; padding-top: 66px; /* Tambahkan padding atas agar konten tidak tertutup navbar */ } .chat-container { flex-grow: 1; overflow-y: auto; padding: 1rem; padding-bottom: 100px; /* Memberi ruang di bawah agar pesan tidak tertutup input */ } .message { display: flex; padding: 1.5rem 0; border-bottom: 1px solid var(--color-border); } .message-content { flex-grow: 1; padding-left: 1rem; word-break: break-word !important; /* Tambahkan !important di sini */ } .profile-image { width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; } .user-message .profile-image { background-color: var(--color-primary); } .ai-message .profile-image { background-color: var(--color-bg-input); } /* --- Input Area --- */ .input-area { background-color: var(--color-bg-light); padding: 1rem; border-top: 1px solid var(--color-border); display: flex; justify-content: center; align-items: center; position: fixed; bottom: 0; left: 0; right: 0; z-index: 5; } .input-container { display: flex; align-items: center; width: 100%; max-width: 900px; background-color: var(--color-bg-input); border-radius: 12px; padding: 0.5rem 1rem; } .input-field { flex-grow: 1; background-color: transparent; border: none; color: var(--color-text-light); outline: none; resize: none; max-height: 200px; padding: 0.5rem 0; } .input-field::placeholder { color: var(--color-text-secondary); } .send-button { background-color: var(--color-primary); color: var(--color-text-light); border: none; border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; transition: background-color 0.2s ease, transform 0.2s ease; } .send-button:hover { background-color: var(--color-primary-hover); transform: translateY(-2px); } .send-button:disabled { background-color: var(--color-text-secondary); cursor: not-allowed; transform: none; } /* --- Code Blocks & Utils --- */ .code-block { background-color: var(--color-bg-input); border-left: 4px solid var(--color-primary); border-radius: 8px; padding: 1rem; margin: 1rem 0; position: relative; } .code-block pre { margin: 0; padding: 0; overflow-x: auto; white-space: pre-wrap; /* Mengizinkan pemecahan baris */ word-break: break-word; /* Memecah kata yang terlalu panjang */ } .code-toolbar { position: absolute; top: 0.5rem; right: 0.5rem; display: flex; gap: 5px; } .code-btn { background-color: var(--color-bg-light); color: var(--color-text-secondary); border: none; border-radius: 6px; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease; } .code-btn:hover { background-color: var(--color-primary); color: var(--color-text-light); } .text-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } /* --- New Features --- */ .typing-indicator { display: inline-flex; align-items: center; background-color: var(--color-bg-input); padding: 0.5rem 1rem; border-radius: 18px; margin-top: 0.5rem; } .typing-dot { width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-text-secondary); margin: 0 2px; animation: typingAnimation 1.4s infinite ease-in-out; } .typing-dot:nth-child(1) { animation-delay: 0s; } .typing-dot:nth-child(2) { animation-delay: 0.2s; } .typing-dot:nth-child(3) { animation-delay: 0.4s; } @keyframes typingAnimation { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-5px); } } .suggestion-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; margin-bottom: 10px; } .suggestion-chip { background-color: var(--color-bg-input); color: var(--color-text-light); border: 1px solid var(--color-border); border-radius: 18px; padding: 6px 12px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; } .suggestion-chip:hover { background-color: var(--color-primary); border-color: var(--color-primary); } /* KODE TOAST BARU */ .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); /* Mulai dari atas, tersembunyi */ background-color: var(--color-success); color: white; padding: 12px 20px; border-radius: 8px; z-index: 1000; opacity: 0; transition: transform 0.4s ease-out, opacity 0.4s ease-out; display: flex; align-items: center; overflow: hidden; flex-direction: column; text-align: center; } .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); /* Meluncur ke posisi akhir */ } .toast-icon { margin-right: 10px; } .toast-content { display: flex; align-items: center; padding-bottom: 4px; /* Ruang untuk timer bar */ } /* --- KODE TIMER BAR BARU --- */ .toast-timer { position: absolute; bottom: 0; left: 0; height: 4px; background-color: rgba(255, 255, 255, 0.4); /* Putih dengan transparansi 40% */ width: 100%; animation: toastTimer 3s linear forwards; } .toast.error { background-color: var(--color-error); } .toast.error .toast-timer { background-color: rgba(255, 255, 255, 0.4); /* Warna yang sama untuk kontras yang bagus */ } @keyframes toastTimer { from { width: 100%; } to { width: 0%; } } /* --- Responsiveness --- */ @media (max-width: 768px) { .app-container { flex-direction: column; height: calc(100vh - 66px); } .sidebar { position: fixed; top: 0; left: 0; height: 100%; width: 80%; transform: translateX(-100%); box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5); } .sidebar.active { transform: translateX(0); } .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.7); z-index: 9; display: none; } .overlay.active { display: block; } .navbar-brand { flex-grow: 1; text-align: center; } .btn-nav.d-none.d-md-block { display: none !important; } } </style></head><body><div class="overlay"></div><nav class="navbar navbar-dark px-3 py-2"><div class="container-fluid"><button class="btn btn-nav d-md-none" type="button" id="sidebarToggle"><i class="fas fa-bars"></i></button><span class="navbar-brand mb-0 h1">Eberardos AI</span><button class="btn btn-nav d-none d-md-block" type="button" id="desktopSidebarToggle"><i class="fas fa-history"></i></button></div></nav><div class="api-status-notification"><i class="fas fa-info-circle me-2"></i><span>Kalo error, kemungkinan ada masalah pada API.</span></div><div class="app-container"><div class="sidebar" id="mainSidebar"><div class="sidebar-header"><h5 class="mb-0">Chat History</h5><div><button class="btn btn-sm btn-nav me-2" id="newChat" title="New chat"><i class="fas fa-plus"></i></button><button class="btn btn-sm btn-nav me-2" id="clearHistory" title="Clear history"><i class="fas fa-trash"></i></button><button class="btn btn-sm btn-nav d-md-none" id="closeSidebar"><i class="fas fa-times"></i></button></div></div><div class="sidebar-body" id="chatHistory"></div></div><div class="main-content"><div class="chat-area"><div class="chat-container" id="chatContainer"><div class="message ai-message"><div class="profile-image"><i class="fas fa-robot"></i></div><div class="message-content"><p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p><div class="suggestion-chips"><div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div><div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div><div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div></div></div></div></div></div></div></div><div class="input-area"><div class="input-container"><textarea class="input-field" placeholder="Ketik pesan Anda..." id="userInput" rows="1"></textarea><button class="send-button" id="sendButton"><i class="fas fa-paper-plane"></i></button></div></div><div class="toast" id="toast" role="alert" aria-live="polite"><div class="toast-timer"></div></div><script> document.addEventListener('DOMContentLoaded', function() { const chatContainer = document.getElementById('chatContainer'); const userInput = document.getElementById('userInput'); const sendButton = document.getElementById('sendButton'); const chatHistory = document.getElementById('chatHistory'); const newChatBtn = document.getElementById('newChat'); const clearHistoryBtn = document.getElementById('clearHistory'); const sidebarToggle = document.getElementById('sidebarToggle'); const desktopSidebarToggle = document.getElementById('desktopSidebarToggle'); const closeSidebar = document.getElementById('closeSidebar'); const overlay = document.querySelector('.overlay'); const sidebar = document.getElementById('mainSidebar'); const toast = document.getElementById('toast'); let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || []; let currentConversationId = null; function showToast(message, isError = false) { const toast = document.getElementById('toast'); const icon = isError ? '<i class="fas fa-exclamation-circle toast-icon"></i>' : '<i class="fas fa-check-circle toast-icon"></i>'; const toastContent = document.createElement('div'); toastContent.className = 'toast-content'; toastContent.innerHTML = icon + message; const timerBar = document.createElement('div'); timerBar.className = 'toast-timer'; toast.innerHTML = ''; toast.appendChild(toastContent); toast.appendChild(timerBar); toast.classList.remove('show', 'error'); if (isError) { toast.classList.add('error'); } toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 3000); } function sanitizeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; } function convertMarkdownToHtml(markdownText) { let html = markdownText; // Tambahkan baris ini untuk menangani kode inline (backtick tunggal) html = html.replace(/`([^`]+)`/g, '<code>$1</code>'); // Perbaiki baris baru di dalam list html = html.replace(/\n\s*([*-] )/g, '\n$1'); // Ubah list dengan simbol * atau - html = html.replace(/^[*-] (.*)/gm, '<li>$1</li>'); // Bungkus semua <li> dengan <ul> html = html.replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>'); // Konversi bold dan italic html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); html = html.replace(/\*(.*?)\*/g, '<em>$1</em>'); // Konversi link html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>'); // Konversi baris baru menjadi <br> html = html.replace(/\n/g, '<br>'); // Hapus <br> yang tidak perlu di dalam <ul> html = html.replace(/<ul><br>/g, '<ul>'); return html;} function extractCodeBlocks(text) { const codeBlockRegex = /```([\s\S]*?)```/g; const matches = []; let match; let lastIndex = 0; const parts = []; while ((match = codeBlockRegex.exec(text)) !== null) { if (match.index > lastIndex) { parts.push({ type: 'text', content: text.substring(lastIndex, match.index) }); } const codeContent = match[1].replace(/^(\w+)\n/, ''); parts.push({ type: 'code', content: codeContent, language: match[1].split('\n')[0] || 'text' }); lastIndex = match.index + match[0].length; } if (lastIndex < text.length) { parts.push({ type: 'text', content: text.substring(lastIndex) }); } return parts.length > 0 ? parts : [{ type: 'text', content: text }]; } function createCodeBlock(code, language = 'text') { const codeBlock = document.createElement('div'); codeBlock.className = 'code-block'; const codeContent = document.createElement('pre'); codeContent.textContent = code; const toolbar = document.createElement('div'); toolbar.className = 'code-toolbar'; const copyBtn = document.createElement('button'); copyBtn.className = 'code-btn'; copyBtn.title = 'Copy code'; copyBtn.innerHTML = '<i class="fas fa-copy"></i>'; copyBtn.addEventListener('click', () => { copyCodeToClipboard(code); showToast('Kode disalin!'); }); const downloadBtn = document.createElement('button'); downloadBtn.className = 'code-btn'; downloadBtn.title = 'Download code'; downloadBtn.innerHTML = '<i class="fas fa-download"></i>'; downloadBtn.addEventListener('click', () => downloadCode(code, language)); toolbar.appendChild(copyBtn); toolbar.appendChild(downloadBtn); codeBlock.appendChild(codeContent); codeBlock.appendChild(toolbar); return codeBlock; } function copyCodeToClipboard(code) { navigator.clipboard.writeText(code).then(() => { console.log('Code copied to clipboard'); }).catch(err => { console.error('Failed to copy code: ', err); }); } function downloadCode(code, language) { const extension = getExtensionForLanguage(language); const blob = new Blob([code], { type: 'text/plain' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `eberardos-code.${extension}`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); showToast('Kode didownload!'); } function getExtensionForLanguage(language) { const extensions = { javascript: 'js', typescript: 'ts', python: 'py', java: 'java', c: 'c', cpp: 'cpp', html: 'html', css: 'css', php: 'php', ruby: 'rb', go: 'go', rust: 'rs', sql: 'sql', json: 'json', xml: 'xml', markdown: 'md' }; return extensions[language.toLowerCase()] || 'txt'; } function toggleSidebar() { sidebar.classList.toggle('active'); overlay.classList.toggle('active'); } function updateChatHistory() { chatHistory.innerHTML = ''; if (conversations.length === 0) { chatHistory.innerHTML = '<div class="text-center text-secondary py-3">Belum ada percakapan</div>'; return; } conversations.forEach(conv => { const historyItem = document.createElement('div'); historyItem.className = `history-item ${currentConversationId === conv.id ? 'active-chat' : ''}`; historyItem.innerHTML = ` <div class="text-truncate">${sanitizeHtml(conv.messages[0]?.text?.substring(0, 30) || 'Percakapan baru')}</div><button class="btn btn-sm btn-outline-danger delete-conv" data-id="${conv.id}"><i class="fas fa-times"></i></button> `; historyItem.addEventListener('click', (e) => { if (!e.target.closest('.delete-conv')) { loadConversation(conv.id); if (window.innerWidth < 768) toggleSidebar(); } }); const deleteBtn = historyItem.querySelector('.delete-conv'); deleteBtn.addEventListener('click', (e) => { e.stopPropagation(); deleteConversation(conv.id); }); chatHistory.appendChild(historyItem); }); } function deleteConversation(id) { conversations = conversations.filter(conv => conv.id !== id); if (currentConversationId === id) { currentConversationId = null; chatContainer.innerHTML = ` <div class="message ai-message"><div class="profile-image"><i class="fas fa-robot"></i></div><div class="message-content"><p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p><div class="suggestion-chips"><div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div><div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div><div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div></div></div></div> `; addSuggestionChipsListeners(); } localStorage.setItem('eberardosConversations', JSON.stringify(conversations)); updateChatHistory(); showToast('Percakapan dihapus'); } function loadConversation(id) { currentConversationId = id; const conversation = conversations.find(conv => conv.id === id); chatContainer.innerHTML = ''; if (conversation && conversation.messages) { conversation.messages.forEach(msg => { appendMessage(msg.text, msg.sender); }); } updateChatHistory(); chatContainer.scrollTop = chatContainer.scrollHeight; } function createNewConversation() { const newConv = { id: Date.now(), messages: [] }; conversations.unshift(newConv); currentConversationId = newConv.id; localStorage.setItem('eberardosConversations', JSON.stringify(conversations)); updateChatHistory(); chatContainer.innerHTML = ''; return newConv.id; } function appendMessage(text, sender) { const messageDiv = document.createElement('div'); messageDiv.className = `message ${sender === 'user' ? 'user-message' : 'ai-message'}`; const profileImage = document.createElement('div'); profileImage.className = 'profile-image'; profileImage.innerHTML = sender === 'ai' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>'; const contentContainer = document.createElement('div'); contentContainer.className = 'message-content'; const contentParts = extractCodeBlocks(text); contentParts.forEach(part => { if (part.type === 'code') { contentContainer.appendChild(createCodeBlock(part.content, part.language)); } else { const textNode = document.createElement('div'); const sanitizedText = sanitizeHtml(part.content); const htmlContent = convertMarkdownToHtml(sanitizedText); textNode.innerHTML = htmlContent; contentContainer.appendChild(textNode); } }); if (sender === 'ai' && !currentConversationId) { const chipsContainer = document.createElement('div'); chipsContainer.className = 'suggestion-chips'; chipsContainer.innerHTML = ` <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div><div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div><div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div></div> `; contentContainer.appendChild(chipsContainer); setTimeout(() => { addSuggestionChipsListeners(); }, 100); } messageDiv.appendChild(profileImage); messageDiv.appendChild(contentContainer); chatContainer.appendChild(messageDiv); chatContainer.scrollTop = chatContainer.scrollHeight; } function addSuggestionChipsListeners() { document.querySelectorAll('.suggestion-chip').forEach(chip => { chip.addEventListener('click', function() { const prompt = this.getAttribute('data-prompt'); userInput.value = prompt; sendMessage(); }); }); } function saveMessage(text, sender) { let conversation = conversations.find(conv => conv.id === currentConversationId); if (!conversation) { currentConversationId = createNewConversation(); conversation = conversations.find(conv => conv.id === currentConversationId); } if (conversation) { conversation.messages.push({ text, sender }); localStorage.setItem('eberardosConversations', JSON.stringify(conversations)); updateChatHistory(); } } function adjustTextareaHeight() { userInput.style.height = 'auto'; userInput.style.height = (userInput.scrollHeight) + 'px'; } function simulateThinking() { const thinkingDiv = document.createElement('div'); thinkingDiv.className = 'message ai-message'; thinkingDiv.innerHTML = ` <div class="profile-image"><i class="fas fa-robot"></i></div><div class="message-content"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div> `; chatContainer.appendChild(thinkingDiv); chatContainer.scrollTop = chatContainer.scrollHeight; return thinkingDiv; } async function sendMessage() { const message = userInput.value.trim(); if (!message) return; if (!currentConversationId) { createNewConversation(); } const conversation = conversations.find(conv => conv.id === currentConversationId); if (!conversation) return; appendMessage(message, 'user'); saveMessage(message, 'user'); userInput.value = ''; adjustTextareaHeight(); userInput.focus(); userInput.disabled = true; sendButton.disabled = true; sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; const thinkingIndicator = simulateThinking(); // --- PERBAIKAN DI SINI --- // Hapus format `User: ` atau `Eberardos AI: ` dari prompt const conversationHistory = conversation.messages.map(msg => msg.text).join('\n'); const combinedPrompt = `ingat, namamu adalah Eberardos AI, Eberardos AI tidak formal. \n\n${conversationHistory}\n\nUser: ${message}`; const apiUrl = '/api/chat'; try { const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: combinedPrompt }) // Kirim string gabungan }); const data = await response.json(); chatContainer.removeChild(thinkingIndicator); const aiResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan dalam memproses permintaan."; // Tidak perlu menghapus label "Eberardos AI:" lagi karena sudah tidak dikirim appendMessage(aiResponseText, 'ai'); saveMessage(aiResponseText, 'ai'); } catch (error) { console.error('Error:', error); if (thinkingIndicator && thinkingIndicator.closest('.message')) { chatContainer.removeChild(thinkingIndicator.closest('.message')); } appendMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai'); saveMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai'); showToast('Maaf, terjadi kesalahan.', true); } finally { userInput.disabled = false; sendButton.disabled = false; sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>'; } } // Event listeners sendButton.addEventListener('click', sendMessage); userInput.addEventListener('keydown', function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!sendButton.disabled) { sendMessage(); } } }); userInput.addEventListener('input', adjustTextareaHeight); newChatBtn.addEventListener('click', function() { createNewConversation(); chatContainer.innerHTML = ` <div class="message ai-message"><div class="profile-image"><i class="fas fa-robot"></i></div><div class="message-content"><p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p><div class="suggestion-chips"><div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div><div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div><div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div></div></div></div> `; addSuggestionChipsListeners(); userInput.value = ''; userInput.focus(); if (window.innerWidth < 768) { toggleSidebar(); } showToast('Percakapan baru dibuat'); }); clearHistoryBtn.addEventListener('click', function() { if (confirm('Apakah Anda yakin ingin menghapus semua riwayat percakapan?')) { conversations = []; localStorage.removeItem('eberardosConversations'); updateChatHistory(); chatContainer.innerHTML = ` <div class="message ai-message"><div class="profile-image"><i class="fas fa-robot"></i></div><div class="message-content"><p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p><div class="suggestion-chips"><div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div><div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div><div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div></div></div></div> `; addSuggestionChipsListeners(); currentConversationId = null; showToast('Semua riwayat dihapus'); } }); sidebarToggle.addEventListener('click', toggleSidebar); desktopSidebarToggle.addEventListener('click', toggleSidebar); closeSidebar.addEventListener('click', toggleSidebar); overlay.addEventListener('click', toggleSidebar); window.addEventListener('resize', function() { if (window.innerWidth >= 768) { sidebar.classList.remove('active'); overlay.classList.remove('active'); } }); // Initialize updateChatHistory(); if (conversations.length > 0) { loadConversation(conversations[0].id); } addSuggestionChipsListeners(); }); </script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eberardos AI</title>
+    <link rel="icon" href="https://eberardos.my.id/eberardos.jpg" type="image/jpeg">
+    <meta property="og:title" content="Eberardos - Community since 2021">
+    <meta property="og:description" content="Discover our community, projects, and contacts.">
+    <meta property="og:image" content="https://eberardos.my.id/eberardos.jpg">
+    <meta property="og:url" content="https://eberardos.my.id">
+    <meta property="og:type" content="website">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /*
+         * Eberardos AI - Versi Redesain Responsif
+         * --------------------------------------
+         * Fokus pada desain mobile-first, dengan transisi yang lebih halus.
+         */
+
+        :root {
+            --color-primary: #b71c1c;
+            --color-primary-hover: #9e1b1b;
+            --color-bg-dark: #0d0d0d;
+            --color-bg-light: #1a1a1a;
+            --color-bg-input: #2a2a2a;
+            --color-text-light: #f0f0f0;
+            --color-text-secondary: #888;
+            --color-border: #333;
+            --color-success: #28a745;
+            --color-warning: #ffc107;
+            --color-error: #dc3545;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-bg-dark);
+            color: var(--color-text-light);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Layout Umum --- */
+        .app-container {
+            padding-top: 50px; /* Tambahan padding untuk notifikasi API */
+            display: flex;
+            flex-grow: 1;
+            height: calc(100vh - 66px); 
+        }
+        
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- Navbar --- */
+        .navbar {
+            background-color: var(--color-bg-light);
+            border-bottom: 1px solid var(--color-border);
+            padding: 1rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+        }
+        .navbar-brand {
+            color: var(--color-primary) !important;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        .btn-nav {
+            color: var(--color-primary);
+            border-color: var(--color-primary);
+            transition: all 0.2s ease;
+        }
+        .btn-nav:hover {
+            background-color: var(--color-primary);
+            color: var(--color-text-light);
+        }
+
+        /* --- Notifikasi Status API --- */
+        .api-status-notification {
+            background-color: var(--color-bg-light);
+            color: var(--color-text-secondary);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            position: fixed;
+            top: 55px;
+            left: 0;
+            right: 0;
+            z-index: 9;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 300px;
+            background-color: var(--color-bg-light);
+            border-right: 1px solid var(--color-border);
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            transition: transform 0.3s ease-in-out;
+            z-index: 10;
+        }
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .sidebar-body {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 1rem;
+        }
+
+        .sidebar-body::-webkit-scrollbar { width: 6px; }
+        .sidebar-body::-webkit-scrollbar-thumb {
+            background-color: var(--color-text-secondary);
+            border-radius: 3px;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .history-item:hover { background-color: var(--color-bg-input); }
+        .active-chat {
+            background-color: var(--color-primary);
+            color: var(--color-text-light);
+        }
+        .active-chat:hover { background-color: var(--color-primary-hover); }
+
+        /* --- Chat Area --- */
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding-top: 66px; /* Tambahkan padding atas agar konten tidak tertutup navbar */
+        }
+
+        .chat-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            padding-bottom: 100px; /* Memberi ruang di bawah agar pesan tidak tertutup input */
+        }
+
+        .message {
+            display: flex;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .message-content {
+            flex-grow: 1;
+            padding-left: 1rem;
+            word-break: break-word !important; /* Tambahkan !important di sini */
+        }
+        .profile-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .user-message .profile-image { background-color: var(--color-primary); }
+        .ai-message .profile-image { background-color: var(--color-bg-input); }
+
+        /* --- Input Area --- */
+        .input-area {
+            background-color: var(--color-bg-light);
+            padding: 1rem;
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 5; 
+        }
+        .input-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--color-bg-input);
+            border-radius: 12px;
+            padding: 0.5rem 1rem;
+        }
+        .input-field {
+            flex-grow: 1;
+            background-color: transparent;
+            border: none;
+            color: var(--color-text-light);
+            outline: none;
+            resize: none;
+            max-height: 200px;
+            padding: 0.5rem 0;
+        }
+        .input-field::placeholder { color: var(--color-text-secondary); }
+
+        .send-button {
+            background-color: var(--color-primary);
+            color: var(--color-text-light);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .send-button:hover {
+            background-color: var(--color-primary-hover);
+            transform: translateY(-2px);
+        }
+        .send-button:disabled {
+            background-color: var(--color-text-secondary);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* --- Code Blocks & Utils --- */
+        .code-block {
+            background-color: var(--color-bg-input);
+            border-left: 4px solid var(--color-primary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            position: relative;
+        }
+        .code-block pre {
+            margin: 0;
+            padding: 0;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Mengizinkan pemecahan baris */
+            word-break: break-word; /* Memecah kata yang terlalu panjang */
+        }
+        .code-toolbar {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            display: flex;
+            gap: 5px;
+        }
+        .code-btn {
+            background-color: var(--color-bg-light);
+            color: var(--color-text-secondary);
+            border: none;
+            border-radius: 6px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .code-btn:hover {
+            background-color: var(--color-primary);
+            color: var(--color-text-light);
+        }
+        .text-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* --- New Features --- */
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--color-bg-input);
+            padding: 0.5rem 1rem;
+            border-radius: 18px;
+            margin-top: 0.5rem;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--color-text-secondary);
+            margin: 0 2px;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .suggestion-chip {
+            background-color: var(--color-bg-input);
+            color: var(--color-text-light);
+            border: 1px solid var(--color-border);
+            border-radius: 18px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .suggestion-chip:hover {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        /* KODE TOAST BARU */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px); /* Mulai dari atas, tersembunyi */
+            background-color: var(--color-success);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0); /* Meluncur ke posisi akhir */
+        }
+        
+        .toast-icon {
+            margin-right: 10px;
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            padding-bottom: 4px; /* Ruang untuk timer bar */
+        }
+
+        /* --- KODE TIMER BAR BARU --- */
+        .toast-timer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.4); /* Putih dengan transparansi 40% */
+            width: 100%;
+            animation: toastTimer 3s linear forwards;
+        }
+
+        .toast.error {
+            background-color: var(--color-error);
+        }
+        
+        .toast.error .toast-timer {
+            background-color: rgba(255, 255, 255, 0.4); /* Warna yang sama untuk kontras yang bagus */
+        }
+
+        @keyframes toastTimer {
+            from {
+                width: 100%;
+            }
+            to {
+                width: 0%;
+            }
+        }
+        /* --- Responsiveness --- */
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+                height: calc(100vh - 66px);
+            }
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 80%;
+                transform: translateX(-100%);
+                box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.7);
+                z-index: 9;
+                display: none;
+            }
+            .overlay.active {
+                display: block;
+            }
+            .navbar-brand {
+                flex-grow: 1;
+                text-align: center;
+            }
+            .btn-nav.d-none.d-md-block { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+    <nav class="navbar navbar-dark px-3 py-2">
+        <div class="container-fluid">
+            <button class="btn btn-nav d-md-none" type="button" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <span class="navbar-brand mb-0 h1">Eberardos AI</span>
+            <button class="btn btn-nav d-none d-md-block" type="button" id="desktopSidebarToggle">
+                <i class="fas fa-history"></i>
+            </button>
+        </div>
+    </nav>
+    
+    <div class="api-status-notification">
+        <i class="fas fa-info-circle me-2"></i>
+        <span>Kalo error, kemungkinan ada masalah pada API.</span>
+    </div>
+
+    <div class="app-container">
+        <div class="sidebar" id="mainSidebar">
+            <div class="sidebar-header">
+                <h5 class="mb-0">Chat History</h5>
+                <div>
+                    <button class="btn btn-sm btn-nav me-2" id="newChat" title="New chat">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="btn btn-sm btn-nav me-2" id="clearHistory" title="Clear history">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="btn btn-sm btn-nav d-md-none" id="closeSidebar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-body" id="chatHistory">
+                </div>
+        </div>
+
+        <div class="main-content">
+            <div class="chat-area">
+                <div class="chat-container" id="chatContainer">
+                    <div class="message ai-message">
+                        <div class="profile-image">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p>
+                            <div class="suggestion-chips">
+                                <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                                <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                                <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="input-area">
+        <div class="input-container">
+            <textarea class="input-field" placeholder="Ketik pesan Anda..." id="userInput" rows="1"></textarea>
+            <button class="send-button" id="sendButton">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast" role="alert" aria-live="polite">
+        <div class="toast-timer"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatContainer = document.getElementById('chatContainer');
+            const userInput = document.getElementById('userInput');
+            const sendButton = document.getElementById('sendButton');
+            const chatHistory = document.getElementById('chatHistory');
+            const newChatBtn = document.getElementById('newChat');
+            const clearHistoryBtn = document.getElementById('clearHistory');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const desktopSidebarToggle = document.getElementById('desktopSidebarToggle');
+            const closeSidebar = document.getElementById('closeSidebar');
+            const overlay = document.querySelector('.overlay');
+            const sidebar = document.getElementById('mainSidebar');
+            const toast = document.getElementById('toast');
+
+            let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || [];
+            let currentConversationId = null;
+
+            function showToast(message, isError = false) {
+                const toast = document.getElementById('toast');
+                const icon = isError 
+                    ? '<i class="fas fa-exclamation-circle toast-icon"></i>'
+                    : '<i class="fas fa-check-circle toast-icon"></i>';
+                
+                const toastContent = document.createElement('div');
+                toastContent.className = 'toast-content';
+                toastContent.innerHTML = icon + message;
+                
+                const timerBar = document.createElement('div');
+                timerBar.className = 'toast-timer';
+
+                toast.innerHTML = '';
+                toast.appendChild(toastContent);
+                toast.appendChild(timerBar);
+
+                toast.classList.remove('show', 'error');
+                
+                if (isError) {
+                    toast.classList.add('error');
+                }
+                
+                toast.classList.add('show');
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+
+            function sanitizeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function convertMarkdownToHtml(markdownText) {
+    let html = markdownText;
+
+    // Tambahkan baris ini untuk menangani kode inline (backtick tunggal)
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    // Perbaiki baris baru di dalam list
+    html = html.replace(/\n\s*([*-] )/g, '\n$1');
+
+    // Ubah list dengan simbol * atau -
+    html = html.replace(/^[*-] (.*)/gm, '<li>$1</li>');
+
+    // Bungkus semua <li> dengan <ul>
+    html = html.replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>');
+    
+    // Konversi bold dan italic
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Konversi link
+    html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+    
+    // Konversi baris baru menjadi <br>
+    html = html.replace(/\n/g, '<br>');
+    
+    // Hapus <br> yang tidak perlu di dalam <ul>
+    html = html.replace(/<ul><br>/g, '<ul>');
+
+    return html;
+}
+
+            function extractCodeBlocks(text) {
+                const codeBlockRegex = /```([\s\S]*?)```/g;
+                const matches = [];
+                let match;
+                let lastIndex = 0;
+                const parts = [];
+
+                while ((match = codeBlockRegex.exec(text)) !== null) {
+                    if (match.index > lastIndex) {
+                        parts.push({
+                            type: 'text',
+                            content: text.substring(lastIndex, match.index)
+                        });
+                    }
+
+                    const codeContent = match[1].replace(/^(\w+)\n/, '');
+                    parts.push({
+                        type: 'code',
+                        content: codeContent,
+                        language: match[1].split('\n')[0] || 'text'
+                    });
+
+                    lastIndex = match.index + match[0].length;
+                }
+
+                if (lastIndex < text.length) {
+                    parts.push({
+                        type: 'text',
+                        content: text.substring(lastIndex)
+                    });
+                }
+                return parts.length > 0 ? parts : [{ type: 'text', content: text }];
+            }
+
+            function createCodeBlock(code, language = 'text') {
+                const codeBlock = document.createElement('div');
+                codeBlock.className = 'code-block';
+
+                const codeContent = document.createElement('pre');
+                codeContent.textContent = code;
+
+                const toolbar = document.createElement('div');
+                toolbar.className = 'code-toolbar';
+
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'code-btn';
+                copyBtn.title = 'Copy code';
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                copyBtn.addEventListener('click', () => {
+                    copyCodeToClipboard(code);
+                    showToast('Kode disalin!');
+                });
+
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'code-btn';
+                downloadBtn.title = 'Download code';
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
+                downloadBtn.addEventListener('click', () => downloadCode(code, language));
+
+                toolbar.appendChild(copyBtn);
+                toolbar.appendChild(downloadBtn);
+
+                codeBlock.appendChild(codeContent);
+                codeBlock.appendChild(toolbar);
+
+                return codeBlock;
+            }
+
+            function copyCodeToClipboard(code) {
+                navigator.clipboard.writeText(code).then(() => {
+                    console.log('Code copied to clipboard');
+                }).catch(err => {
+                    console.error('Failed to copy code: ', err);
+                });
+            }
+
+            function downloadCode(code, language) {
+                const extension = getExtensionForLanguage(language);
+                const blob = new Blob([code], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `eberardos-code.${extension}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('Kode didownload!');
+            }
+
+            function getExtensionForLanguage(language) {
+                const extensions = {
+                    javascript: 'js', typescript: 'ts', python: 'py', java: 'java', c: 'c', cpp: 'cpp',
+                    html: 'html', css: 'css', php: 'php', ruby: 'rb', go: 'go', rust: 'rs',
+                    sql: 'sql', json: 'json', xml: 'xml', markdown: 'md'
+                };
+                return extensions[language.toLowerCase()] || 'txt';
+            }
+
+            function toggleSidebar() {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            }
+
+            function updateChatHistory() {
+                chatHistory.innerHTML = '';
+                if (conversations.length === 0) {
+                    chatHistory.innerHTML = '<div class="text-center text-secondary py-3">Belum ada percakapan</div>';
+                    return;
+                }
+                
+                conversations.forEach(conv => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = `history-item ${currentConversationId === conv.id ? 'active-chat' : ''}`;
+                    historyItem.innerHTML = `
+                        <div class="text-truncate">${sanitizeHtml(conv.messages[0]?.text?.substring(0, 30) || 'Percakapan baru')}</div>
+                        <button class="btn btn-sm btn-outline-danger delete-conv" data-id="${conv.id}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    
+                    historyItem.addEventListener('click', (e) => {
+                        if (!e.target.closest('.delete-conv')) {
+                            loadConversation(conv.id);
+                            if (window.innerWidth < 768) toggleSidebar();
+                        }
+                    });
+                    
+                    const deleteBtn = historyItem.querySelector('.delete-conv');
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deleteConversation(conv.id);
+                    });
+                    
+                    chatHistory.appendChild(historyItem);
+                });
+            }
+
+            function deleteConversation(id) {
+                conversations = conversations.filter(conv => conv.id !== id);
+                if (currentConversationId === id) {
+                    currentConversationId = null;
+                    chatContainer.innerHTML = `
+                        <div class="message ai-message">
+                            <div class="profile-image">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p>
+                                <div class="suggestion-chips">
+                                    <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                                    <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                                    <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    addSuggestionChipsListeners();
+                }
+                localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
+                updateChatHistory();
+                showToast('Percakapan dihapus');
+            }
+
+            function loadConversation(id) {
+                currentConversationId = id;
+                const conversation = conversations.find(conv => conv.id === id);
+                chatContainer.innerHTML = '';
+                
+                if (conversation && conversation.messages) {
+                    conversation.messages.forEach(msg => {
+                        appendMessage(msg.text, msg.sender);
+                    });
+                }
+                updateChatHistory();
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            function createNewConversation() {
+                const newConv = {
+                    id: Date.now(),
+                    messages: []
+                };
+                conversations.unshift(newConv);
+                currentConversationId = newConv.id;
+                localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
+                updateChatHistory();
+                chatContainer.innerHTML = '';
+                return newConv.id;
+            }
+
+            function appendMessage(text, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
+                
+                const profileImage = document.createElement('div');
+                profileImage.className = 'profile-image';
+                profileImage.innerHTML = sender === 'ai' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
+                
+                const contentContainer = document.createElement('div');
+                contentContainer.className = 'message-content';
+                
+                const contentParts = extractCodeBlocks(text);
+                
+                contentParts.forEach(part => {
+                    if (part.type === 'code') {
+                        contentContainer.appendChild(createCodeBlock(part.content, part.language));
+                    } else {
+                        const textNode = document.createElement('div');
+                        const sanitizedText = sanitizeHtml(part.content);
+                        const htmlContent = convertMarkdownToHtml(sanitizedText);
+                        textNode.innerHTML = htmlContent;
+                        contentContainer.appendChild(textNode);
+                    }
+                });
+                
+                if (sender === 'ai' && !currentConversationId) {
+                    const chipsContainer = document.createElement('div');
+                    chipsContainer.className = 'suggestion-chips';
+                    chipsContainer.innerHTML = `
+                        <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                        <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                        <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                    </div>
+                    `;
+                    contentContainer.appendChild(chipsContainer);
+                    
+                    setTimeout(() => {
+                        addSuggestionChipsListeners();
+                    }, 100);
+                }
+                
+                messageDiv.appendChild(profileImage);
+                messageDiv.appendChild(contentContainer);
+                
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            function addSuggestionChipsListeners() {
+                document.querySelectorAll('.suggestion-chip').forEach(chip => {
+                    chip.addEventListener('click', function() {
+                        const prompt = this.getAttribute('data-prompt');
+                        userInput.value = prompt;
+                        sendMessage();
+                    });
+                });
+            }
+
+            function saveMessage(text, sender) {
+                let conversation = conversations.find(conv => conv.id === currentConversationId);
+                if (!conversation) {
+                    currentConversationId = createNewConversation();
+                    conversation = conversations.find(conv => conv.id === currentConversationId);
+                }
+                
+                if (conversation) {
+                    conversation.messages.push({ text, sender });
+                    localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
+                    updateChatHistory();
+                }
+            }
+
+            function adjustTextareaHeight() {
+                userInput.style.height = 'auto';
+                userInput.style.height = (userInput.scrollHeight) + 'px';
+            }
+
+            function simulateThinking() {
+                const thinkingDiv = document.createElement('div');
+                thinkingDiv.className = 'message ai-message';
+                thinkingDiv.innerHTML = `
+                    <div class="profile-image">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="typing-indicator">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                `;
+                chatContainer.appendChild(thinkingDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                return thinkingDiv;
+            }
+
+            async function sendMessage() {
+                const message = userInput.value.trim();
+                if (!message) return;
+
+                if (!currentConversationId) {
+                    createNewConversation();
+                }
+
+                const conversation = conversations.find(conv => conv.id === currentConversationId);
+                if (!conversation) return;
+
+                appendMessage(message, 'user');
+                saveMessage(message, 'user');
+                userInput.value = '';
+                adjustTextareaHeight();
+                userInput.focus();
+
+                userInput.disabled = true;
+                sendButton.disabled = true;
+                sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                const thinkingIndicator = simulateThinking();
+
+                // --- PERBAIKAN DI SINI ---
+                // Hapus format `User: ` atau `Eberardos AI: ` dari prompt
+                const conversationHistory = conversation.messages.map(msg => msg.text).join('\n');
+                const combinedPrompt = `ingat, namamu adalah Eberardos AI, Eberardos AI tidak formal. \n\n${conversationHistory}\n\nUser: ${message}`;
+                
+                const apiUrl = '/api/chat';
+                
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ prompt: combinedPrompt }) // Kirim string gabungan
+                    });
+                    
+                    const data = await response.json();
+                    
+                    chatContainer.removeChild(thinkingIndicator);
+                    
+                    const aiResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan dalam memproses permintaan.";
+                    
+                    // Tidak perlu menghapus label "Eberardos AI:" lagi karena sudah tidak dikirim
+                    appendMessage(aiResponseText, 'ai');
+                    saveMessage(aiResponseText, 'ai');
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    if (thinkingIndicator && thinkingIndicator.closest('.message')) {
+                        chatContainer.removeChild(thinkingIndicator.closest('.message'));
+                    }
+                    appendMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai');
+                    saveMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai');
+                    showToast('Maaf, terjadi kesalahan.', true);
+                } finally {
+                    userInput.disabled = false;
+                    sendButton.disabled = false;
+                    sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                }
+            }
+
+            // Event listeners
+            sendButton.addEventListener('click', sendMessage);
+            userInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (!sendButton.disabled) {
+                        sendMessage();
+                    }
+                }
+            });
+            userInput.addEventListener('input', adjustTextareaHeight);
+
+            newChatBtn.addEventListener('click', function() {
+                createNewConversation();
+                chatContainer.innerHTML = `
+                    <div class="message ai-message">
+                        <div class="profile-image">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p>
+                            <div class="suggestion-chips">
+                                <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                                <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                                <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                addSuggestionChipsListeners();
+                userInput.value = '';
+                userInput.focus();
+                if (window.innerWidth < 768) {
+                    toggleSidebar();
+                }
+                showToast('Percakapan baru dibuat');
+            });
+
+            clearHistoryBtn.addEventListener('click', function() {
+                if (confirm('Apakah Anda yakin ingin menghapus semua riwayat percakapan?')) {
+                    conversations = [];
+                    localStorage.removeItem('eberardosConversations');
+                    updateChatHistory();
+                    chatContainer.innerHTML = `
+                        <div class="message ai-message">
+                            <div class="profile-image">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p>
+                                <div class="suggestion-chips">
+                                    <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                                    <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                                    <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    addSuggestionChipsListeners();
+                    currentConversationId = null;
+                    showToast('Semua riwayat dihapus');
+                }
+            });
+
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            desktopSidebarToggle.addEventListener('click', toggleSidebar);
+            closeSidebar.addEventListener('click', toggleSidebar);
+            overlay.addEventListener('click', toggleSidebar);
+
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                }
+            });
+
+            // Initialize
+            updateChatHistory();
+            if (conversations.length > 0) {
+                loadConversation(conversations[0].id);
+            }
+            
+            addSuggestionChipsListeners();
+        });
+    </script>
+</body>
+</html>
