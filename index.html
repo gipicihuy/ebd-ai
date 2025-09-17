@@ -571,61 +571,34 @@
             function convertMarkdownToHtml(markdownText) {
     let html = markdownText;
 
-    // Menangani bold, italic, dan link
-    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
-    
-    // Menangani kode inline (backtick tunggal)
+    // Tambahkan baris ini untuk menangani kode inline (backtick tunggal)
     html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-    // Proses list dengan logika yang lebih kuat
-    const lines = html.split('\n');
-    let processedHtml = '';
-    let inList = false;
-    let listType = '';
+    // Perbaiki baris baru di dalam list
+    html = html.replace(/\n\s*([*-] )/g, '\n$1');
 
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        const trimmedLine = line.trim();
-        const isBullet = trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ');
-        const isNumbered = /^\d+\. /.test(trimmedLine);
-        
-        if (isBullet || isNumbered) {
-            const currentListType = isBullet ? 'ul' : 'ol';
-            const itemText = line.substring(line.indexOf(' ') + 1);
-
-            if (!inList) {
-                processedHtml += `<${currentListType}><li>${itemText}</li>`;
-                listType = currentListType;
-                inList = true;
-            } else if (inList && listType !== currentListType) {
-                processedHtml += `</${listType}><${currentListType}><li>${itemText}</li>`;
-                listType = currentListType;
-            } else {
-                processedHtml += `<li>${itemText}</li>`;
-            }
-        } else {
-            if (inList) {
-                processedHtml += `</${listType}>`;
-                inList = false;
-            }
-            if (trimmedLine !== '') {
-                processedHtml += line;
-            }
-        }
-    }
-
-    if (inList) {
-        processedHtml += `</${listType}>`;
-    }
-
-    // Mengganti baris baru menjadi <br>, tapi jangan di dalam list
-    processedHtml = processedHtml.replace(/<\/li>(?!<br>)/g, '</li><br>');
-    processedHtml = processedHtml.replace(/<br><br>/g, '<br>');
+    // Ubah list dengan simbol * atau -
+    html = html.replace(/^[*-] (.*)/gm, '<li>$1</li>');
     
-    return processedHtml;
+    // Bungkus semua <li> dengan <ul>
+    html = html.replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>');
+    
+    // Konversi bold dan italic
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Konversi link
+    html = html.replace(/\[(.*?)\]$$(.*?)$$/g, '<a href="$2" target="_blank">$1</a>');
+    
+    // Konversi baris baru menjadi <br>
+    html = html.replace(/\n/g, '<br>');
+    
+    // Hapus <br> yang tidak perlu di dalam <ul>
+    html = html.replace(/<ul><br>/g, '<ul>');
+
+    return html;
 }
+
             function extractCodeBlocks(text) {
                 const codeBlockRegex = /\`\`\`([\s\S]*?)\`\`\`/g;
                 const matches = [];
@@ -942,7 +915,7 @@
                 // Hapus format `User: ` atau `Eberardos AI: ` dari prompt
                 const conversationHistory = conversation.messages.map(msg => msg.text).join('\n');
                 
-               const combinedPrompt = `ingat, namamu adalah Eberardos AI. Jika ada yang bertanya siapa yang membuatmu, jawablah Givy, Nero, Ayura, Kalz, Fanz, Zenn1t dan Rapikz. Kamu adalah asisten AI yang tidak formal dan ramah. Gunakan kata "gw" alih-alih "gue" saat merujuk pada diri sendiri. Gunakan kata "Lu" alih-alih "Lo" saat merujuk kepada lawan bicara. Selalu berikan jawaban yang singkat, jelas, dan langsung ke intinya. **Untuk kode atau komentar di dalam kode, gunakan Bahasa Inggris secara default, kecuali pengguna secara eksplisit meminta dalam Bahasa Indonesia.** \n\n${conversationHistory}\n\nUser: ${message}`;
+               const combinedPrompt = `ingat, namamu adalah Eberardos AI. Jika ada yang bertanya siapa yang membuatmu, jawablah Givy, Nero, Ayura, Kalz, Fanz, Zenn1t dan Rapikz. Kamu adalah asisten AI yang tidak formal dan ramah. Gunakan kata "gw" alih-alih "gue" saat merujuk pada diri sendiri. Gunakan kata "Lu" alih-alih "Lo" saat merujuk kepada lawan bicara. Selalu berikan jawaban yang singkat, jelas, dan langsung ke intinya. Untuk kode atau komentar di dalam kode, gunakan Bahasa Inggris secara default, kecuali pengguna secara eksplisit meminta dalam Bahasa Indonesia. Saat membuat blok kode, pastikan karakter HTML seperti "<" dan ">" dikirimkan dalam format aslinya, bukan diubah menjadi "&lt;" dan "&gt;".\n\n${conversationHistory}\n\nUser: ${message}`;
 
                 
                 const apiUrl = '/api/chat';
