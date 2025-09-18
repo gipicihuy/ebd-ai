@@ -17,9 +17,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /*
-         * Eberardos AI - Versi Redesain Final (Revisi)
+         * Eberardos AI - Versi Redesain Final (Revisi 2)
          * ---------------------------------------------
-         * Layout responsif dengan navbar atas & bawah (khusus mobile)
+         * Navigasi bawah untuk mobile dan tombol settings
          */
 
         :root {
@@ -467,8 +467,8 @@
     <div class="overlay"></div>
     <nav class="navbar navbar-dark px-3 py-2">
         <div class="container-fluid">
-            <button class="btn btn-nav d-md-none" type="button" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
+            <button class="btn btn-nav d-md-none" type="button" id="settingsToggle">
+                <i class="fas fa-gear"></i>
             </button>
             <span class="navbar-brand mb-0 h1">Eberardos AI</span>
             <button class="btn btn-nav d-none d-md-block" type="button" id="desktopToggle">
@@ -524,7 +524,7 @@
     </div>
     
     <div class="bottom-nav d-md-none" id="bottomNav">
-        <a href="#" class="bottom-nav-item active">
+        <a href="#" class="bottom-nav-item active" id="mobileChatToggle">
             <i class="fas fa-robot"></i>
             <span>Chat</span>
         </a>
@@ -555,6 +555,23 @@
         </div>
     </div>
 
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Halaman pengaturan akan dibuat di sini.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast" role="alert" aria-live="polite">
         <div class="toast-timer"></div>
     </div>
@@ -568,14 +585,16 @@
             const chatHistory = document.getElementById('chatHistory');
             const newChatBtn = document.getElementById('newChat');
             const clearHistoryBtn = document.getElementById('clearHistory');
-            const sidebarToggle = document.getElementById('sidebarToggle');
+            const settingsToggle = document.getElementById('settingsToggle');
             const desktopToggle = document.getElementById('desktopToggle');
+            const mobileChatToggle = document.getElementById('mobileChatToggle');
             const mobileHistoryToggle = document.getElementById('mobileHistoryToggle');
             const overlay = document.querySelector('.overlay');
             const sidebar = document.getElementById('mainSidebar');
             const toast = document.getElementById('toast');
             
             const apiStatusModal = new bootstrap.Modal(document.getElementById('apiStatusModal'), {});
+            const settingsModal = new bootstrap.Modal(document.getElementById('settingsModal'), {});
             apiStatusModal.show();
 
             let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || [];
@@ -1068,29 +1087,33 @@
                 }
             });
 
-            if (sidebarToggle) {
-                sidebarToggle.addEventListener('click', toggleSidebar);
-            }
-            if (desktopToggle) {
-                desktopToggle.addEventListener('click', () => {
-                    const isCollapsed = sidebar.classList.contains('collapsed');
-                    if(isCollapsed) {
-                        sidebar.classList.remove('collapsed');
-                        desktopToggle.innerHTML = `<i class="fas fa-arrow-right-to-bracket"></i>`;
-                        desktopToggle.title = 'Minimize sidebar';
-                    } else {
-                        sidebar.classList.add('collapsed');
-                        desktopToggle.innerHTML = `<i class="fas fa-arrow-left-to-bracket"></i>`;
-                        desktopToggle.title = 'Maximize sidebar';
-                    }
+            // Mobile toggles
+            if (settingsToggle) {
+                settingsToggle.addEventListener('click', () => {
+                    settingsModal.show();
                 });
             }
+
             if (mobileHistoryToggle) {
                  mobileHistoryToggle.addEventListener('click', (e) => {
                     e.preventDefault();
                     toggleSidebar();
+                    mobileHistoryToggle.classList.add('active');
+                    mobileChatToggle.classList.remove('active');
                  });
             }
+
+            if (mobileChatToggle) {
+                 mobileChatToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (sidebar.classList.contains('active')) {
+                        toggleSidebar();
+                    }
+                    mobileChatToggle.classList.add('active');
+                    mobileHistoryToggle.classList.remove('active');
+                 });
+            }
+
             if (overlay) {
                 overlay.addEventListener('click', function() {
                     if (sidebar.classList.contains('active')) {
@@ -1099,12 +1122,33 @@
                 });
             }
             
-            // Set up sidebar on first load
+            // Desktop toggles
+            if (desktopToggle) {
+                desktopToggle.addEventListener('click', () => {
+                    const isHidden = sidebar.classList.contains('d-none');
+                    if(isHidden) {
+                        sidebar.classList.remove('d-none', 'd-md-flex');
+                        sidebar.classList.add('d-md-flex');
+                        desktopToggle.innerHTML = `<i class="fas fa-history"></i>`;
+                        desktopToggle.title = 'Hide sidebar';
+                    } else {
+                        sidebar.classList.remove('d-md-flex');
+                        sidebar.classList.add('d-none', 'd-md-flex');
+                        desktopToggle.innerHTML = `<i class="fas fa-history"></i>`;
+                        desktopToggle.title = 'Show sidebar';
+                    }
+                });
+            }
+
+
+            // Set up initial state
             if (window.innerWidth >= 768) {
-                sidebar.classList.remove('active');
+                sidebar.classList.add('d-md-flex');
+                sidebar.classList.remove('d-none', 'active');
                 overlay.classList.remove('active');
             } else {
-                sidebar.classList.add('active'); // Hide sidebar by default on mobile
+                sidebar.classList.add('d-none');
+                sidebar.classList.remove('d-md-flex', 'active');
             }
 
             updateChatHistory();
