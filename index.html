@@ -44,6 +44,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            padding-bottom: 60px; /* Tambahkan padding untuk bottom navbar */
         }
         
         /* --- Modal Kustomisasi (agar sesuai tema) --- */
@@ -207,7 +208,7 @@
             justify-content: center;
             align-items: center;
             position: fixed;
-            bottom: 0;
+            bottom: 60px; /* Diubah dari 0 ke 60px agar tidak tertutup bottom navbar */
             left: 0;
             right: 0;
             z-index: 5; 
@@ -411,6 +412,41 @@
                 width: 0%;
             }
         }
+
+        /* --- Bottom Navigation Bar --- */
+        .bottom-navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--color-bg-light);
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            font-size: 0.75rem;
+            transition: color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--color-primary);
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+            margin-bottom: 4px;
+        }
+
         /* --- Responsiveness --- */
         @media (max-width: 768px) {
             .app-container {
@@ -455,7 +491,7 @@
     <nav class="navbar navbar-dark px-3 py-2">
         <div class="container-fluid">
             <button class="btn btn-nav d-md-none" type="button" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
+                <i class="fas fa-cog"></i> <!-- Diubah dari fa-bars menjadi fa-cog -->
             </button>
             <span class="navbar-brand mb-0 h1">Eberardos AI</span>
             <button class="btn btn-nav d-none d-md-block" type="button" id="desktopSidebarToggle">
@@ -513,6 +549,18 @@
         </div>
     </div>
 
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-navbar">
+        <div class="nav-item active" id="navChat">
+            <i class="fas fa-robot"></i>
+            <span>Chat</span>
+        </div>
+        <div class="nav-item" id="navHistory">
+            <i class="fas fa-history"></i>
+            <span>History</span>
+        </div>
+    </div>
+
     <div class="modal fade" id="apiStatusModal" tabindex="-1" aria-labelledby="apiStatusModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -553,6 +601,8 @@
             const overlay = document.querySelector('.overlay');
             const sidebar = document.getElementById('mainSidebar');
             const toast = document.getElementById('toast');
+            const navChat = document.getElementById('navChat');
+            const navHistory = document.getElementById('navHistory');
             
             // Tampilkan modal saat halaman dimuat
             const apiStatusModal = new bootstrap.Modal(document.getElementById('apiStatusModal'), {});
@@ -941,85 +991,62 @@
                 `;
                 chatContainer.appendChild(thinkingDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
-                
                 return thinkingDiv;
             }
 
-            async function sendMessage() {
+            function sendMessage() {
                 const message = userInput.value.trim();
                 if (!message) return;
-
+                
                 if (!currentConversationId) {
                     createNewConversation();
                 }
-
-                const conversation = conversations.find(conv => conv.id === currentConversationId);
-                if (!conversation) return;
-
+                
                 appendMessage(message, 'user');
                 saveMessage(message, 'user');
+                
                 userInput.value = '';
                 adjustTextareaHeight();
-                userInput.focus();
-
-                userInput.disabled = true;
-                sendButton.disabled = true;
-                sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-                const thinkingIndicator = simulateThinking();
-
-                const conversationHistory = conversation.messages.map(msg => msg.text).join('\n');
                 
-                const combinedPrompt = `ingat, namamu adalah Eberardos AI. Jika ada yang bertanya siapa yang membuatmu, jawablah Givy, Nero, Ayura, Kalz, Fanz, Zenn1t dan Rapikz. Kamu adalah asisten AI yang tidak formal dan ramah. Gunakan kata "gw" alih-alih "gue" saat merujuk pada diri sendiri. Gunakan kata "Lu" alih-alih "Lo" saat merujuk kepada lawan bicara. Gunakan kata "kaga" alih-alih "enggak". Gunakan kata "kek gitu" alih-alih "begitu". Selalu berikan jawaban yang singkat, jelas, dan langsung ke intinya. **Jangan pernah sertakan namamu (Eberardos AI) atau nama siapa pun di awal setiap jawaban. Berikan jawaban langsung.** Untuk kode atau komentar di dalam kode, gunakan Bahasa Inggris secara default, kecuali pengguna secara eksplisit meminta dalam Bahasa Indonesia. Saat membuat blok kode, pastikan karakter HTML seperti "<" dan ">" dikirimkan dalam format aslinya, bukan diubah menjadi "&lt;" dan "&gt;".\n\n${conversationHistory}\n\nUser: ${message}`;
+                const thinkingElement = simulateThinking();
                 
-                const apiUrl = '/api/chat';
-                
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ prompt: combinedPrompt }) // Kirim string gabungan
-                    });
+                // Simulasi respons AI (dalam implementasi nyata, ini akan diganti dengan API call)
+                setTimeout(() => {
+                    thinkingElement.remove();
                     
-                    const data = await response.json();
+                    // Simulasi respons AI berdasarkan input pengguna
+                    let response = '';
                     
-                    chatContainer.removeChild(thinkingIndicator);
-                    
-                    const aiResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan dalam memproses permintaan.";
-                    
-                    appendMessage(aiResponseText, 'ai');
-                    saveMessage(aiResponseText, 'ai');
-
-                } catch (error) {
-                    console.error('Error:', error);
-                    if (thinkingIndicator && thinkingIndicator.closest('.message')) {
-                        chatContainer.removeChild(thinkingIndicator.closest('.message'));
+                    if (message.toLowerCase().includes('halo') || message.toLowerCase().includes('hai')) {
+                        response = "Halo! Senang bisa membantu Anda hari ini. Ada yang bisa saya bantu?";
+                    } else if (message.toLowerCase().includes('eberardos')) {
+                        response = "Eberardos adalah komunitas yang berfokus pada pengembangan teknologi dan kreativitas. Komunitas ini didirikan pada tahun 2021 dan telah menghasilkan berbagai proyek menarik di bidang web development, AI, dan desain.";
+                    } else if (message.toLowerCase().includes('html')) {
+                        response = "Berikut contoh kode HTML sederhana:\n\n```html\n<!DOCTYPE html>\n<html>\n<head>\n    <title>Halaman Saya</title>\n</head>\n<body>\n    <h1>Halo Dunia!</h1>\n    <p>Ini adalah halaman HTML sederhana.</p>\n</body>\n</html>\n```\n\nKode ini membuat halaman web dengan judul dan paragraf sederhana.";
+                    } else if (message.toLowerCase().includes('ai')) {
+                        response = "AI (Artificial Intelligence) atau kecerdasan buatan adalah simulasi proses kecerdasan manusia oleh mesin, terutama sistem komputer. Proses ini termasuk pembelajaran, penalaran, dan koreksi diri. AI digunakan dalam berbagai bidang seperti pemrosesan bahasa alami, pengenalan suara, dan visi komputer.";
+                    } else {
+                        response = "Terima kasih atas pesannya! Ini adalah simulasi respons AI. Dalam implementasi nyata, ini akan terhubung ke API AI seperti OpenAI GPT untuk menghasilkan respons yang lebih cerdas dan kontekstual.\n\nUntuk informasi lebih lanjut, kunjungi [Eberardos](https://eberardos.my.id).";
                     }
-                    appendMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai');
-                    saveMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai');
-                    showToast('Maaf, terjadi kesalahan.', true);
-                } finally {
-                    userInput.disabled = false;
-                    sendButton.disabled = false;
-                    sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
-                }
+                    
+                    appendMessage(response, 'ai');
+                    saveMessage(response, 'ai');
+                }, 2000);
             }
 
-            // Event listeners
+            // Event Listeners
             sendButton.addEventListener('click', sendMessage);
-            userInput.addEventListener('keydown', function(e) {
+            
+            userInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    if (!sendButton.disabled) {
-                        sendMessage();
-                    }
+                    sendMessage();
                 }
             });
+            
             userInput.addEventListener('input', adjustTextareaHeight);
-
-            newChatBtn.addEventListener('click', function() {
+            
+            newChatBtn.addEventListener('click', () => {
                 createNewConversation();
                 chatContainer.innerHTML = `
                     <div class="message ai-message">
@@ -1037,17 +1064,13 @@
                     </div>
                 `;
                 addSuggestionChipsListeners();
-                userInput.value = '';
-                userInput.focus();
-                if (window.innerWidth < 768) {
-                    toggleSidebar();
-                }
                 showToast('Percakapan baru dibuat');
             });
-
-            clearHistoryBtn.addEventListener('click', function() {
-                if (confirm('Apakah Anda yakin ingin menghapus semua riwayat percakapan?')) {
+            
+            clearHistoryBtn.addEventListener('click', () => {
+                if (confirm('Hapus semua riwayat percakapan?')) {
                     conversations = [];
+                    currentConversationId = null;
                     localStorage.removeItem('eberardosConversations');
                     updateChatHistory();
                     chatContainer.innerHTML = `
@@ -1066,29 +1089,38 @@
                         </div>
                     `;
                     addSuggestionChipsListeners();
-                    currentConversationId = null;
-                    showToast('Semua riwayat dihapus');
+                    showToast('Riwayat dihapus');
                 }
             });
-
+            
             sidebarToggle.addEventListener('click', toggleSidebar);
-            desktopSidebarToggle.addEventListener('click', toggleSidebar);
+            desktopSidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('d-none');
+            });
+            
             closeSidebar.addEventListener('click', toggleSidebar);
             overlay.addEventListener('click', toggleSidebar);
-
-            window.addEventListener('resize', function() {
-                if (window.innerWidth >= 768) {
-                    sidebar.classList.remove('active');
-                    overlay.classList.remove('active');
-                }
+            
+            // Bottom navbar functionality
+            navChat.addEventListener('click', () => {
+                navChat.classList.add('active');
+                navHistory.classList.remove('active');
+                // Tampilkan halaman chat
+                document.querySelector('.main-content').style.display = 'flex';
+                // Sembunyikan halaman history (jika ada)
+            });
+            
+            navHistory.addEventListener('click', () => {
+                navHistory.classList.add('active');
+                navChat.classList.remove('active');
+                // Sembunyikan halaman chat
+                document.querySelector('.main-content').style.display = 'none';
+                // Tampilkan halaman history (jika ada)
+                showToast('Fitur History akan segera hadir!');
             });
 
             // Initialize
             updateChatHistory();
-            if (conversations.length > 0) {
-                loadConversation(conversations[0].id);
-            }
-            
             addSuggestionChipsListeners();
         });
     </script>
