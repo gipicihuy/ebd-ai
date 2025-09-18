@@ -17,9 +17,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /*
-         * Eberardos AI - Versi Redesain Final
-         * ----------------------------------
-         * Layout baru dengan sidebar permanen
+         * Eberardos AI - Versi Redesain Final (Revisi)
+         * ---------------------------------------------
+         * Layout responsif dengan navbar atas & bawah (khusus mobile)
          */
 
         :root {
@@ -42,9 +42,10 @@
             color: var(--color-text-light);
             margin: 0;
             display: flex;
+            flex-direction: column;
             min-height: 100vh;
         }
-
+        
         /* --- Modal Kustomisasi (agar sesuai tema) --- */
         .modal-content {
             background-color: var(--color-bg-light);
@@ -69,14 +70,15 @@
             background-color: var(--color-primary-hover);
             border-color: var(--color-primary-hover);
         }
-        
-        /* --- Layout Utama --- */
+
+        /* --- Layout Umum --- */
         .app-container {
             display: flex;
+            flex-grow: 1;
             width: 100%;
-            height: 100vh;
+            height: calc(100vh - 66px); /* Mengakomodasi navbar atas */
         }
-
+        
         .main-content {
             flex-grow: 1;
             display: flex;
@@ -84,7 +86,33 @@
             overflow: hidden;
         }
 
-        /* --- Sidebar Baru --- */
+        /* --- Navbar Atas --- */
+        .navbar {
+            background-color: var(--color-bg-light);
+            border-bottom: 1px solid var(--color-border);
+            padding: 1rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+        }
+        .navbar-brand {
+            color: var(--color-primary) !important;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        .btn-nav {
+            color: var(--color-primary);
+            border-color: var(--color-primary);
+            transition: all 0.2s ease;
+        }
+        .btn-nav:hover {
+            background-color: var(--color-primary);
+            color: var(--color-text-light);
+        }
+
+        /* --- Sidebar --- */
         .sidebar {
             width: 300px;
             background-color: var(--color-bg-light);
@@ -93,31 +121,16 @@
             display: flex;
             flex-direction: column;
             padding: 1rem;
-            transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
             z-index: 10;
+            padding-top: 66px; /* Mengakomodasi navbar atas */
+            height: 100vh;
         }
         
-        .sidebar.collapsed {
-            width: 60px;
-            padding: 1rem 0;
-            text-align: center;
-        }
-
         .sidebar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
-        }
-
-        .sidebar.collapsed .sidebar-header {
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .sidebar.collapsed .sidebar-header h5 {
-            display: none;
         }
 
         .sidebar-body {
@@ -126,17 +139,11 @@
             padding-right: 1rem;
         }
         
-        .sidebar.collapsed .sidebar-body {
-            padding-right: 0;
-            overflow-y: hidden;
-        }
-        
         .sidebar-body::-webkit-scrollbar { width: 6px; }
         .sidebar-body::-webkit-scrollbar-thumb {
             background-color: var(--color-text-secondary);
             border-radius: 3px;
         }
-        .sidebar.collapsed .sidebar-body::-webkit-scrollbar { display: none; }
 
         .history-item {
             display: flex;
@@ -148,15 +155,6 @@
             cursor: pointer;
             transition: background-color 0.2s ease;
         }
-        
-        .sidebar.collapsed .history-item {
-            justify-content: center;
-            padding: 0.75rem 0.5rem;
-        }
-
-        .sidebar.collapsed .history-item .text-truncate { display: none; }
-        .sidebar.collapsed .history-item .delete-conv { display: none; }
-
         .history-item:hover { background-color: var(--color-bg-input); }
         .active-chat {
             background-color: var(--color-primary);
@@ -169,13 +167,14 @@
             display: flex;
             flex-direction: column;
             height: 100%;
+            padding-top: 66px;
+            padding-bottom: 80px; /* Ruang untuk input & bottom nav di mobile */
         }
 
         .chat-container {
             flex-grow: 1;
             overflow-y: auto;
             padding: 1rem;
-            padding-bottom: 100px;
         }
 
         .message {
@@ -231,7 +230,6 @@
             padding: 0.5rem 0;
         }
         .input-field::placeholder { color: var(--color-text-secondary); }
-
         .send-button {
             background-color: var(--color-primary);
             color: var(--color-text-light);
@@ -295,8 +293,6 @@
             color: var(--color-text-light);
         }
         .text-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-        /* --- New Features --- */
         .typing-indicator {
             display: inline-flex;
             align-items: center;
@@ -305,7 +301,6 @@
             border-radius: 18px;
             margin-top: 0.5rem;
         }
-
         .typing-dot {
             width: 8px;
             height: 8px;
@@ -317,12 +312,10 @@
         .typing-dot:nth-child(1) { animation-delay: 0s; }
         .typing-dot:nth-child(2) { animation-delay: 0.2s; }
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-
         @keyframes typingAnimation {
             0%, 60%, 100% { transform: translateY(0); }
             30% { transform: translateY(-5px); }
         }
-
         .suggestion-chips {
             display: flex;
             flex-wrap: wrap;
@@ -389,10 +382,13 @@
             from { width: 100%; }
             to { width: 0%; }
         }
-
-        /* Responsiveness */
+        
+        /* --- Responsiveness --- */
         @media (max-width: 768px) {
-            .app-container { flex-direction: column; }
+            .app-container {
+                flex-direction: column;
+                height: 100vh;
+            }
             .sidebar {
                 position: fixed;
                 top: 0;
@@ -402,8 +398,12 @@
                 transform: translateX(-100%);
                 box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
                 border-right: none;
+                padding-top: 0;
+                transition: transform 0.3s ease-in-out;
             }
-            .sidebar.active { transform: translateX(0); }
+            .sidebar.active {
+                transform: translateX(0);
+            }
             .overlay {
                 position: fixed;
                 top: 0;
@@ -414,26 +414,73 @@
                 z-index: 9;
                 display: none;
             }
-            .overlay.active { display: block; }
-            .chat-area { padding-top: 0; }
-            .input-area { position: fixed; bottom: 0; left: 0; right: 0; }
-            .desktop-toggle { display: none; }
-            .mobile-toggle { display: block; }
+            .overlay.active {
+                display: block;
+            }
+            .navbar-brand {
+                flex-grow: 1;
+                text-align: center;
+            }
+            .navbar .d-none.d-md-block { display: none !important; }
+            .chat-area {
+                padding-top: 66px; /* Space for top navbar */
+                padding-bottom: 80px; /* Space for bottom nav */
+            }
+            .input-area {
+                position: fixed;
+                bottom: 66px; /* Di atas bottom nav */
+                left: 0;
+                right: 0;
+                z-index: 5;
+            }
+            .bottom-nav {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background-color: var(--color-bg-light);
+                border-top: 1px solid var(--color-border);
+                justify-content: space-around;
+                padding: 0.5rem;
+                z-index: 10;
+            }
+            .bottom-nav-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                color: var(--color-text-secondary);
+                text-decoration: none;
+                font-size: 0.75rem;
+            }
+            .bottom-nav-item i {
+                font-size: 1.2rem;
+                margin-bottom: 0.25rem;
+            }
+            .bottom-nav-item:hover, .bottom-nav-item.active {
+                color: var(--color-primary);
+            }
         }
     </style>
 </head>
 <body>
     <div class="overlay"></div>
+    <nav class="navbar navbar-dark px-3 py-2">
+        <div class="container-fluid">
+            <button class="btn btn-nav d-md-none" type="button" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <span class="navbar-brand mb-0 h1">Eberardos AI</span>
+            <button class="btn btn-nav d-none d-md-block" type="button" id="desktopToggle">
+                <i class="fas fa-history"></i>
+            </button>
+        </div>
+    </nav>
+
     <div class="app-container">
-        <div class="sidebar" id="mainSidebar">
+        <div class="sidebar d-none d-md-flex" id="mainSidebar">
             <div class="sidebar-header">
-                <span class="navbar-brand mb-0 h1">Eberardos AI</span>
-                <button class="btn btn-sm btn-nav d-md-none" id="closeSidebar">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0 text-truncate">Chat History</h5>
+                <h5 class="mb-0">Chat History</h5>
                 <div>
                     <button class="btn btn-sm btn-nav me-2" id="newChat" title="New chat">
                         <i class="fas fa-plus"></i>
@@ -475,6 +522,17 @@
             </div>
         </div>
     </div>
+    
+    <div class="bottom-nav d-md-none" id="bottomNav">
+        <a href="#" class="bottom-nav-item active">
+            <i class="fas fa-robot"></i>
+            <span>Chat</span>
+        </a>
+        <a href="#" class="bottom-nav-item" id="mobileHistoryToggle">
+            <i class="fas fa-history"></i>
+            <span>History</span>
+        </a>
+    </div>
 
     <div class="modal fade" id="apiStatusModal" tabindex="-1" aria-labelledby="apiStatusModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -511,7 +569,8 @@
             const newChatBtn = document.getElementById('newChat');
             const clearHistoryBtn = document.getElementById('clearHistory');
             const sidebarToggle = document.getElementById('sidebarToggle');
-            const closeSidebar = document.getElementById('closeSidebar');
+            const desktopToggle = document.getElementById('desktopToggle');
+            const mobileHistoryToggle = document.getElementById('mobileHistoryToggle');
             const overlay = document.querySelector('.overlay');
             const sidebar = document.getElementById('mainSidebar');
             const toast = document.getElementById('toast');
@@ -560,17 +619,14 @@
 
             function convertMarkdownToHtml(markdownText) {
                 let html = markdownText;
-
                 html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
                 html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
                 html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-                
                 const lines = html.split('\n');
                 let processedHtml = '';
                 let inList = false;
                 let listType = '';
-
                 for (let i = 0; i < lines.length; i++) {
                     const line = lines[i];
                     const trimmedLine = line.trim();
@@ -601,14 +657,11 @@
                         }
                     }
                 }
-
                 if (inList) {
                     processedHtml += `</${listType}>`;
                 }
-
                 processedHtml = processedHtml.replace(/<\/li>(?!<br>)/g, '</li><br>');
                 processedHtml = processedHtml.replace(/<br><br>/g, '<br>');
-                
                 return processedHtml;
             }
 
@@ -618,7 +671,6 @@
                 let match;
                 let lastIndex = 0;
                 const parts = [];
-
                 while ((match = codeBlockRegex.exec(text)) !== null) {
                     if (match.index > lastIndex) {
                         parts.push({
@@ -626,17 +678,14 @@
                             content: text.substring(lastIndex, match.index)
                         });
                     }
-
                     const codeContent = match[1].replace(/^(\w+)\n/, '');
                     parts.push({
                         type: 'code',
                         content: codeContent,
                         language: match[1].split('\n')[0] || 'text'
                     });
-
                     lastIndex = match.index + match[0].length;
                 }
-
                 if (lastIndex < text.length) {
                     parts.push({
                         type: 'text',
@@ -649,13 +698,10 @@
             function createCodeBlock(code, language = 'text') {
                 const codeBlock = document.createElement('div');
                 codeBlock.className = 'code-block';
-
                 const codeContent = document.createElement('pre');
                 codeContent.textContent = code;
-
                 const toolbar = document.createElement('div');
                 toolbar.className = 'code-toolbar';
-
                 const copyBtn = document.createElement('button');
                 copyBtn.className = 'code-btn';
                 copyBtn.title = 'Copy code';
@@ -664,19 +710,15 @@
                     copyCodeToClipboard(code);
                     showToast('Kode disalin!');
                 });
-
                 const downloadBtn = document.createElement('button');
                 downloadBtn.className = 'code-btn';
                 downloadBtn.title = 'Download code';
                 downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
                 downloadBtn.addEventListener('click', () => downloadCode(code, language));
-
                 toolbar.appendChild(copyBtn);
                 toolbar.appendChild(downloadBtn);
-
                 codeBlock.appendChild(codeContent);
                 codeBlock.appendChild(toolbar);
-
                 return codeBlock;
             }
 
@@ -712,12 +754,8 @@
             }
 
             function toggleSidebar() {
-                if (window.innerWidth >= 768) {
-                    sidebar.classList.toggle('collapsed');
-                } else {
-                    sidebar.classList.toggle('active');
-                    overlay.classList.toggle('active');
-                }
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
             }
 
             function updateChatHistory() {
@@ -967,7 +1005,6 @@
                 }
             }
 
-            // Event listeners
             sendButton.addEventListener('click', sendMessage);
             userInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -1034,8 +1071,25 @@
             if (sidebarToggle) {
                 sidebarToggle.addEventListener('click', toggleSidebar);
             }
-            if (closeSidebar) {
-                closeSidebar.addEventListener('click', toggleSidebar);
+            if (desktopToggle) {
+                desktopToggle.addEventListener('click', () => {
+                    const isCollapsed = sidebar.classList.contains('collapsed');
+                    if(isCollapsed) {
+                        sidebar.classList.remove('collapsed');
+                        desktopToggle.innerHTML = `<i class="fas fa-arrow-right-to-bracket"></i>`;
+                        desktopToggle.title = 'Minimize sidebar';
+                    } else {
+                        sidebar.classList.add('collapsed');
+                        desktopToggle.innerHTML = `<i class="fas fa-arrow-left-to-bracket"></i>`;
+                        desktopToggle.title = 'Maximize sidebar';
+                    }
+                });
+            }
+            if (mobileHistoryToggle) {
+                 mobileHistoryToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    toggleSidebar();
+                 });
             }
             if (overlay) {
                 overlay.addEventListener('click', function() {
@@ -1044,17 +1098,35 @@
                     }
                 });
             }
-
-            window.addEventListener('resize', function() {
-                if (window.innerWidth >= 768) {
-                    sidebar.classList.remove('active');
-                    overlay.classList.remove('active');
-                }
-            });
+            
+            // Set up sidebar on first load
+            if (window.innerWidth >= 768) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            } else {
+                sidebar.classList.add('active'); // Hide sidebar by default on mobile
+            }
 
             updateChatHistory();
             if (conversations.length > 0) {
                 loadConversation(conversations[0].id);
+            } else {
+                const initialMessage = `
+                    <div class="message ai-message">
+                        <div class="profile-image">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p>
+                            <div class="suggestion-chips">
+                                <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                                <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                                <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                chatContainer.innerHTML = initialMessage;
             }
             
             addSuggestionChipsListeners();
