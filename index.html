@@ -17,9 +17,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /*
-         * Eberardos AI - Versi Redesain Responsif
-         * --------------------------------------
-         * Fokus pada desain mobile-first, dengan transisi yang lebih halus.
+         * Eberardos AI - Versi Redesain Final
+         * ----------------------------------
+         * Layout baru dengan sidebar permanen
          */
 
         :root {
@@ -42,10 +42,9 @@
             color: var(--color-text-light);
             margin: 0;
             display: flex;
-            flex-direction: column;
             min-height: 100vh;
         }
-        
+
         /* --- Modal Kustomisasi (agar sesuai tema) --- */
         .modal-content {
             background-color: var(--color-bg-light);
@@ -60,7 +59,7 @@
             border-top: 1px solid var(--color-border);
         }
         .btn-close {
-            filter: invert(1) grayscale(1) brightness(2.5); /* Membuat icon 'X' terlihat di tema gelap */
+            filter: invert(1) grayscale(1) brightness(2.5);
         }
         .btn-primary {
             background-color: var(--color-primary);
@@ -70,15 +69,14 @@
             background-color: var(--color-primary-hover);
             border-color: var(--color-primary-hover);
         }
-        /* --- Akhir Modal Kustomisasi --- */
-
-        /* --- Layout Umum --- */
+        
+        /* --- Layout Utama --- */
         .app-container {
             display: flex;
-            flex-grow: 1;
-            height: calc(100vh - 66px); 
+            width: 100%;
+            height: 100vh;
         }
-        
+
         .main-content {
             flex-grow: 1;
             display: flex;
@@ -86,33 +84,7 @@
             overflow: hidden;
         }
 
-        /* --- Navbar --- */
-        .navbar {
-            background-color: var(--color-bg-light);
-            border-bottom: 1px solid var(--color-border);
-            padding: 1rem;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 10;
-        }
-        .navbar-brand {
-            color: var(--color-primary) !important;
-            font-weight: 700;
-            font-size: 1.5rem;
-        }
-        .btn-nav {
-            color: var(--color-primary);
-            border-color: var(--color-primary);
-            transition: all 0.2s ease;
-        }
-        .btn-nav:hover {
-            background-color: var(--color-primary);
-            color: var(--color-text-light);
-        }
-
-        /* --- Sidebar --- */
+        /* --- Sidebar Baru --- */
         .sidebar {
             width: 300px;
             background-color: var(--color-bg-light);
@@ -121,46 +93,50 @@
             display: flex;
             flex-direction: column;
             padding: 1rem;
-            transition: width 0.3s ease-in-out;
+            transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
             z-index: 10;
         }
+        
         .sidebar.collapsed {
-            width: 60px; /* Lebar untuk mode ikon */
-            overflow: hidden;
+            width: 60px;
             padding: 1rem 0;
+            text-align: center;
         }
+
         .sidebar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
         }
+
         .sidebar.collapsed .sidebar-header {
+            flex-direction: column;
             justify-content: center;
+            align-items: center;
         }
+
         .sidebar.collapsed .sidebar-header h5 {
             display: none;
         }
-        .sidebar.collapsed .sidebar-header .btn-nav {
-            margin: 0 !important;
-        }
+
         .sidebar-body {
             flex-grow: 1;
             overflow-y: auto;
             padding-right: 1rem;
         }
+        
         .sidebar.collapsed .sidebar-body {
             padding-right: 0;
             overflow-y: hidden;
         }
+        
         .sidebar-body::-webkit-scrollbar { width: 6px; }
         .sidebar-body::-webkit-scrollbar-thumb {
             background-color: var(--color-text-secondary);
             border-radius: 3px;
         }
-        .sidebar.collapsed .sidebar-body::-webkit-scrollbar {
-            display: none;
-        }
+        .sidebar.collapsed .sidebar-body::-webkit-scrollbar { display: none; }
 
         .history-item {
             display: flex;
@@ -172,16 +148,15 @@
             cursor: pointer;
             transition: background-color 0.2s ease;
         }
+        
         .sidebar.collapsed .history-item {
             justify-content: center;
             padding: 0.75rem 0.5rem;
         }
-        .sidebar.collapsed .history-item .text-truncate {
-            display: none;
-        }
-        .sidebar.collapsed .history-item .delete-conv {
-            display: none;
-        }
+
+        .sidebar.collapsed .history-item .text-truncate { display: none; }
+        .sidebar.collapsed .history-item .delete-conv { display: none; }
+
         .history-item:hover { background-color: var(--color-bg-input); }
         .active-chat {
             background-color: var(--color-primary);
@@ -194,14 +169,13 @@
             display: flex;
             flex-direction: column;
             height: 100%;
-            padding-top: 66px; /* Tambahkan padding atas agar konten tidak tertutup navbar */
         }
 
         .chat-container {
             flex-grow: 1;
             overflow-y: auto;
             padding: 1rem;
-            padding-bottom: 100px; /* Memberi ruang di bawah agar pesan tidak tertutup input */
+            padding-bottom: 100px;
         }
 
         .message {
@@ -212,8 +186,8 @@
         .message-content {
             flex-grow: 1;
             padding-left: 1rem;
-            word-break: break-word !important; /* Tambahkan !important di sini */
-            font-size: 0.875rem; /* 14px, sama seperti text yang saya kirim */
+            word-break: break-word !important;
+            font-size: 0.875rem;
             line-height: 1.5;
         }
         .profile-image {
@@ -236,11 +210,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 5; 
         }
         .input-container {
             display: flex;
@@ -298,8 +267,8 @@
             margin: 0;
             padding: 0;
             overflow-x: auto;
-            white-space: pre-wrap; /* Mengizinkan pemecahan baris */
-            word-break: break-word; /* Memecah kata yang terlalu panjang */
+            white-space: pre-wrap;
+            word-break: break-word;
         }
         .code-toolbar {
             position: absolute;
@@ -345,7 +314,6 @@
             margin: 0 2px;
             animation: typingAnimation 1.4s infinite ease-in-out;
         }
-
         .typing-dot:nth-child(1) { animation-delay: 0s; }
         .typing-dot:nth-child(2) { animation-delay: 0.2s; }
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
@@ -362,7 +330,6 @@
             margin-top: 10px;
             margin-bottom: 10px;
         }
-
         .suggestion-chip {
             background-color: var(--color-bg-input);
             color: var(--color-text-light);
@@ -373,18 +340,17 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-
         .suggestion-chip:hover {
             background-color: var(--color-primary);
             border-color: var(--color-primary);
         }
 
-        /* KODE TOAST BARU */
+        /* Toast */
         .toast {
             position: fixed;
             top: 20px;
             left: 50%;
-            transform: translateX(-50%) translateY(-100px); /* Mulai dari atas, tersembunyi */
+            transform: translateX(-50%) translateY(-100px);
             background-color: var(--color-success);
             color: white;
             padding: 12px 20px;
@@ -398,55 +364,35 @@
             flex-direction: column;
             text-align: center;
         }
-        
         .toast.show {
             opacity: 1;
-            transform: translateX(-50%) translateY(0); /* Meluncur ke posisi akhir */
+            transform: translateX(-50%) translateY(0);
         }
-        
-        .toast-icon {
-            margin-right: 10px;
-        }
-
+        .toast-icon { margin-right: 10px; }
         .toast-content {
             display: flex;
             align-items: center;
-            padding-bottom: 4px; /* Ruang untuk timer bar */
+            padding-bottom: 4px;
         }
-
-        /* --- KODE TIMER BAR BARU --- */
         .toast-timer {
             position: absolute;
             bottom: 0;
             left: 0;
             height: 4px;
-            background-color: rgba(255, 255, 255, 0.4); /* Putih dengan transparansi 40% */
+            background-color: rgba(255, 255, 255, 0.4);
             width: 100%;
             animation: toastTimer 3s linear forwards;
         }
-
-        .toast.error {
-            background-color: var(--color-error);
-        }
-        
-        .toast.error .toast-timer {
-            background-color: rgba(255, 255, 255, 0.4); /* Warna yang sama untuk kontras yang bagus */
-        }
-
+        .toast.error { background-color: var(--color-error); }
+        .toast.error .toast-timer { background-color: rgba(255, 255, 255, 0.4); }
         @keyframes toastTimer {
-            from {
-                width: 100%;
-            }
-            to {
-                width: 0%;
-            }
+            from { width: 100%; }
+            to { width: 0%; }
         }
-        /* --- Responsiveness --- */
+
+        /* Responsiveness */
         @media (max-width: 768px) {
-            .app-container {
-                flex-direction: column;
-                height: calc(100vh - 66px);
-            }
+            .app-container { flex-direction: column; }
             .sidebar {
                 position: fixed;
                 top: 0;
@@ -455,10 +401,9 @@
                 width: 80%;
                 transform: translateX(-100%);
                 box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
+                border-right: none;
             }
-            .sidebar.active {
-                transform: translateX(0);
-            }
+            .sidebar.active { transform: translateX(0); }
             .overlay {
                 position: fixed;
                 top: 0;
@@ -469,49 +414,37 @@
                 z-index: 9;
                 display: none;
             }
-            .overlay.active {
-                display: block;
-            }
-            .navbar-brand {
-                flex-grow: 1;
-                text-align: center;
-            }
-            .btn-nav.d-none.d-md-block { display: none !important; }
+            .overlay.active { display: block; }
+            .chat-area { padding-top: 0; }
+            .input-area { position: fixed; bottom: 0; left: 0; right: 0; }
+            .desktop-toggle { display: none; }
+            .mobile-toggle { display: block; }
         }
     </style>
 </head>
 <body>
     <div class="overlay"></div>
-    <nav class="navbar navbar-dark px-3 py-2">
-        <div class="container-fluid">
-            <button class="btn btn-nav d-md-none" type="button" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <span class="navbar-brand mb-0 h1">Eberardos AI</span>
-            <button class="btn btn-nav d-none d-md-block" type="button" id="desktopSidebarToggle">
-                <i class="fas fa-history"></i>
-            </button>
-        </div>
-    </nav>
-
     <div class="app-container">
         <div class="sidebar" id="mainSidebar">
             <div class="sidebar-header">
-                <h5 class="mb-0">Chat History</h5>
+                <span class="navbar-brand mb-0 h1">Eberardos AI</span>
+                <button class="btn btn-sm btn-nav d-md-none" id="closeSidebar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0 text-truncate">Chat History</h5>
                 <div>
                     <button class="btn btn-sm btn-nav me-2" id="newChat" title="New chat">
                         <i class="fas fa-plus"></i>
                     </button>
-                    <button class="btn btn-sm btn-nav me-2" id="clearHistory" title="Clear history">
+                    <button class="btn btn-sm btn-nav" id="clearHistory" title="Clear history">
                         <i class="fas fa-trash"></i>
-                    </button>
-                    <button class="btn btn-sm btn-nav d-md-none" id="closeSidebar">
-                        <i class="fas fa-times"></i>
                     </button>
                 </div>
             </div>
             <div class="sidebar-body" id="chatHistory">
-                </div>
+            </div>
         </div>
 
         <div class="main-content">
@@ -532,14 +465,14 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="input-area">
-        <div class="input-container">
-            <textarea class="input-field" placeholder="Ketik pesan Anda..." id="userInput" rows="1"></textarea>
-            <button class="send-button" id="sendButton">
-                <i class="fas fa-paper-plane"></i>
-            </button>
+            <div class="input-area">
+                <div class="input-container">
+                    <textarea class="input-field" placeholder="Ketik pesan Anda..." id="userInput" rows="1"></textarea>
+                    <button class="send-button" id="sendButton">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -578,19 +511,16 @@
             const newChatBtn = document.getElementById('newChat');
             const clearHistoryBtn = document.getElementById('clearHistory');
             const sidebarToggle = document.getElementById('sidebarToggle');
-            const desktopSidebarToggle = document.getElementById('desktopSidebarToggle');
             const closeSidebar = document.getElementById('closeSidebar');
             const overlay = document.querySelector('.overlay');
             const sidebar = document.getElementById('mainSidebar');
             const toast = document.getElementById('toast');
             
-            // Tampilkan modal saat halaman dimuat
             const apiStatusModal = new bootstrap.Modal(document.getElementById('apiStatusModal'), {});
             apiStatusModal.show();
 
             let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || [];
             let currentConversationId = null;
-            let sidebarCollapsed = false;
 
             function showToast(message, isError = false) {
                 const toast = document.getElementById('toast');
@@ -631,15 +561,11 @@
             function convertMarkdownToHtml(markdownText) {
                 let html = markdownText;
 
-                // Menangani bold, italic, dan link
                 html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
                 html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
-                
-                // Menangani kode inline (backtick tunggal)
                 html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-                // Proses list dengan logika yang lebih kuat
+                
                 const lines = html.split('\n');
                 let processedHtml = '';
                 let inList = false;
@@ -680,7 +606,6 @@
                     processedHtml += `</${listType}>`;
                 }
 
-                // Mengganti baris baru menjadi <br>, tapi jangan di dalam list
                 processedHtml = processedHtml.replace(/<\/li>(?!<br>)/g, '</li><br>');
                 processedHtml = processedHtml.replace(/<br><br>/g, '<br>');
                 
@@ -789,8 +714,6 @@
             function toggleSidebar() {
                 if (window.innerWidth >= 768) {
                     sidebar.classList.toggle('collapsed');
-                    sidebarCollapsed = sidebar.classList.contains('collapsed');
-                    localStorage.setItem('sidebarCollapsed', sidebarCollapsed);
                 } else {
                     sidebar.classList.toggle('active');
                     overlay.classList.toggle('active');
@@ -1017,7 +940,7 @@
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ prompt: combinedPrompt }) // Kirim string gabungan
+                        body: JSON.stringify({ prompt: combinedPrompt })
                     });
                     
                     const data = await response.json();
@@ -1108,14 +1031,19 @@
                 }
             });
 
-            sidebarToggle.addEventListener('click', toggleSidebar);
-            desktopSidebarToggle.addEventListener('click', toggleSidebar);
-            closeSidebar.addEventListener('click', toggleSidebar);
-            overlay.addEventListener('click', function() {
-                if (sidebar.classList.contains('active')) {
-                    toggleSidebar();
-                }
-            });
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', toggleSidebar);
+            }
+            if (closeSidebar) {
+                closeSidebar.addEventListener('click', toggleSidebar);
+            }
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    if (sidebar.classList.contains('active')) {
+                        toggleSidebar();
+                    }
+                });
+            }
 
             window.addEventListener('resize', function() {
                 if (window.innerWidth >= 768) {
@@ -1124,20 +1052,12 @@
                 }
             });
 
-            // Initialize
             updateChatHistory();
             if (conversations.length > 0) {
                 loadConversation(conversations[0].id);
             }
             
             addSuggestionChipsListeners();
-            
-            // Atur sidebar saat dimuat
-            const storedCollapsed = localStorage.getItem('sidebarCollapsed');
-            if (storedCollapsed === 'true') {
-                sidebar.classList.add('collapsed');
-                sidebarCollapsed = true;
-            }
         });
     </script>
 </body>
