@@ -209,6 +209,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: fixed; /* Tetap fixed untuk mobile */
+            bottom: 66px;
+            left: 0;
+            right: 0;
+            z-index: 5;
         }
         .input-container {
             display: flex;
@@ -424,7 +429,7 @@
             .navbar .d-none.d-md-block { display: none !important; }
             .chat-area {
                 padding-top: 66px; /* Space for top navbar */
-                padding-bottom: 80px; /* Space for bottom nav */
+                padding-bottom: calc(1rem + 66px); /* Perbaikan: Ruang untuk input & bottom nav di mobile */
             }
             .input-area {
                 position: fixed;
@@ -1097,7 +1102,9 @@
             if (mobileHistoryToggle) {
                  mobileHistoryToggle.addEventListener('click', (e) => {
                     e.preventDefault();
-                    toggleSidebar();
+                    if (!sidebar.classList.contains('active')) {
+                        toggleSidebar();
+                    }
                     mobileHistoryToggle.classList.add('active');
                     mobileChatToggle.classList.remove('active');
                  });
