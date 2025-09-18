@@ -17,9 +17,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /*
-         * Eberardos AI - Versi Redesain Final (Revisi 2)
-         * ---------------------------------------------
-         * Navigasi bawah untuk mobile dan tombol settings
+         * Eberardos AI - Versi Redesain Responsif
+         * --------------------------------------
+         * Fokus pada desain mobile-first, dengan transisi yang lebih halus.
          */
 
         :root {
@@ -45,7 +45,7 @@
             flex-direction: column;
             min-height: 100vh;
         }
-        
+
         /* --- Modal Kustomisasi (agar sesuai tema) --- */
         .modal-content {
             background-color: var(--color-bg-light);
@@ -70,15 +70,15 @@
             background-color: var(--color-primary-hover);
             border-color: var(--color-primary-hover);
         }
+        /* --- Akhir Modal Kustomisasi --- */
 
         /* --- Layout Umum --- */
         .app-container {
             display: flex;
             flex-grow: 1;
-            width: 100%;
-            height: calc(100vh - 66px); /* Mengakomodasi navbar atas */
+            height: calc(100vh - 66px);
         }
-        
+
         .main-content {
             flex-grow: 1;
             display: flex;
@@ -86,7 +86,7 @@
             overflow: hidden;
         }
 
-        /* --- Navbar Atas --- */
+        /* --- Navbar --- */
         .navbar {
             background-color: var(--color-bg-light);
             border-bottom: 1px solid var(--color-border);
@@ -121,24 +121,21 @@
             display: flex;
             flex-direction: column;
             padding: 1rem;
+            transition: transform 0.3s ease-in-out;
             z-index: 10;
-            padding-top: 66px; /* Mengakomodasi navbar atas */
-            height: 100vh;
         }
-        
         .sidebar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
         }
-
         .sidebar-body {
             flex-grow: 1;
             overflow-y: auto;
             padding-right: 1rem;
         }
-        
+
         .sidebar-body::-webkit-scrollbar { width: 6px; }
         .sidebar-body::-webkit-scrollbar-thumb {
             background-color: var(--color-text-secondary);
@@ -168,13 +165,13 @@
             flex-direction: column;
             height: 100%;
             padding-top: 66px;
-            padding-bottom: 80px; /* Ruang untuk input & bottom nav di mobile */
         }
 
         .chat-container {
             flex-grow: 1;
             overflow-y: auto;
             padding: 1rem;
+            padding-bottom: 100px;
         }
 
         .message {
@@ -209,8 +206,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            position: fixed; /* Tetap fixed untuk mobile */
-            bottom: 66px;
+            position: fixed;
+            bottom: 0;
             left: 0;
             right: 0;
             z-index: 5;
@@ -235,6 +232,7 @@
             padding: 0.5rem 0;
         }
         .input-field::placeholder { color: var(--color-text-secondary); }
+
         .send-button {
             background-color: var(--color-primary);
             color: var(--color-text-light);
@@ -298,6 +296,8 @@
             color: var(--color-text-light);
         }
         .text-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* --- New Features --- */
         .typing-indicator {
             display: inline-flex;
             align-items: center;
@@ -306,6 +306,7 @@
             border-radius: 18px;
             margin-top: 0.5rem;
         }
+
         .typing-dot {
             width: 8px;
             height: 8px;
@@ -314,13 +315,16 @@
             margin: 0 2px;
             animation: typingAnimation 1.4s infinite ease-in-out;
         }
+
         .typing-dot:nth-child(1) { animation-delay: 0s; }
         .typing-dot:nth-child(2) { animation-delay: 0.2s; }
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
         @keyframes typingAnimation {
             0%, 60%, 100% { transform: translateY(0); }
             30% { transform: translateY(-5px); }
         }
+
         .suggestion-chips {
             display: flex;
             flex-wrap: wrap;
@@ -328,6 +332,7 @@
             margin-top: 10px;
             margin-bottom: 10px;
         }
+
         .suggestion-chip {
             background-color: var(--color-bg-input);
             color: var(--color-text-light);
@@ -338,12 +343,13 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
+
         .suggestion-chip:hover {
             background-color: var(--color-primary);
             border-color: var(--color-primary);
         }
 
-        /* Toast */
+        /* KODE TOAST BARU */
         .toast {
             position: fixed;
             top: 20px;
@@ -362,16 +368,23 @@
             flex-direction: column;
             text-align: center;
         }
+
         .toast.show {
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
-        .toast-icon { margin-right: 10px; }
+
+        .toast-icon {
+            margin-right: 10px;
+        }
+
         .toast-content {
             display: flex;
             align-items: center;
             padding-bottom: 4px;
         }
+
+        /* --- KODE TIMER BARU --- */
         .toast-timer {
             position: absolute;
             bottom: 0;
@@ -381,18 +394,84 @@
             width: 100%;
             animation: toastTimer 3s linear forwards;
         }
-        .toast.error { background-color: var(--color-error); }
-        .toast.error .toast-timer { background-color: rgba(255, 255, 255, 0.4); }
-        @keyframes toastTimer {
-            from { width: 100%; }
-            to { width: 0%; }
+
+        .toast.error {
+            background-color: var(--color-error);
         }
-        
+
+        .toast.error .toast-timer {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        @keyframes toastTimer {
+            from {
+                width: 100%;
+            }
+            to {
+                width: 0%;
+            }
+        }
+
+        /* --- Bottom Navbar --- */
+        .bottom-navbar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--color-bg-light);
+            border-top: 1px solid var(--color-border);
+            z-index: 10;
+            height: 60px;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .bottom-navbar .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-secondary);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .bottom-navbar .nav-item.active {
+            color: var(--color-primary);
+        }
+
+        .bottom-navbar .nav-item:hover {
+            color: var(--color-primary);
+        }
+
+        .bottom-navbar .nav-item i {
+            font-size: 1.25rem;
+            margin-bottom: 4px;
+        }
+
         /* --- Responsiveness --- */
         @media (max-width: 768px) {
+            .bottom-navbar {
+                display: flex;
+            }
+            .navbar {
+                display: none;
+            }
             .app-container {
                 flex-direction: column;
-                height: 100vh;
+                height: calc(100vh - 60px);
+                padding-bottom: 60px;
+            }
+            .chat-area {
+                padding-top: 0;
+            }
+            .input-area {
+                bottom: 60px;
+            }
+            .main-content {
+                padding-bottom: 0;
             }
             .sidebar {
                 position: fixed;
@@ -402,9 +481,6 @@
                 width: 80%;
                 transform: translateX(-100%);
                 box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
-                border-right: none;
-                padding-top: 0;
-                transition: transform 0.3s ease-in-out;
             }
             .sidebar.active {
                 transform: translateX(0);
@@ -426,45 +502,7 @@
                 flex-grow: 1;
                 text-align: center;
             }
-            .navbar .d-none.d-md-block { display: none !important; }
-            .chat-area {
-                padding-top: 66px; /* Space for top navbar */
-                padding-bottom: calc(1rem + 66px); /* Perbaikan: Ruang untuk input & bottom nav di mobile */
-            }
-            .input-area {
-                position: fixed;
-                bottom: 66px; /* Di atas bottom nav */
-                left: 0;
-                right: 0;
-                z-index: 5;
-            }
-            .bottom-nav {
-                display: flex;
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background-color: var(--color-bg-light);
-                border-top: 1px solid var(--color-border);
-                justify-content: space-around;
-                padding: 0.5rem;
-                z-index: 10;
-            }
-            .bottom-nav-item {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                color: var(--color-text-secondary);
-                text-decoration: none;
-                font-size: 0.75rem;
-            }
-            .bottom-nav-item i {
-                font-size: 1.2rem;
-                margin-bottom: 0.25rem;
-            }
-            .bottom-nav-item:hover, .bottom-nav-item.active {
-                color: var(--color-primary);
-            }
+            .btn-nav.d-none.d-md-block { display: none !important; }
         }
     </style>
 </head>
@@ -472,31 +510,34 @@
     <div class="overlay"></div>
     <nav class="navbar navbar-dark px-3 py-2">
         <div class="container-fluid">
-            <button class="btn btn-nav d-md-none" type="button" id="settingsToggle">
-                <i class="fas fa-gear"></i>
+            <button class="btn btn-nav d-md-none" type="button" id="sidebarToggle">
+                <i class="fas fa-cog"></i>
             </button>
             <span class="navbar-brand mb-0 h1">Eberardos AI</span>
-            <button class="btn btn-nav d-none d-md-block" type="button" id="desktopToggle">
+            <button class="btn btn-nav d-none d-md-block" type="button" id="desktopSidebarToggle">
                 <i class="fas fa-history"></i>
             </button>
         </div>
     </nav>
 
     <div class="app-container">
-        <div class="sidebar d-none d-md-flex" id="mainSidebar">
+        <div class="sidebar" id="mainSidebar">
             <div class="sidebar-header">
                 <h5 class="mb-0">Chat History</h5>
                 <div>
                     <button class="btn btn-sm btn-nav me-2" id="newChat" title="New chat">
                         <i class="fas fa-plus"></i>
                     </button>
-                    <button class="btn btn-sm btn-nav" id="clearHistory" title="Clear history">
+                    <button class="btn btn-sm btn-nav me-2" id="clearHistory" title="Clear history">
                         <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="btn btn-sm btn-nav d-md-none" id="closeSidebar">
+                        <i class="fas fa-times"></i>
                     </button>
                 </div>
             </div>
             <div class="sidebar-body" id="chatHistory">
-            </div>
+                </div>
         </div>
 
         <div class="main-content">
@@ -517,26 +558,15 @@
                     </div>
                 </div>
             </div>
-            <div class="input-area">
-                <div class="input-container">
-                    <textarea class="input-field" placeholder="Ketik pesan Anda..." id="userInput" rows="1"></textarea>
-                    <button class="send-button" id="sendButton">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
-            </div>
         </div>
     </div>
-    
-    <div class="bottom-nav d-md-none" id="bottomNav">
-        <a href="#" class="bottom-nav-item active" id="mobileChatToggle">
-            <i class="fas fa-robot"></i>
-            <span>Chat</span>
-        </a>
-        <a href="#" class="bottom-nav-item" id="mobileHistoryToggle">
-            <i class="fas fa-history"></i>
-            <span>History</span>
-        </a>
+    <div class="input-area">
+        <div class="input-container">
+            <textarea class="input-field" placeholder="Ketik pesan Anda..." id="userInput" rows="1"></textarea>
+            <button class="send-button" id="sendButton">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
     </div>
 
     <div class="modal fade" id="apiStatusModal" tabindex="-1" aria-labelledby="apiStatusModalLabel" aria-hidden="true">
@@ -560,26 +590,24 @@
         </div>
     </div>
 
-    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Halaman pengaturan akan dibuat di sini.</p>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Tutup</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="toast" id="toast" role="alert" aria-live="polite">
         <div class="toast-timer"></div>
     </div>
+
+    <nav class="bottom-navbar d-md-none">
+        <div class="nav-item active" data-target="chat-area">
+            <i class="fas fa-robot"></i>
+            <span>Chat</span>
+        </div>
+        <div class="nav-item" data-target="sidebar">
+            <i class="fas fa-history"></i>
+            <span>History</span>
+        </div>
+        <div class="nav-item" data-target="settings">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </div>
+    </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -590,16 +618,35 @@
             const chatHistory = document.getElementById('chatHistory');
             const newChatBtn = document.getElementById('newChat');
             const clearHistoryBtn = document.getElementById('clearHistory');
-            const settingsToggle = document.getElementById('settingsToggle');
-            const desktopToggle = document.getElementById('desktopToggle');
-            const mobileChatToggle = document.getElementById('mobileChatToggle');
-            const mobileHistoryToggle = document.getElementById('mobileHistoryToggle');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const desktopSidebarToggle = document.getElementById('desktopSidebarToggle');
+            const closeSidebar = document.getElementById('closeSidebar');
             const overlay = document.querySelector('.overlay');
             const sidebar = document.getElementById('mainSidebar');
             const toast = document.getElementById('toast');
-            
+
+            // Tambahkan listener untuk bottom navbar
+            const bottomNavItems = document.querySelectorAll('.bottom-navbar .nav-item');
+            bottomNavItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const target = this.getAttribute('data-target');
+
+                    // Hapus kelas 'active' dari semua item dan tambahkan ke item yang diklik
+                    bottomNavItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+
+                    if (target === 'sidebar') {
+                        sidebar.classList.add('active');
+                        overlay.classList.add('active');
+                    } else {
+                        sidebar.classList.remove('active');
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+
+            // Tampilkan modal saat halaman dimuat
             const apiStatusModal = new bootstrap.Modal(document.getElementById('apiStatusModal'), {});
-            const settingsModal = new bootstrap.Modal(document.getElementById('settingsModal'), {});
             apiStatusModal.show();
 
             let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || [];
@@ -607,14 +654,14 @@
 
             function showToast(message, isError = false) {
                 const toast = document.getElementById('toast');
-                const icon = isError 
+                const icon = isError
                     ? '<i class="fas fa-exclamation-circle toast-icon"></i>'
                     : '<i class="fas fa-check-circle toast-icon"></i>';
-                
+
                 const toastContent = document.createElement('div');
                 toastContent.className = 'toast-content';
                 toastContent.innerHTML = icon + message;
-                
+
                 const timerBar = document.createElement('div');
                 timerBar.className = 'toast-timer';
 
@@ -623,13 +670,13 @@
                 toast.appendChild(timerBar);
 
                 toast.classList.remove('show', 'error');
-                
+
                 if (isError) {
                     toast.classList.add('error');
                 }
-                
+
                 toast.classList.add('show');
-                
+
                 setTimeout(() => {
                     toast.classList.remove('show');
                 }, 3000);
@@ -643,20 +690,24 @@
 
             function convertMarkdownToHtml(markdownText) {
                 let html = markdownText;
+
                 html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
                 html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+
                 html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
                 const lines = html.split('\n');
                 let processedHtml = '';
                 let inList = false;
                 let listType = '';
+
                 for (let i = 0; i < lines.length; i++) {
                     const line = lines[i];
                     const trimmedLine = line.trim();
                     const isBullet = trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ');
                     const isNumbered = /^\d+\. /.test(trimmedLine);
-                    
+
                     if (isBullet || isNumbered) {
                         const currentListType = isBullet ? 'ul' : 'ol';
                         const itemText = line.substring(line.indexOf(' ') + 1);
@@ -681,11 +732,14 @@
                         }
                     }
                 }
+
                 if (inList) {
                     processedHtml += `</${listType}>`;
                 }
+
                 processedHtml = processedHtml.replace(/<\/li>(?!<br>)/g, '</li><br>');
                 processedHtml = processedHtml.replace(/<br><br>/g, '<br>');
+
                 return processedHtml;
             }
 
@@ -695,6 +749,7 @@
                 let match;
                 let lastIndex = 0;
                 const parts = [];
+
                 while ((match = codeBlockRegex.exec(text)) !== null) {
                     if (match.index > lastIndex) {
                         parts.push({
@@ -702,14 +757,17 @@
                             content: text.substring(lastIndex, match.index)
                         });
                     }
+
                     const codeContent = match[1].replace(/^(\w+)\n/, '');
                     parts.push({
                         type: 'code',
                         content: codeContent,
                         language: match[1].split('\n')[0] || 'text'
                     });
+
                     lastIndex = match.index + match[0].length;
                 }
+
                 if (lastIndex < text.length) {
                     parts.push({
                         type: 'text',
@@ -722,10 +780,13 @@
             function createCodeBlock(code, language = 'text') {
                 const codeBlock = document.createElement('div');
                 codeBlock.className = 'code-block';
+
                 const codeContent = document.createElement('pre');
                 codeContent.textContent = code;
+
                 const toolbar = document.createElement('div');
                 toolbar.className = 'code-toolbar';
+
                 const copyBtn = document.createElement('button');
                 copyBtn.className = 'code-btn';
                 copyBtn.title = 'Copy code';
@@ -734,15 +795,19 @@
                     copyCodeToClipboard(code);
                     showToast('Kode disalin!');
                 });
+
                 const downloadBtn = document.createElement('button');
                 downloadBtn.className = 'code-btn';
                 downloadBtn.title = 'Download code';
                 downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
                 downloadBtn.addEventListener('click', () => downloadCode(code, language));
+
                 toolbar.appendChild(copyBtn);
                 toolbar.appendChild(downloadBtn);
+
                 codeBlock.appendChild(codeContent);
                 codeBlock.appendChild(toolbar);
+
                 return codeBlock;
             }
 
@@ -788,7 +853,7 @@
                     chatHistory.innerHTML = '<div class="text-center text-secondary py-3">Belum ada percakapan</div>';
                     return;
                 }
-                
+
                 conversations.forEach(conv => {
                     const historyItem = document.createElement('div');
                     historyItem.className = `history-item ${currentConversationId === conv.id ? 'active-chat' : ''}`;
@@ -798,20 +863,20 @@
                             <i class="fas fa-times"></i>
                         </button>
                     `;
-                    
+
                     historyItem.addEventListener('click', (e) => {
                         if (!e.target.closest('.delete-conv')) {
                             loadConversation(conv.id);
                             if (window.innerWidth < 768) toggleSidebar();
                         }
                     });
-                    
+
                     const deleteBtn = historyItem.querySelector('.delete-conv');
                     deleteBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         deleteConversation(conv.id);
                     });
-                    
+
                     chatHistory.appendChild(historyItem);
                 });
             }
@@ -846,7 +911,7 @@
                 currentConversationId = id;
                 const conversation = conversations.find(conv => conv.id === id);
                 chatContainer.innerHTML = '';
-                
+
                 if (conversation && conversation.messages) {
                     conversation.messages.forEach(msg => {
                         appendMessage(msg.text, msg.sender);
@@ -872,16 +937,16 @@
             function appendMessage(text, sender) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
-                
+
                 const profileImage = document.createElement('div');
                 profileImage.className = 'profile-image';
                 profileImage.innerHTML = sender === 'ai' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
-                
+
                 const contentContainer = document.createElement('div');
                 contentContainer.className = 'message-content';
-                
+
                 const contentParts = extractCodeBlocks(text);
-                
+
                 contentParts.forEach(part => {
                     if (part.type === 'code') {
                         contentContainer.appendChild(createCodeBlock(part.content, part.language));
@@ -893,7 +958,7 @@
                         contentContainer.appendChild(textNode);
                     }
                 });
-                
+
                 if (sender === 'ai' && !currentConversationId) {
                     const chipsContainer = document.createElement('div');
                     chipsContainer.className = 'suggestion-chips';
@@ -904,15 +969,15 @@
                     </div>
                     `;
                     contentContainer.appendChild(chipsContainer);
-                    
+
                     setTimeout(() => {
                         addSuggestionChipsListeners();
                     }, 100);
                 }
-                
+
                 messageDiv.appendChild(profileImage);
                 messageDiv.appendChild(contentContainer);
-                
+
                 chatContainer.appendChild(messageDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }
@@ -933,7 +998,7 @@
                     currentConversationId = createNewConversation();
                     conversation = conversations.find(conv => conv.id === currentConversationId);
                 }
-                
+
                 if (conversation) {
                     conversation.messages.push({ text, sender });
                     localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
@@ -963,7 +1028,7 @@
                 `;
                 chatContainer.appendChild(thinkingDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
-                
+
                 return thinkingDiv;
             }
 
@@ -991,11 +1056,11 @@
                 const thinkingIndicator = simulateThinking();
 
                 const conversationHistory = conversation.messages.map(msg => msg.text).join('\n');
-                
-                const combinedPrompt = `ingat, namamu adalah Eberardos AI. Jika ada yang bertanya siapa yang membuatmu, jawablah Givy, Nero, Ayura, Kalz, Fanz, Zenn1t dan Rapikz. Kamu adalah asisten AI yang tidak formal dan ramah. Gunakan kata "gw" alih-alih "gue" saat merujuk pada diri sendiri. Gunakan kata "Lu" alih-alih "Lo" saat merujuk kepada lawan bicara. Gunakan kata "kaga" alih-alih "enggak". Gunakan kata "kek gitu" alih-alih "begitu". Selalu berikan jawaban yang singkat, jelas, dan langsung ke intinya. Jangan pernah sertakan namamu (Eberardos AI) atau nama siapa pun di awal setiap jawaban. Berikan jawaban langsung. Untuk kode atau komentar di dalam kode, gunakan Bahasa Inggris secara default, kecuali pengguna secara eksplisit meminta dalam Bahasa Indonesia. Saat membuat blok kode, pastikan karakter HTML seperti "<" dan ">" dikirimkan dalam format aslinya, bukan diubah menjadi "&lt;" dan "&gt;".\n\n${conversationHistory}\n\nUser: ${message}`;
-                
+
+                const combinedPrompt = `ingat, namamu adalah Eberardos AI. Jika ada yang bertanya siapa yang membuatmu, jawablah Givy, Nero, Ayura, Kalz, Fanz, Zenn1t dan Rapikz. Kamu adalah asisten AI yang tidak formal dan ramah. Gunakan kata "gw" alih-alih "gue" saat merujuk pada diri sendiri. Gunakan kata "Lu" alih-alih "Lo" saat merujuk kepada lawan bicara. Gunakan kata "kaga" alih-alih "enggak". Gunakan kata "kek gitu" alih-alih "begitu". Selalu berikan jawaban yang singkat, jelas, dan langsung ke intinya. **Jangan pernah sertakan namamu (Eberardos AI) atau nama siapa pun di awal setiap jawaban. Berikan jawaban langsung.** Untuk kode atau komentar di dalam kode, gunakan Bahasa Inggris secara default, kecuali pengguna secara eksplisit meminta dalam Bahasa Indonesia. Saat membuat blok kode, pastikan karakter HTML seperti "<" dan ">" dikirimkan dalam format aslinya, bukan diubah menjadi "&lt;" dan "&gt;".\n\n${conversationHistory}\n\nUser: ${message}`;
+
                 const apiUrl = '/api/chat';
-                
+
                 try {
                     const response = await fetch(apiUrl, {
                         method: 'POST',
@@ -1004,13 +1069,13 @@
                         },
                         body: JSON.stringify({ prompt: combinedPrompt })
                     });
-                    
+
                     const data = await response.json();
-                    
+
                     chatContainer.removeChild(thinkingIndicator);
-                    
+
                     const aiResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan dalam memproses permintaan.";
-                    
+
                     appendMessage(aiResponseText, 'ai');
                     saveMessage(aiResponseText, 'ai');
 
@@ -1029,6 +1094,7 @@
                 }
             }
 
+            // Event listeners
             sendButton.addEventListener('click', sendMessage);
             userInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -1092,94 +1158,24 @@
                 }
             });
 
-            // Mobile toggles
-            if (settingsToggle) {
-                settingsToggle.addEventListener('click', () => {
-                    settingsModal.show();
-                });
-            }
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            desktopSidebarToggle.addEventListener('click', toggleSidebar);
+            closeSidebar.addEventListener('click', toggleSidebar);
+            overlay.addEventListener('click', toggleSidebar);
 
-            if (mobileHistoryToggle) {
-                 mobileHistoryToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if (!sidebar.classList.contains('active')) {
-                        toggleSidebar();
-                    }
-                    mobileHistoryToggle.classList.add('active');
-                    mobileChatToggle.classList.remove('active');
-                 });
-            }
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                }
+            });
 
-            if (mobileChatToggle) {
-                 mobileChatToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if (sidebar.classList.contains('active')) {
-                        toggleSidebar();
-                    }
-                    mobileChatToggle.classList.add('active');
-                    mobileHistoryToggle.classList.remove('active');
-                 });
-            }
-
-            if (overlay) {
-                overlay.addEventListener('click', function() {
-                    if (sidebar.classList.contains('active')) {
-                        toggleSidebar();
-                    }
-                });
-            }
-            
-            // Desktop toggles
-            if (desktopToggle) {
-                desktopToggle.addEventListener('click', () => {
-                    const isHidden = sidebar.classList.contains('d-none');
-                    if(isHidden) {
-                        sidebar.classList.remove('d-none', 'd-md-flex');
-                        sidebar.classList.add('d-md-flex');
-                        desktopToggle.innerHTML = `<i class="fas fa-history"></i>`;
-                        desktopToggle.title = 'Hide sidebar';
-                    } else {
-                        sidebar.classList.remove('d-md-flex');
-                        sidebar.classList.add('d-none', 'd-md-flex');
-                        desktopToggle.innerHTML = `<i class="fas fa-history"></i>`;
-                        desktopToggle.title = 'Show sidebar';
-                    }
-                });
-            }
-
-
-            // Set up initial state
-            if (window.innerWidth >= 768) {
-                sidebar.classList.add('d-md-flex');
-                sidebar.classList.remove('d-none', 'active');
-                overlay.classList.remove('active');
-            } else {
-                sidebar.classList.add('d-none');
-                sidebar.classList.remove('d-md-flex', 'active');
-            }
-
+            // Initialize
             updateChatHistory();
             if (conversations.length > 0) {
                 loadConversation(conversations[0].id);
-            } else {
-                const initialMessage = `
-                    <div class="message ai-message">
-                        <div class="profile-image">
-                            <i class="fas fa-robot"></i>
-                        </div>
-                        <div class="message-content">
-                            <p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p>
-                            <div class="suggestion-chips">
-                                <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
-                                <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
-                                <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                chatContainer.innerHTML = initialMessage;
             }
-            
+
             addSuggestionChipsListeners();
         });
     </script>
