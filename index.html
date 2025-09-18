@@ -121,8 +121,13 @@
             display: flex;
             flex-direction: column;
             padding: 1rem;
-            transition: transform 0.3s ease-in-out;
+            transition: width 0.3s ease-in-out;
             z-index: 10;
+        }
+        .sidebar.collapsed {
+            width: 60px; /* Lebar untuk mode ikon */
+            overflow: hidden;
+            padding: 1rem 0;
         }
         .sidebar-header {
             display: flex;
@@ -130,16 +135,31 @@
             align-items: center;
             margin-bottom: 1rem;
         }
+        .sidebar.collapsed .sidebar-header {
+            justify-content: center;
+        }
+        .sidebar.collapsed .sidebar-header h5 {
+            display: none;
+        }
+        .sidebar.collapsed .sidebar-header .btn-nav {
+            margin: 0 !important;
+        }
         .sidebar-body {
             flex-grow: 1;
             overflow-y: auto;
             padding-right: 1rem;
         }
-
+        .sidebar.collapsed .sidebar-body {
+            padding-right: 0;
+            overflow-y: hidden;
+        }
         .sidebar-body::-webkit-scrollbar { width: 6px; }
         .sidebar-body::-webkit-scrollbar-thumb {
             background-color: var(--color-text-secondary);
             border-radius: 3px;
+        }
+        .sidebar.collapsed .sidebar-body::-webkit-scrollbar {
+            display: none;
         }
 
         .history-item {
@@ -151,6 +171,16 @@
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.2s ease;
+        }
+        .sidebar.collapsed .history-item {
+            justify-content: center;
+            padding: 0.75rem 0.5rem;
+        }
+        .sidebar.collapsed .history-item .text-truncate {
+            display: none;
+        }
+        .sidebar.collapsed .history-item .delete-conv {
+            display: none;
         }
         .history-item:hover { background-color: var(--color-bg-input); }
         .active-chat {
@@ -560,6 +590,7 @@
 
             let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || [];
             let currentConversationId = null;
+            let sidebarCollapsed = false;
 
             function showToast(message, isError = false) {
                 const toast = document.getElementById('toast');
@@ -756,8 +787,14 @@
             }
 
             function toggleSidebar() {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.toggle('collapsed');
+                    sidebarCollapsed = sidebar.classList.contains('collapsed');
+                    localStorage.setItem('sidebarCollapsed', sidebarCollapsed);
+                } else {
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                }
             }
 
             function updateChatHistory() {
@@ -970,7 +1007,7 @@
 
                 const conversationHistory = conversation.messages.map(msg => msg.text).join('\n');
                 
-                const combinedPrompt = `ingat, namamu adalah Eberardos AI. Jika ada yang bertanya siapa yang membuatmu, jawablah Givy, Nero, Ayura, Kalz, Fanz, Zenn1t dan Rapikz. Kamu adalah asisten AI yang tidak formal dan ramah. Gunakan kata "gw" alih-alih "gue" saat merujuk pada diri sendiri. Gunakan kata "Lu" alih-alih "Lo" saat merujuk kepada lawan bicara. Gunakan kata "kaga" alih-alih "enggak". Gunakan kata "kek gitu" alih-alih "begitu". Selalu berikan jawaban yang singkat, jelas, dan langsung ke intinya. **Jangan pernah sertakan namamu (Eberardos AI) atau nama siapa pun di awal setiap jawaban. Berikan jawaban langsung.** Untuk kode atau komentar di dalam kode, gunakan Bahasa Inggris secara default, kecuali pengguna secara eksplisit meminta dalam Bahasa Indonesia. Saat membuat blok kode, pastikan karakter HTML seperti "<" dan ">" dikirimkan dalam format aslinya, bukan diubah menjadi "&lt;" dan "&gt;".\n\n${conversationHistory}\n\nUser: ${message}`;
+                const combinedPrompt = `ingat, namamu adalah Eberardos AI. Jika ada yang bertanya siapa yang membuatmu, jawablah Givy, Nero, Ayura, Kalz, Fanz, Zenn1t dan Rapikz. Kamu adalah asisten AI yang tidak formal dan ramah. Gunakan kata "gw" alih-alih "gue" saat merujuk pada diri sendiri. Gunakan kata "Lu" alih-alih "Lo" saat merujuk kepada lawan bicara. Gunakan kata "kaga" alih-alih "enggak". Gunakan kata "kek gitu" alih-alih "begitu". Selalu berikan jawaban yang singkat, jelas, dan langsung ke intinya. Jangan pernah sertakan namamu (Eberardos AI) atau nama siapa pun di awal setiap jawaban. Berikan jawaban langsung. Untuk kode atau komentar di dalam kode, gunakan Bahasa Inggris secara default, kecuali pengguna secara eksplisit meminta dalam Bahasa Indonesia. Saat membuat blok kode, pastikan karakter HTML seperti "<" dan ">" dikirimkan dalam format aslinya, bukan diubah menjadi "&lt;" dan "&gt;".\n\n${conversationHistory}\n\nUser: ${message}`;
                 
                 const apiUrl = '/api/chat';
                 
@@ -1074,7 +1111,11 @@
             sidebarToggle.addEventListener('click', toggleSidebar);
             desktopSidebarToggle.addEventListener('click', toggleSidebar);
             closeSidebar.addEventListener('click', toggleSidebar);
-            overlay.addEventListener('click', toggleSidebar);
+            overlay.addEventListener('click', function() {
+                if (sidebar.classList.contains('active')) {
+                    toggleSidebar();
+                }
+            });
 
             window.addEventListener('resize', function() {
                 if (window.innerWidth >= 768) {
@@ -1090,6 +1131,13 @@
             }
             
             addSuggestionChipsListeners();
+            
+            // Atur sidebar saat dimuat
+            const storedCollapsed = localStorage.getItem('sidebarCollapsed');
+            if (storedCollapsed === 'true') {
+                sidebar.classList.add('collapsed');
+                sidebarCollapsed = true;
+            }
         });
     </script>
 </body>
