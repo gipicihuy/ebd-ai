@@ -34,20 +34,6 @@
             --color-success: #28a745;
             --color-warning: #ffc107;
             --color-error: #dc3545;
-            --font-size-base: 1rem;
-            --font-size-sm: 0.875rem;
-            --font-size-lg: 1.125rem;
-        }
-
-        .light-theme {
-            --color-primary: #1e88e5;
-            --color-primary-hover: #1565c0;
-            --color-bg-dark: #f0f2f5;
-            --color-bg-light: #ffffff;
-            --color-bg-input: #e9ecef;
-            --color-text-light: #333333;
-            --color-text-secondary: #6c757d;
-            --color-border: #dee2e6;
         }
 
         body {
@@ -58,12 +44,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            padding-bottom: 60px; /* Tambahkan padding untuk bottom navbar */
-            font-size: var(--font-size-base);
         }
-
-        body.font-small { font-size: var(--font-size-sm); }
-        body.font-large { font-size: var(--font-size-lg); }
         
         /* --- Modal Kustomisasi (agar sesuai tema) --- */
         .modal-content {
@@ -79,10 +60,7 @@
             border-top: 1px solid var(--color-border);
         }
         .btn-close {
-            filter: var(--color-text-light) invert(0) grayscale(0) brightness(1);
-        }
-        .light-theme .btn-close {
-            filter: invert(0) grayscale(1) brightness(0.5);
+            filter: invert(1) grayscale(1) brightness(2.5); /* Membuat icon 'X' terlihat di tema gelap */
         }
         .btn-primary {
             background-color: var(--color-primary);
@@ -101,7 +79,7 @@
             height: calc(100vh - 66px); 
         }
         
-        .main-content, .history-view {
+        .main-content {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -163,14 +141,23 @@
             background-color: var(--color-text-secondary);
             border-radius: 3px;
         }
-        
-        .settings-control {
-            margin-bottom: 1.5rem;
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
         }
-        
-        .form-check-label {
+        .history-item:hover { background-color: var(--color-bg-input); }
+        .active-chat {
+            background-color: var(--color-primary);
             color: var(--color-text-light);
         }
+        .active-chat:hover { background-color: var(--color-primary-hover); }
 
         /* --- Chat Area --- */
         .chat-area {
@@ -195,7 +182,8 @@
         .message-content {
             flex-grow: 1;
             padding-left: 1rem;
-            word-break: break-word !important;
+            word-break: break-word !important; /* Tambahkan !important di sini */
+            font-size: 0.875rem; /* 14px, sama seperti text yang saya kirim */
             line-height: 1.5;
         }
         .profile-image {
@@ -219,7 +207,7 @@
             justify-content: center;
             align-items: center;
             position: fixed;
-            bottom: 60px; /* Diubah dari 0 ke 60px agar tidak tertutup bottom navbar */
+            bottom: 0;
             left: 0;
             right: 0;
             z-index: 5; 
@@ -280,8 +268,8 @@
             margin: 0;
             padding: 0;
             overflow-x: auto;
-            white-space: pre-wrap;
-            word-break: break-word;
+            white-space: pre-wrap; /* Mengizinkan pemecahan baris */
+            word-break: break-word; /* Memecah kata yang terlalu panjang */
         }
         .code-toolbar {
             position: absolute;
@@ -396,7 +384,7 @@
             padding-bottom: 4px; /* Ruang untuk timer bar */
         }
 
-        /* --- KODE TIMER BARU --- */
+        /* --- KODE TIMER BAR BARU --- */
         .toast-timer {
             position: absolute;
             bottom: 0;
@@ -423,76 +411,6 @@
                 width: 0%;
             }
         }
-
-        /* --- Bottom Navigation Bar --- */
-        .bottom-navbar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: var(--color-bg-light);
-            border-top: 1px solid var(--color-border);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            z-index: 10;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--color-text-secondary);
-            text-decoration: none;
-            font-size: 0.75rem;
-            transition: color 0.2s ease;
-            cursor: pointer;
-        }
-
-        .nav-item.active {
-            color: var(--color-primary);
-        }
-
-        .nav-item i {
-            font-size: 1.25rem;
-            margin-bottom: 4px;
-        }
-        
-        /* --- History View --- */
-        .history-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .history-list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            margin-bottom: 0.5rem;
-            background-color: var(--color-bg-light);
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-        
-        .history-list-item:hover {
-            background-color: var(--color-bg-input);
-        }
-        
-        .history-list-item .delete-btn {
-            background-color: transparent;
-            border: none;
-            color: var(--color-text-secondary);
-            transition: color 0.2s ease;
-        }
-        
-        .history-list-item .delete-btn:hover {
-            color: var(--color-error);
-        }
-
         /* --- Responsiveness --- */
         @media (max-width: 768px) {
             .app-container {
@@ -537,11 +455,11 @@
     <nav class="navbar navbar-dark px-3 py-2">
         <div class="container-fluid">
             <button class="btn btn-nav d-md-none" type="button" id="sidebarToggle">
-                <i class="fas fa-cog"></i>
+                <i class="fas fa-bars"></i>
             </button>
             <span class="navbar-brand mb-0 h1">Eberardos AI</span>
             <button class="btn btn-nav d-none d-md-block" type="button" id="desktopSidebarToggle">
-                <i class="fas fa-cog"></i>
+                <i class="fas fa-history"></i>
             </button>
         </div>
     </nav>
@@ -549,32 +467,24 @@
     <div class="app-container">
         <div class="sidebar" id="mainSidebar">
             <div class="sidebar-header">
-                <h5 class="mb-0">Pengaturan</h5>
-                <button class="btn btn-sm btn-nav d-md-none" id="closeSidebar">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="sidebar-body">
-                <div class="settings-control">
-                    <h6>Tema</h6>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="darkModeToggle">
-                        <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
-                    </div>
+                <h5 class="mb-0">Chat History</h5>
+                <div>
+                    <button class="btn btn-sm btn-nav me-2" id="newChat" title="New chat">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="btn btn-sm btn-nav me-2" id="clearHistory" title="Clear history">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="btn btn-sm btn-nav d-md-none" id="closeSidebar">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <div class="settings-control">
-                    <h6>Ukuran Font</h6>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-secondary btn-sm" id="fontSmallBtn">A</button>
-                        <button class="btn btn-secondary btn-sm" id="fontMediumBtn">A</button>
-                        <button class="btn btn-secondary btn-sm" id="fontLargeBtn">A</button>
-                    </div>
-                </div>
-                <button class="btn btn-primary w-100 mt-3" id="saveSettingsBtn">Simpan Pengaturan</button>
             </div>
+            <div class="sidebar-body" id="chatHistory">
+                </div>
         </div>
 
-        <div class="main-content" id="chatView">
+        <div class="main-content">
             <div class="chat-area">
                 <div class="chat-container" id="chatContainer">
                     <div class="message ai-message">
@@ -593,20 +503,6 @@
                 </div>
             </div>
         </div>
-        
-        <div class="history-view d-none" id="historyView">
-            <div class="container-fluid p-3">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Riwayat Percakapan</h5>
-                    <button class="btn btn-sm btn-nav" id="newChatFromHistory" title="Mulai chat baru">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-                <div id="historyListContainer">
-                    <ul class="history-list"></ul>
-                </div>
-            </div>
-        </div>
     </div>
     <div class="input-area">
         <div class="input-container">
@@ -614,17 +510,6 @@
             <button class="send-button" id="sendButton">
                 <i class="fas fa-paper-plane"></i>
             </button>
-        </div>
-    </div>
-
-    <div class="bottom-navbar">
-        <div class="nav-item active" id="navChat">
-            <i class="fas fa-robot"></i>
-            <span>Chat</span>
-        </div>
-        <div class="nav-item" id="navHistory">
-            <i class="fas fa-history"></i>
-            <span>History</span>
         </div>
     </div>
 
@@ -656,28 +541,18 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const body = document.body;
-            const chatView = document.getElementById('chatView');
-            const historyView = document.getElementById('historyView');
-            const historyListContainer = document.querySelector('.history-list');
             const chatContainer = document.getElementById('chatContainer');
             const userInput = document.getElementById('userInput');
             const sendButton = document.getElementById('sendButton');
+            const chatHistory = document.getElementById('chatHistory');
+            const newChatBtn = document.getElementById('newChat');
+            const clearHistoryBtn = document.getElementById('clearHistory');
             const sidebarToggle = document.getElementById('sidebarToggle');
+            const desktopSidebarToggle = document.getElementById('desktopSidebarToggle');
             const closeSidebar = document.getElementById('closeSidebar');
             const overlay = document.querySelector('.overlay');
             const sidebar = document.getElementById('mainSidebar');
             const toast = document.getElementById('toast');
-            const navChat = document.getElementById('navChat');
-            const navHistory = document.getElementById('navHistory');
-            const newChatFromHistoryBtn = document.getElementById('newChatFromHistory');
-
-            // Pengaturan
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            const fontSmallBtn = document.getElementById('fontSmallBtn');
-            const fontMediumBtn = document.getElementById('fontMediumBtn');
-            const fontLargeBtn = document.getElementById('fontLargeBtn');
-            const saveSettingsBtn = document.getElementById('saveSettingsBtn');
             
             // Tampilkan modal saat halaman dimuat
             const apiStatusModal = new bootstrap.Modal(document.getElementById('apiStatusModal'), {});
@@ -774,6 +649,8 @@
                     processedHtml += `</${listType}>`;
                 }
 
+                // Mengganti baris baru menjadi <br>, tapi jangan di dalam list
+                processedHtml = processedHtml.replace(/<\/li>(?!<br>)/g, '</li><br>');
                 processedHtml = processedHtml.replace(/<br><br>/g, '<br>');
                 
                 return processedHtml;
@@ -882,105 +759,64 @@
                 sidebar.classList.toggle('active');
                 overlay.classList.toggle('active');
             }
-            
-            function saveSettings() {
-                const settings = {
-                    darkMode: darkModeToggle.checked,
-                    fontSize: body.classList.contains('font-small') ? 'small' : 
-                              body.classList.contains('font-large') ? 'large' : 'medium'
-                };
-                localStorage.setItem('eberardosSettings', JSON.stringify(settings));
-                showToast('Pengaturan disimpan!');
-                if (window.innerWidth < 768) toggleSidebar();
-            }
 
-            function loadSettings() {
-                const savedSettings = JSON.parse(localStorage.getItem('eberardosSettings'));
-                if (savedSettings) {
-                    if (savedSettings.darkMode) {
-                        body.classList.add('light-theme');
-                        darkModeToggle.checked = true;
-                    } else {
-                        body.classList.remove('light-theme');
-                        darkModeToggle.checked = false;
-                    }
-
-                    body.classList.remove('font-small', 'font-large');
-                    if (savedSettings.fontSize === 'small') {
-                        body.classList.add('font-small');
-                    } else if (savedSettings.fontSize === 'large') {
-                        body.classList.add('font-large');
-                    }
-                    updateFontButtonActiveState(savedSettings.fontSize);
-                } else {
-                    // Default to dark mode
-                    body.classList.remove('light-theme');
-                    darkModeToggle.checked = false;
-                    updateFontButtonActiveState('medium');
-                }
-            }
-
-            function updateFontButtonActiveState(size) {
-                fontSmallBtn.classList.remove('btn-primary');
-                fontMediumBtn.classList.remove('btn-primary');
-                fontLargeBtn.classList.remove('btn-primary');
-                fontSmallBtn.classList.add('btn-secondary');
-                fontMediumBtn.classList.add('btn-secondary');
-                fontLargeBtn.classList.add('btn-secondary');
-
-                if (size === 'small') {
-                    fontSmallBtn.classList.add('btn-primary');
-                    fontSmallBtn.classList.remove('btn-secondary');
-                } else if (size === 'large') {
-                    fontLargeBtn.classList.add('btn-primary');
-                    fontLargeBtn.classList.remove('btn-secondary');
-                } else {
-                    fontMediumBtn.classList.add('btn-primary');
-                    fontMediumBtn.classList.remove('btn-secondary');
-                }
-            }
-
-            function renderHistoryView() {
-                historyListContainer.innerHTML = '';
+            function updateChatHistory() {
+                chatHistory.innerHTML = '';
                 if (conversations.length === 0) {
-                    historyListContainer.innerHTML = '<div class="text-center text-secondary py-3">Belum ada percakapan.</div>';
+                    chatHistory.innerHTML = '<div class="text-center text-secondary py-3">Belum ada percakapan</div>';
                     return;
                 }
                 
                 conversations.forEach(conv => {
-                    const listItem = document.createElement('li');
-                    listItem.className = 'history-list-item';
+                    const historyItem = document.createElement('div');
+                    historyItem.className = `history-item ${currentConversationId === conv.id ? 'active-chat' : ''}`;
+                    historyItem.innerHTML = `
+                        <div class="text-truncate">${sanitizeHtml(conv.messages[0]?.text?.substring(0, 30) || 'Percakapan baru')}</div>
+                        <button class="btn btn-sm btn-outline-danger delete-conv" data-id="${conv.id}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
                     
-                    const title = document.createElement('div');
-                    title.className = 'text-truncate';
-                    title.textContent = conv.messages[0]?.text?.substring(0, 40) || 'Percakapan baru';
-                    
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'delete-btn';
-                    deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
-                    
-                    listItem.appendChild(title);
-                    listItem.appendChild(deleteBtn);
-                    
-                    listItem.addEventListener('click', (e) => {
-                        if (e.target.closest('.delete-btn')) {
-                            deleteConversation(conv.id);
-                        } else {
+                    historyItem.addEventListener('click', (e) => {
+                        if (!e.target.closest('.delete-conv')) {
                             loadConversation(conv.id);
+                            if (window.innerWidth < 768) toggleSidebar();
                         }
                     });
                     
-                    historyListContainer.appendChild(listItem);
+                    const deleteBtn = historyItem.querySelector('.delete-conv');
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deleteConversation(conv.id);
+                    });
+                    
+                    chatHistory.appendChild(historyItem);
                 });
             }
 
             function deleteConversation(id) {
                 conversations = conversations.filter(conv => conv.id !== id);
                 if (currentConversationId === id) {
-                    createNewConversation();
+                    currentConversationId = null;
+                    chatContainer.innerHTML = `
+                        <div class="message ai-message">
+                            <div class="profile-image">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p>
+                                <div class="suggestion-chips">
+                                    <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                                    <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                                    <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    addSuggestionChipsListeners();
                 }
                 localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
-                renderHistoryView();
+                updateChatHistory();
                 showToast('Percakapan dihapus');
             }
 
@@ -994,7 +830,7 @@
                         appendMessage(msg.text, msg.sender);
                     });
                 }
-                switchView('chat');
+                updateChatHistory();
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }
 
@@ -1006,23 +842,9 @@
                 conversations.unshift(newConv);
                 currentConversationId = newConv.id;
                 localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
-                chatContainer.innerHTML = `
-                    <div class="message ai-message">
-                        <div class="profile-image">
-                            <i class="fas fa-robot"></i>
-                        </div>
-                        <div class="message-content">
-                            <p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p>
-                            <div class="suggestion-chips">
-                                <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
-                                <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
-                                <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                addSuggestionChipsListeners();
-                switchView('chat');
+                updateChatHistory();
+                chatContainer.innerHTML = '';
+                return newConv.id;
             }
 
             function appendMessage(text, sender) {
@@ -1050,6 +872,22 @@
                     }
                 });
                 
+                if (sender === 'ai' && !currentConversationId) {
+                    const chipsContainer = document.createElement('div');
+                    chipsContainer.className = 'suggestion-chips';
+                    chipsContainer.innerHTML = `
+                        <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                        <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                        <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                    </div>
+                    `;
+                    contentContainer.appendChild(chipsContainer);
+                    
+                    setTimeout(() => {
+                        addSuggestionChipsListeners();
+                    }, 100);
+                }
+                
                 messageDiv.appendChild(profileImage);
                 messageDiv.appendChild(contentContainer);
                 
@@ -1070,13 +908,14 @@
             function saveMessage(text, sender) {
                 let conversation = conversations.find(conv => conv.id === currentConversationId);
                 if (!conversation) {
-                    currentConversationId = createNewConversation().id;
+                    currentConversationId = createNewConversation();
                     conversation = conversations.find(conv => conv.id === currentConversationId);
                 }
                 
                 if (conversation) {
                     conversation.messages.push({ text, sender });
                     localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
+                    updateChatHistory();
                 }
             }
 
@@ -1102,120 +941,154 @@
                 `;
                 chatContainer.appendChild(thinkingDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
+                
                 return thinkingDiv;
             }
 
-            function sendMessage() {
+            async function sendMessage() {
                 const message = userInput.value.trim();
                 if (!message) return;
-                
+
                 if (!currentConversationId) {
                     createNewConversation();
                 }
-                
+
+                const conversation = conversations.find(conv => conv.id === currentConversationId);
+                if (!conversation) return;
+
                 appendMessage(message, 'user');
                 saveMessage(message, 'user');
-                
                 userInput.value = '';
                 adjustTextareaHeight();
+                userInput.focus();
+
+                userInput.disabled = true;
+                sendButton.disabled = true;
+                sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                const thinkingIndicator = simulateThinking();
+
+                const conversationHistory = conversation.messages.map(msg => msg.text).join('\n');
                 
-                const thinkingElement = simulateThinking();
+                const combinedPrompt = `ingat, namamu adalah Eberardos AI. Jika ada yang bertanya siapa yang membuatmu, jawablah Givy, Nero, Ayura, Kalz, Fanz, Zenn1t dan Rapikz. Kamu adalah asisten AI yang tidak formal dan ramah. Gunakan kata "gw" alih-alih "gue" saat merujuk pada diri sendiri. Gunakan kata "Lu" alih-alih "Lo" saat merujuk kepada lawan bicara. Gunakan kata "kaga" alih-alih "enggak". Gunakan kata "kek gitu" alih-alih "begitu". Selalu berikan jawaban yang singkat, jelas, dan langsung ke intinya. **Jangan pernah sertakan namamu (Eberardos AI) atau nama siapa pun di awal setiap jawaban. Berikan jawaban langsung.** Untuk kode atau komentar di dalam kode, gunakan Bahasa Inggris secara default, kecuali pengguna secara eksplisit meminta dalam Bahasa Indonesia. Saat membuat blok kode, pastikan karakter HTML seperti "<" dan ">" dikirimkan dalam format aslinya, bukan diubah menjadi "&lt;" dan "&gt;".\n\n${conversationHistory}\n\nUser: ${message}`;
                 
-                // Simulasi respons AI (dalam implementasi nyata, ini akan diganti dengan API call)
-                setTimeout(() => {
-                    thinkingElement.remove();
+                const apiUrl = '/api/chat';
+                
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ prompt: combinedPrompt }) // Kirim string gabungan
+                    });
                     
-                    let response = '';
+                    const data = await response.json();
                     
-                    if (message.toLowerCase().includes('halo') || message.toLowerCase().includes('hai')) {
-                        response = "Halo! Senang bisa membantu Anda hari ini. Ada yang bisa saya bantu?";
-                    } else if (message.toLowerCase().includes('eberardos')) {
-                        response = "Eberardos adalah komunitas yang berfokus pada pengembangan teknologi dan kreativitas. Komunitas ini didirikan pada tahun 2021 dan telah menghasilkan berbagai proyek menarik di bidang web development, AI, dan desain.";
-                    } else if (message.toLowerCase().includes('html')) {
-                        response = "Berikut contoh kode HTML sederhana:\n\n```html\n<!DOCTYPE html>\n<html>\n<head>\n    <title>Halaman Saya</title>\n</head>\n<body>\n    <h1>Halo Dunia!</h1>\n    <p>Ini adalah halaman HTML sederhana.</p>\n</body>\n</html>\n```\n\nKode ini membuat halaman web dengan judul dan paragraf sederhana.";
-                    } else if (message.toLowerCase().includes('ai')) {
-                        response = "AI (Artificial Intelligence) atau kecerdasan buatan adalah simulasi proses kecerdasan manusia oleh mesin, terutama sistem komputer. Proses ini termasuk pembelajaran, penalaran, dan koreksi diri. AI digunakan dalam berbagai bidang seperti pemrosesan bahasa alami, pengenalan suara, dan visi komputer.";
-                    } else {
-                        response = "Terima kasih atas pesannya! Ini adalah simulasi respons AI. Dalam implementasi nyata, ini akan terhubung ke API AI seperti OpenAI GPT untuk menghasilkan respons yang lebih cerdas dan kontekstual.\n\nUntuk informasi lebih lanjut, kunjungi [Eberardos](https://eberardos.my.id).";
+                    chatContainer.removeChild(thinkingIndicator);
+                    
+                    const aiResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan dalam memproses permintaan.";
+                    
+                    appendMessage(aiResponseText, 'ai');
+                    saveMessage(aiResponseText, 'ai');
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    if (thinkingIndicator && thinkingIndicator.closest('.message')) {
+                        chatContainer.removeChild(thinkingIndicator.closest('.message'));
                     }
-                    
-                    appendMessage(response, 'ai');
-                    saveMessage(response, 'ai');
-                }, 2000);
-            }
-            
-            function switchView(view) {
-                if (view === 'chat') {
-                    chatView.classList.remove('d-none');
-                    historyView.classList.add('d-none');
-                    navChat.classList.add('active');
-                    navHistory.classList.remove('active');
-                    if (window.innerWidth < 768) {
-                        userInput.focus();
-                    }
-                } else if (view === 'history') {
-                    chatView.classList.add('d-none');
-                    historyView.classList.remove('d-none');
-                    navHistory.classList.add('active');
-                    navChat.classList.remove('active');
-                    renderHistoryView();
+                    appendMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai');
+                    saveMessage('Maaf, terjadi kesalahan dalam memproses permintaan Anda. Silakan coba lagi.', 'ai');
+                    showToast('Maaf, terjadi kesalahan.', true);
+                } finally {
+                    userInput.disabled = false;
+                    sendButton.disabled = false;
+                    sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
                 }
             }
 
-            // Event Listeners
+            // Event listeners
             sendButton.addEventListener('click', sendMessage);
-            
-            userInput.addEventListener('keydown', (e) => {
+            userInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    sendMessage();
+                    if (!sendButton.disabled) {
+                        sendMessage();
+                    }
                 }
             });
-            
             userInput.addEventListener('input', adjustTextareaHeight);
-            
-            // Bottom navbar functionality
-            navChat.addEventListener('click', () => switchView('chat'));
-            navHistory.addEventListener('click', () => switchView('history'));
-            
-            newChatFromHistoryBtn.addEventListener('click', () => {
+
+            newChatBtn.addEventListener('click', function() {
                 createNewConversation();
+                chatContainer.innerHTML = `
+                    <div class="message ai-message">
+                        <div class="profile-image">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p>
+                            <div class="suggestion-chips">
+                                <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                                <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                                <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                addSuggestionChipsListeners();
+                userInput.value = '';
+                userInput.focus();
+                if (window.innerWidth < 768) {
+                    toggleSidebar();
+                }
                 showToast('Percakapan baru dibuat');
             });
-            
-            // Sidebar for Settings
-            sidebarToggle.addEventListener('click', toggleSidebar);
-            document.getElementById('desktopSidebarToggle').addEventListener('click', toggleSidebar);
-            closeSidebar.addEventListener('click', toggleSidebar);
-            overlay.addEventListener('click', toggleSidebar);
-            
-            darkModeToggle.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    body.classList.add('light-theme');
-                } else {
-                    body.classList.remove('light-theme');
+
+            clearHistoryBtn.addEventListener('click', function() {
+                if (confirm('Apakah Anda yakin ingin menghapus semua riwayat percakapan?')) {
+                    conversations = [];
+                    localStorage.removeItem('eberardosConversations');
+                    updateChatHistory();
+                    chatContainer.innerHTML = `
+                        <div class="message ai-message">
+                            <div class="profile-image">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <p>Halo! Saya Eberardos AI. Ada yang bisa saya bantu?</p>
+                                <div class="suggestion-chips">
+                                    <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
+                                    <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
+                                    <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    addSuggestionChipsListeners();
+                    currentConversationId = null;
+                    showToast('Semua riwayat dihapus');
                 }
             });
 
-            fontSmallBtn.addEventListener('click', () => {
-                body.classList.remove('font-large');
-                body.classList.add('font-small');
-                updateFontButtonActiveState('small');
-            });
-            fontMediumBtn.addEventListener('click', () => {
-                body.classList.remove('font-small', 'font-large');
-                updateFontButtonActiveState('medium');
-            });
-            fontLargeBtn.addEventListener('click', () => {
-                body.classList.remove('font-small');
-                body.classList.add('font-large');
-                updateFontButtonActiveState('large');
-            });
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            desktopSidebarToggle.addEventListener('click', toggleSidebar);
+            closeSidebar.addEventListener('click', toggleSidebar);
+            overlay.addEventListener('click', toggleSidebar);
 
-            saveSettingsBtn.addEventListener('click', saveSettings);
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                }
+            });
 
             // Initialize
-            loadSettings();
+            updateChatHistory();
+            if (conversations.length > 0) {
+                loadConversation(conversations[0].id);
+            }
+            
             addSuggestionChipsListeners();
         });
     </script>
