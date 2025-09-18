@@ -74,7 +74,6 @@
 
         /* --- Layout Umum --- */
         .app-container {
-            padding-top: 50px; /* Tambahan padding untuk notifikasi API */
             display: flex;
             flex-grow: 1;
             height: calc(100vh - 66px); 
@@ -879,8 +878,9 @@
                     chipsContainer.innerHTML = `
                         <div class="suggestion-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</div>
                         <div class="suggestion-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</div>
-                        <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
-                    </div>
+                                <div class="suggestion-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</div>
+                            </div>
+                        </div>
                     `;
                     contentContainer.appendChild(chipsContainer);
                     
