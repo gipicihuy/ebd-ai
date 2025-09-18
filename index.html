@@ -17,9 +17,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /*
-         * Eberardos AI - Versi Redesain Final (Revisi 2)
+         * Eberardos AI - Versi Redesain Final (Revisi 3)
          * ---------------------------------------------
-         * Navigasi bawah untuk mobile dan tombol settings
+         * Perbaikan bug history tidak muncul di mobile
          */
 
         :root {
@@ -797,7 +797,11 @@
                     historyItem.addEventListener('click', (e) => {
                         if (!e.target.closest('.delete-conv')) {
                             loadConversation(conv.id);
-                            if (window.innerWidth < 768) toggleSidebar();
+                            if (window.innerWidth < 768) {
+                                toggleSidebar();
+                                mobileChatToggle.classList.add('active');
+                                mobileHistoryToggle.classList.remove('active');
+                            }
                         }
                     });
                     
@@ -1097,7 +1101,8 @@
             if (mobileHistoryToggle) {
                  mobileHistoryToggle.addEventListener('click', (e) => {
                     e.preventDefault();
-                    toggleSidebar();
+                    sidebar.classList.add('active');
+                    overlay.classList.add('active');
                     mobileHistoryToggle.classList.add('active');
                     mobileChatToggle.classList.remove('active');
                  });
@@ -1107,7 +1112,8 @@
                  mobileChatToggle.addEventListener('click', (e) => {
                     e.preventDefault();
                     if (sidebar.classList.contains('active')) {
-                        toggleSidebar();
+                        sidebar.classList.remove('active');
+                        overlay.classList.remove('active');
                     }
                     mobileChatToggle.classList.add('active');
                     mobileHistoryToggle.classList.remove('active');
@@ -1117,7 +1123,10 @@
             if (overlay) {
                 overlay.addEventListener('click', function() {
                     if (sidebar.classList.contains('active')) {
-                        toggleSidebar();
+                        sidebar.classList.remove('active');
+                        overlay.classList.remove('active');
+                        mobileChatToggle.classList.add('active');
+                        mobileHistoryToggle.classList.remove('active');
                     }
                 });
             }
@@ -1127,13 +1136,13 @@
                 desktopToggle.addEventListener('click', () => {
                     const isHidden = sidebar.classList.contains('d-none');
                     if(isHidden) {
-                        sidebar.classList.remove('d-none', 'd-md-flex');
+                        sidebar.classList.remove('d-none');
                         sidebar.classList.add('d-md-flex');
                         desktopToggle.innerHTML = `<i class="fas fa-history"></i>`;
                         desktopToggle.title = 'Hide sidebar';
                     } else {
                         sidebar.classList.remove('d-md-flex');
-                        sidebar.classList.add('d-none', 'd-md-flex');
+                        sidebar.classList.add('d-none');
                         desktopToggle.innerHTML = `<i class="fas fa-history"></i>`;
                         desktopToggle.title = 'Show sidebar';
                     }
@@ -1147,8 +1156,8 @@
                 sidebar.classList.remove('d-none', 'active');
                 overlay.classList.remove('active');
             } else {
-                sidebar.classList.add('d-none');
                 sidebar.classList.remove('d-md-flex', 'active');
+                sidebar.classList.add('d-none');
             }
 
             updateChatHistory();
