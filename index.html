@@ -76,7 +76,7 @@
         .app-container {
             display: flex;
             flex-grow: 1;
-            height: calc(100vh - 66px - 60px); /* Adjusted for bottom navbar */
+            height: calc(100vh - 66px); 
         }
         
         .main-content {
@@ -207,7 +207,7 @@
             justify-content: center;
             align-items: center;
             position: fixed;
-            bottom: 60px; /* Adjusted to make room for bottom navbar */
+            bottom: 0;
             left: 0;
             right: 0;
             z-index: 5; 
@@ -411,68 +411,11 @@
                 width: 0%;
             }
         }
-
-        /* --- Bottom Navbar Styles --- */
-        .bottom-navbar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: var(--color-bg-light);
-            border-top: 1px solid var(--color-border);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0.75rem 0;
-            z-index: 10;
-        }
-
-        .bottom-nav-container {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .bottom-nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0.5rem 1rem;
-            color: var(--color-text-secondary);
-            text-decoration: none;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border-radius: 8px;
-            min-width: 60px;
-        }
-
-        .bottom-nav-item:hover {
-            color: var(--color-primary);
-            background-color: rgba(183, 28, 28, 0.1);
-        }
-
-        .bottom-nav-item.active {
-            color: var(--color-primary);
-            background-color: rgba(183, 28, 28, 0.15);
-        }
-
-        .bottom-nav-icon {
-            font-size: 1.2rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .bottom-nav-label {
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
         /* --- Responsiveness --- */
         @media (max-width: 768px) {
             .app-container {
                 flex-direction: column;
-                height: calc(100vh - 66px - 60px); /* Adjusted for bottom navbar */
+                height: calc(100vh - 66px);
             }
             .sidebar {
                 position: fixed;
@@ -570,24 +513,6 @@
         </div>
     </div>
 
-    <!-- Bottom Navbar -->
-    <div class="bottom-navbar">
-        <div class="bottom-nav-container">
-            <div class="bottom-nav-item active" id="chatNavItem">
-                <div class="bottom-nav-icon">
-                    <i class="fas fa-robot"></i>
-                </div>
-                <div class="bottom-nav-label">Chat</div>
-            </div>
-            <div class="bottom-nav-item" id="historyNavItem">
-                <div class="bottom-nav-icon">
-                    <i class="fas fa-history"></i>
-                </div>
-                <div class="bottom-nav-label">History</div>
-            </div>
-        </div>
-    </div>
-
     <div class="modal fade" id="apiStatusModal" tabindex="-1" aria-labelledby="apiStatusModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -628,9 +553,6 @@
             const overlay = document.querySelector('.overlay');
             const sidebar = document.getElementById('mainSidebar');
             const toast = document.getElementById('toast');
-            
-            const chatNavItem = document.getElementById('chatNavItem');
-            const historyNavItem = document.getElementById('historyNavItem');
             
             // Tampilkan modal saat halaman dimuat
             const apiStatusModal = new bootstrap.Modal(document.getElementById('apiStatusModal'), {});
@@ -681,7 +603,7 @@
                 // Menangani bold, italic, dan link
                 html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-                html = html.replace(/\[(.*?)\]$$(.*?)$$/g, '<a href="$2" target="_blank">$1</a>');
+                html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
                 
                 // Menangani kode inline (backtick tunggal)
                 html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
@@ -836,17 +758,6 @@
             function toggleSidebar() {
                 sidebar.classList.toggle('active');
                 overlay.classList.toggle('active');
-                
-                // Update navbar state based on sidebar visibility
-                if (window.innerWidth < 768) {
-                    if (sidebar.classList.contains('active')) {
-                        historyNavItem.classList.add('active');
-                        chatNavItem.classList.remove('active');
-                    } else {
-                        chatNavItem.classList.add('active');
-                        historyNavItem.classList.remove('active');
-                    }
-                }
             }
 
             function updateChatHistory() {
@@ -1059,7 +970,7 @@
 
                 const conversationHistory = conversation.messages.map(msg => msg.text).join('\n');
                 
-                const combinedPrompt = `ingat, namamu adalah Eberardos AI. Jika ada yang bertanya siapa yang membuatmu, jawablah Givy, Nero, Ayura, Kalz, Fanz, Zenn1t dan Rapikz. Kamu adalah asisten AI yang tidak formal dan ramah. Gunakan kata "gw" alih-alih "gue" saat merujuk pada diri sendiri. Gunakan kata "Lu" alih-alih "Lo" saat merujuk kepada lawan bicara. Gunakan kata "kaga" alih-alih "enggak". Gunakan kata "kek gitu" alih-alih "begitu". Selalu berikan jawaban yang singkat, jelas, dan langsung ke intinya. **Jangan pernah sertakan namamu (Eberardos AI) atau nama siapa pun di awal setiap jawaban. Berikan jawaban langsung.** Saat membuat blok kode, pastikan karakter HTML seperti "<" dan ">" dikirimkan dalam format aslinya, bukan diubah menjadi "&lt;" dan "&gt;".\n\n${conversationHistory}\n\nUser: ${message}`;
+                const combinedPrompt = `ingat, namamu adalah Eberardos AI. Jika ada yang bertanya siapa yang membuatmu, jawablah Givy, Nero, Ayura, Kalz, Fanz, Zenn1t dan Rapikz. Kamu adalah asisten AI yang tidak formal dan ramah. Gunakan kata "gw" alih-alih "gue" saat merujuk pada diri sendiri. Gunakan kata "Lu" alih-alih "Lo" saat merujuk kepada lawan bicara. Gunakan kata "kaga" alih-alih "enggak". Gunakan kata "kek gitu" alih-alih "begitu". Selalu berikan jawaban yang singkat, jelas, dan langsung ke intinya. **Jangan pernah sertakan namamu (Eberardos AI) atau nama siapa pun di awal setiap jawaban. Berikan jawaban langsung.** Untuk kode atau komentar di dalam kode, gunakan Bahasa Inggris secara default, kecuali pengguna secara eksplisit meminta dalam Bahasa Indonesia. Saat membuat blok kode, pastikan karakter HTML seperti "<" dan ">" dikirimkan dalam format aslinya, bukan diubah menjadi "&lt;" dan "&gt;".\n\n${conversationHistory}\n\nUser: ${message}`;
                 
                 const apiUrl = '/api/chat';
                 
@@ -1165,37 +1076,10 @@
             closeSidebar.addEventListener('click', toggleSidebar);
             overlay.addEventListener('click', toggleSidebar);
 
-            chatNavItem.addEventListener('click', function() {
-                // Switch to chat view (hide sidebar on mobile)
-                if (window.innerWidth < 768 && sidebar.classList.contains('active')) {
-                    toggleSidebar();
-                }
-                chatNavItem.classList.add('active');
-                historyNavItem.classList.remove('active');
-            });
-
-            historyNavItem.addEventListener('click', function() {
-                // Switch to history view (show sidebar)
-                if (window.innerWidth < 768) {
-                    if (!sidebar.classList.contains('active')) {
-                        toggleSidebar();
-                    }
-                } else {
-                    // On desktop, just toggle sidebar
-                    if (!sidebar.classList.contains('active')) {
-                        toggleSidebar();
-                    }
-                }
-                historyNavItem.classList.add('active');
-                chatNavItem.classList.remove('active');
-            });
-
             window.addEventListener('resize', function() {
                 if (window.innerWidth >= 768) {
                     sidebar.classList.remove('active');
                     overlay.classList.remove('active');
-                    chatNavItem.classList.add('active');
-                    historyNavItem.classList.remove('active');
                 }
             });
 
