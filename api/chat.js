@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     const apiKey = process.env.GOOGLE_API_KEY;
     
     // PERBAIKAN: Gunakan model 'gemini-2.0-flash'
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     
     try {
         const { prompt } = req.body;
