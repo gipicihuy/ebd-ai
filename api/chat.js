@@ -2,7 +2,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
 
-
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
@@ -29,8 +28,11 @@ export default async function handler(req, res) {
             })
         });
 
-        const data = await response.json();
+        const rawText = await response.text();
+        const cleanText = rawText.replace(/\n/g, '');
+        const data = JSON.parse(cleanText);
         res.status(response.status).json(data);
+
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
