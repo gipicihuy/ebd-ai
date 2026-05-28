@@ -1,39 +1,37 @@
-import fetch from 'node-fetch';
-import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs/promises';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
-    
-    const apiKey = process.env.GOOGLE_API_KEY;
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-    
+
     try {
         const { prompt } = req.body;
 
         const __dirname = path.dirname(fileURLToPath(import.meta.url));
         const systemPrompt = await fs.readFile(path.join(__dirname, '../data/system-prompt.txt'), 'utf-8');
-        const fullPrompt = `${systemPrompt}\n\n${prompt}`;
-        
-        const response = await fetch(apiUrl, {
+
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`
             },
             body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: fullPrompt }]
-                }]
+                model: 'deepseek/deepseek-v4-flash',
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: prompt }
+                ]
             })
         });
 
         const data = await response.json();
         res.status(response.status).json(data);
     } catch (error) {
-        console.error('Error saat meneruskan permintaan:', error);
+        console.error('Error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
