@@ -987,7 +987,7 @@
                     
                     chatContainer.removeChild(thinkingIndicator);
                     
-                    const aiResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, terjadi kesalahan dalam memproses permintaan.";
+                    const aiResponseText = data?.choices?.[0]?.message?.content || "Maaf, terjadi kesalahan dalam memproses permintaan.";
                     
                     appendMessage(aiResponseText, 'ai');
                     saveMessage(aiResponseText, 'ai');
