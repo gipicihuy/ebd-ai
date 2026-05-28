@@ -15,8 +15,7 @@ export default async function handler(req, res) {
         const { prompt } = req.body;
 
         const __dirname = path.dirname(fileURLToPath(import.meta.url));
-        const systemPromptRaw = await fs.readFile(path.join(__dirname, '../data/system-prompt.json'), 'utf-8');
-        const { prompt: systemPrompt } = JSON.parse(systemPromptRaw);
+        const systemPrompt = await fs.readFile(path.join(__dirname, '../data/system-prompt.txt'), 'utf-8');
         const fullPrompt = `${systemPrompt}\n\n${prompt}`;
         
         const response = await fetch(apiUrl, {
