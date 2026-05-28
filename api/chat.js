@@ -1,5 +1,7 @@
 import fetch from 'node-fetch';
 import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -12,9 +14,9 @@ export default async function handler(req, res) {
     try {
         const { prompt } = req.body;
 
-        const systemPromptRaw = await fs.readFile('../data/system-prompt.json', 'utf-8');
+        const __dirname = path.dirname(fileURLToPath(import.meta.url));
+        const systemPromptRaw = await fs.readFile(path.join(__dirname, '../data/system-prompt.json'), 'utf-8');
         const { prompt: systemPrompt } = JSON.parse(systemPromptRaw);
-
         const fullPrompt = `${systemPrompt}\n\n${prompt}`;
         
         const response = await fetch(apiUrl, {
