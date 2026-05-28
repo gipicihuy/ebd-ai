@@ -1,6 +1,5 @@
-// /api/chat.js
-
 import fetch from 'node-fetch';
+import fs from 'fs/promises';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -8,12 +7,15 @@ export default async function handler(req, res) {
     }
     
     const apiKey = process.env.GOOGLE_API_KEY;
-    
-    // PERBAIKAN: Gunakan model 'gemini-2.0-flash'
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     
     try {
         const { prompt } = req.body;
+
+        const systemPromptRaw = await fs.readFile('./data/system-prompt.json', 'utf-8');
+        const { prompt: systemPrompt } = JSON.parse(systemPromptRaw);
+
+        const fullPrompt = `${systemPrompt}\n\n${prompt}`;
         
         const response = await fetch(apiUrl, {
             method: 'POST',
@@ -22,7 +24,7 @@ export default async function handler(req, res) {
             },
             body: JSON.stringify({
                 contents: [{
-                    parts: [{ text: prompt }]
+                    parts: [{ text: fullPrompt }]
                 }]
             })
         });
