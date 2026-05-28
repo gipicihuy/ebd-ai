@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     try {
         const { prompt } = req.body;
 
-        const systemPromptRaw = await fs.readFile('./data/system-prompt.json', 'utf-8');
+        const systemPromptRaw = await fs.readFile('/data/system-prompt.json', 'utf-8');
         const { prompt: systemPrompt } = JSON.parse(systemPromptRaw);
 
         const fullPrompt = `${systemPrompt}\n\n${prompt}`;
