@@ -175,15 +175,31 @@
         }
 
         .message {
-            display: flex;
-            padding: 1.5rem 0;
-            border-bottom: 1px solid var(--color-border);
-        }
+    display: flex;
+    padding: 0.5rem 1rem;
+    border-bottom: none;
+    gap: 8px;
+    align-items: flex-end;
+}
+.user-message {
+    flex-direction: row-reverse;
+}
+.user-message .message-content {
+    background: var(--color-primary);
+    border-radius: 18px 18px 4px 18px;
+    padding: 10px 14px;
+    max-width: 78%;
+}
+.ai-message .message-content {
+    background: var(--color-bg-input);
+    border-radius: 18px 18px 18px 4px;
+    padding: 10px 14px;
+    max-width: 78%;
+    border: 1px solid var(--color-border);
+}
         .message-content {
-            flex-grow: 1;
-            padding-left: 1rem;
-            word-break: break-word !important; /* Tambahkan !important di sini */
-            font-size: 0.875rem; /* 14px, sama seperti text yang saya kirim */
+            word-break: break-word !important;
+            font-size: 0.875rem;
             line-height: 1.5;
         }
         .profile-image {
@@ -1091,6 +1107,13 @@
             
             addSuggestionChipsListeners();
         });
+        
+        if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+        const offset = window.innerHeight - window.visualViewport.height;
+        document.querySelector('.input-area').style.bottom = offset + 'px';
+    });
+}
     </script>
 </body>
 </html>
