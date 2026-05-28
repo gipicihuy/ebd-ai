@@ -1112,8 +1112,14 @@
         
         if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', () => {
-        const offset = window.innerHeight - window.visualViewport.height;
-        document.querySelector('.input-area').style.bottom = offset + 'px';
+        const viewport = window.visualViewport;
+        const bottomOffset = window.innerHeight - viewport.height - viewport.offsetTop;
+        document.querySelector('.input-area').style.bottom = Math.max(0, bottomOffset) + 'px';
+    });
+    window.visualViewport.addEventListener('scroll', () => {
+        const viewport = window.visualViewport;
+        const bottomOffset = window.innerHeight - viewport.height - viewport.offsetTop;
+        document.querySelector('.input-area').style.bottom = Math.max(0, bottomOffset) + 'px';
     });
 }
     </script>
