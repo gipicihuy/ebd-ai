@@ -9,7 +9,6 @@ export default async function handler(req, res) {
 
     try {
         const { prompt } = req.body;
-
         const __dirname = path.dirname(fileURLToPath(import.meta.url));
         const systemPrompt = await fs.readFile(path.join(__dirname, '../data/system-prompt.txt'), 'utf-8');
 
@@ -21,6 +20,7 @@ export default async function handler(req, res) {
             },
             body: JSON.stringify({
                 model: 'deepseek/deepseek-v4-flash',
+                stream: true,
                 messages: [
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: prompt }
@@ -28,11 +28,21 @@ export default async function handler(req, res) {
             })
         });
 
-        const rawText = await response.text();
-        const cleanText = rawText.replace(/\n/g, '');
-        const data = JSON.parse(cleanText);
-        res.status(response.status).json(data);
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
 
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+            res.write(chunk);
+        }
+
+        res.end();
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
