@@ -447,7 +447,8 @@
             background: linear-gradient(to top, var(--bg) 70%, transparent);
             padding: 16px 20px 20px;
             z-index: 50;
-            transition: left 0.25s cubic-bezier(0.4,0,0.2,1), bottom 0.5s cubic-bezier(0.4,0,0.2,1), top 0.5s cubic-bezier(0.4,0,0.2,1), transform 0.5s cubic-bezier(0.4,0,0.2,1), background 0.5s ease;
+            will-change: transform, bottom;
+            transition: left 0.25s cubic-bezier(0.4,0,0.2,1), bottom 0.15s ease-out, top 0.5s cubic-bezier(0.4,0,0.2,1), transform 0.15s ease-out, background 0.5s ease;
         }
         .input-area.centered {
             bottom: 0;
@@ -1249,12 +1250,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const fix = () => {
             const isZoomed = window.visualViewport.scale > 1.05;
             if (isZoomed) return;
-            const offset = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop;
-            document.querySelector('.input-area').style.bottom = Math.max(0, offset) + 'px';
+            const kb = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
+            if (isCentered) {
+                inputArea.style.bottom = kb > 0 ? `${kb}px` : '';
+            } else {
+                inputArea.style.transform = `translateY(-${kb}px)`;
+            }
         };
         window.visualViewport.addEventListener('resize', fix);
-        window.visualViewport.addEventListener('scroll', fix);
-    }
 });
 </script>
 </body>
