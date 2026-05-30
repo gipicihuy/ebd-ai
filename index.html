@@ -992,6 +992,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ── MARKDOWN ──
     function mdToHtml(text) {
+        // Strip leading dash/bullet sebelum escape
+        text = text.replace(/^[ \t]*[-–•]\s+/gm, '__LISTITEM__');
+
         function esc(str) {
             return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         }
@@ -1000,9 +1003,6 @@ document.addEventListener('DOMContentLoaded', function () {
         h = h.replace(/^(#{1,6}) /gm, '$1 ');
         h = h.replace(/^---+$/gm, '---');
         h = h.replace(/^\|/gm, '|');
-        h = h.replace(/^(\s*)&ndash; /gm, '$1- ');
-        h = h.replace(/^(\s*)– /gm, '$1- ');
-        h = h.replace(/^(\s*)• /gm, '$1- ');
 
         // Tabel
         const tableRegex = /(\|.+\|\n\|[-| :]+\|\n(?:\|.+\|\n?)+)/g;
@@ -1018,7 +1018,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return `<div class="table-wrap"><table>${thead}${tbody}</table></div>`;
         });
 
-        h = h.replace(/- \*\*(.*?)\*\*/g, '<strong>$1</strong>');
         h = h.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         h = h.replace(/\*(.*?)\*/g, '<em>$1</em>');
         h = h.replace(/~~(.*?)~~/g, '<del>$1</del>');
@@ -1049,13 +1048,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 out += '<hr>';
                 continue;
             }
-            const isBullet = t.startsWith('* ') || t.startsWith('- ') || t.startsWith('– ') || t.startsWith('• ');
+            const isBullet = t.startsWith('__LISTITEM__') || t.startsWith('* ') || t.startsWith('- ');
             const isNum = /^\d+\. /.test(t);
-            if (isBullet || isNum) {
-                const lt = isBullet ? 'ul' : 'ol';
+            if (isBullet) {
+                const item = t.replace('__LISTITEM__', '').replace(/^\*\s+/, '').replace(/^-\s+/, '');
+                if (!inList) { out += '<ul>'; listType = 'ul'; inList = true; }
+                else if (listType !== 'ul') { out += '</ol><ul>'; listType = 'ul'; }
+                out += `<li>${item}</li>`;
+            } else if (isNum) {
                 const item = line.substring(line.indexOf(' ') + 1);
-                if (!inList) { out += `<${lt}>`; listType = lt; inList = true; }
-                else if (listType !== lt) { out += `</${listType}><${lt}>`; listType = lt; }
+                if (!inList) { out += '<ol>'; listType = 'ol'; inList = true; }
+                else if (listType !== 'ol') { out += '</ul><ol>'; listType = 'ol'; }
                 out += `<li>${item}</li>`;
             } else {
                 if (inList) { out += `</${listType}>`; inList = false; }
