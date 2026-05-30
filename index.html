@@ -490,14 +490,14 @@
             position: fixed;
             left: 260px;
             right: 0;
-            top: 0;
+            top: 56px;
             bottom: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 56px 20px 120px;
+            padding: 20px 20px 100px;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.4s ease;
@@ -650,7 +650,7 @@
             .sidebar.active { transform: translateX(0); }
             .input-area { left: 0; }
             .input-area.centered { left: 0; }
-            .center-welcome { left: 0; }
+            .center-welcome { left: 0; top: 56px; }
             .navbar-brand { text-align: left; }
             .close-sidebar-btn { display: flex !important; }
             .history-delete { opacity: 1; }
@@ -730,7 +730,7 @@
         <div class="sidebar-top">
             <span class="sidebar-top-label">Riwayat</span>
             <div class="sidebar-actions">
-                <button class="btn-icon" id="newChat" title="Chat baru"><i class="fas fa-plus"></i></button>
+                <button class="btn-icon" id="newChat" title="Chat baru"><i class="fas fa-pencil-alt"></i></button>
                 <button class="btn-icon" id="clearHistory" title="Hapus semua"><i class="fas fa-trash-alt"></i></button>
                 <button class="btn-icon close-sidebar-btn" id="closeSidebar"><i class="fas fa-times"></i></button>
             </div>
