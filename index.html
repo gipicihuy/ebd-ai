@@ -722,6 +722,7 @@
         <img src="https://athars.space/uploads/351182a6.jpg" alt="logo" style="width:28px;height:28px;border-radius:50%;object-fit:cover;margin-right:8px;vertical-align:middle;border:1px solid var(--border);">
         <span>Eberardos</span> AI
     </span>
+    <button class="btn-icon d-md-none" id="newChatMobile" title="Chat baru"><i class="fas fa-plus"></i></button>
     <button class="btn-icon d-none d-md-flex" id="desktopSidebarToggle"><i class="fas fa-sidebar"></i></button>
 </nav>
 
@@ -730,7 +731,7 @@
         <div class="sidebar-top">
             <span class="sidebar-top-label">Riwayat</span>
             <div class="sidebar-actions">
-                <button class="btn-icon" id="newChat" title="Chat baru"><i class="fas fa-pencil-alt"></i></button>
+                <button class="btn-icon" id="newChat" title="Chat baru"><i class="fas fa-plus"></i></button>
                 <button class="btn-icon" id="clearHistory" title="Hapus semua"><i class="fas fa-trash-alt"></i></button>
                 <button class="btn-icon close-sidebar-btn" id="closeSidebar"><i class="fas fa-times"></i></button>
             </div>
@@ -1130,10 +1131,19 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.getElementById('newChat').addEventListener('click', () => {
-        createNewConv();
-        resetChat();
-        userInput.focus();
+        currentConversationId = null;
+        chatInner.innerHTML = '';
+        setCentered(true);
+        addChipListeners();
         if (window.innerWidth < 768) toggleSidebar();
+        showToast('Chat baru dibuat');
+    });
+
+    document.getElementById('newChatMobile')?.addEventListener('click', () => {
+        currentConversationId = null;
+        chatInner.innerHTML = '';
+        setCentered(true);
+        addChipListeners();
         showToast('Chat baru dibuat');
     });
 
