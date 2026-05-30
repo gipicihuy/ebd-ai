@@ -543,6 +543,16 @@
             justify-content: center;
             max-width: 480px;
         }
+        .center-input-wrapper {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+        }
+        .center-input-wrapper .input-container {
+            border-radius: 14px;
+            padding: 12px 14px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+        }
         .input-field {
             flex: 1;
             background: transparent;
@@ -741,6 +751,12 @@
                 <button class="welcome-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</button>
                 <button class="welcome-chip" data-prompt="Rekomendasiin anime bagus dong">Rekomen anime</button>
             </div>
+            <div class="center-input-wrapper">
+                <div class="input-container" id="centerInputContainer">
+                    <textarea class="input-field" placeholder="Ketik pesan..." id="userInputCenter" rows="1"></textarea>
+                    <button class="send-btn" id="sendButtonCenter"><i class="fas fa-arrow-up"></i></button>
+                </div>
+            </div>
         </div>
         <div class="chat-container" id="chatContainer">
             <div class="chat-inner" id="chatInner">
@@ -749,7 +765,7 @@
     </div>
 </div>
 
-<div class="input-area">
+<div class="input-area" id="inputAreaBottom">
     <div class="input-wrapper">
         <div class="input-container">
             <textarea class="input-field" placeholder="Ketik pesan..." id="userInput" rows="1"></textarea>
@@ -802,16 +818,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const inputArea = document.querySelector('.input-area');
     const centerWelcome = document.getElementById('centerWelcome');
 
+    const inputAreaBottom = document.getElementById('inputAreaBottom');
+
     function setCentered(val) {
         isCentered = val;
         if (val) {
-            inputArea.classList.add('centered');
+            inputAreaBottom.style.display = 'none';
             centerWelcome.classList.remove('hidden');
             setTimeout(() => centerWelcome.classList.add('visible'), 10);
         } else {
-            inputArea.classList.remove('centered');
+            inputAreaBottom.style.display = '';
             centerWelcome.classList.add('hidden');
             centerWelcome.classList.remove('visible');
+            setTimeout(() => userInput.focus(), 100);
         }
     }
     setCentered(true);
@@ -1068,11 +1087,27 @@ document.addEventListener('DOMContentLoaded', function () {
     function addChipListeners() {
         document.querySelectorAll('.welcome-chip, .suggestion-chip').forEach(c => {
             c.addEventListener('click', function () {
-                userInput.value = this.dataset.prompt;
+                const target = isCentered ? userInputCenter : userInput;
+                target.value = this.dataset.prompt;
                 sendMessage();
             });
         });
     }
+
+    const userInputCenter = document.getElementById('userInputCenter');
+    const sendButtonCenter = document.getElementById('sendButtonCenter');
+
+    userInputCenter.addEventListener('input', () => {
+        userInputCenter.style.height = 'auto';
+        userInputCenter.style.height = userInputCenter.scrollHeight + 'px';
+    });
+    userInputCenter.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+    sendButtonCenter.addEventListener('click', sendMessage);
 
     // ── SIDEBAR ──
     function toggleSidebar() {
@@ -1126,7 +1161,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ── SEND MESSAGE WITH STREAMING ──
     async function sendMessage() {
-        const message = userInput.value.trim();
+        const activeInput = isCentered ? userInputCenter : userInput;
+        const message = activeInput.value.trim();
         if (!message) return;
 
         if (!currentConversationId) createNewConv();
@@ -1137,9 +1173,9 @@ document.addEventListener('DOMContentLoaded', function () {
         hideWelcome();
         appendMessage(message, 'user');
         saveMsg(message, 'user');
-        userInput.value = '';
-        resizeInput();
-        userInput.focus();
+        activeInput.value = '';
+        activeInput.style.height = '22px';
+        if (!isCentered) userInput.focus();
 
         userInput.disabled = true;
         sendButton.disabled = true;
