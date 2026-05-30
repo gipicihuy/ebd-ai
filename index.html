@@ -1219,7 +1219,8 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>`;
         chatInner.appendChild(thinkDiv);
         chatContainer.scrollTop = chatContainer.scrollHeight;
-
+        
+        const requestConvId = currentConversationId;
         const history = conv.messages.map(m => m.text).join('\n');
         const combined = `${history}\n\nUser: ${message}`;
 
@@ -1231,7 +1232,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             // Remove thinking indicator
-            chatInner.removeChild(thinkDiv);
+            if (thinkDiv.parentNode) thinkDiv.parentNode.removeChild(thinkDiv);
+            if (requestConvId !== currentConversationId) return;
 
             // Create streaming bubble
             const streamMsg = document.createElement('div');
@@ -1279,7 +1281,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Remove cursor when done
             cursor.remove();
-            saveMsg(fullText, 'ai');
+            if (requestConvId === currentConversationId) {
+                saveMsg(fullText, 'ai');
+            }
 
         } catch (err) {
             console.error(err);
