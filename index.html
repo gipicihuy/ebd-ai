@@ -450,13 +450,13 @@
             transition: left 0.25s cubic-bezier(0.4,0,0.2,1), bottom 0.5s cubic-bezier(0.4,0,0.2,1), top 0.5s cubic-bezier(0.4,0,0.2,1), transform 0.5s cubic-bezier(0.4,0,0.2,1), background 0.5s ease;
         }
         .input-area.centered {
-            bottom: unset;
-            top: 50%;
-            transform: translateY(-50%);
+            bottom: 0;
+            top: unset;
+            transform: none;
             left: 260px;
             right: 0;
             background: transparent;
-            padding: 0 20px;
+            padding: 16px 20px 32px;
         }
         .input-area.centered .input-wrapper {
             max-width: 600px;
@@ -489,24 +489,25 @@
             position: fixed;
             left: 260px;
             right: 0;
-            top: 50%;
-            transform: translateY(-120%);
+            top: 0;
+            bottom: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             text-align: center;
-            padding: 0 20px 180px;
+            padding: 56px 20px 120px;
             pointer-events: none;
-            transition: transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+            opacity: 0;
+            transition: opacity 0.4s ease;
             z-index: 40;
         }
         .center-welcome.visible {
-            transform: translateY(-100%);
+            opacity: 1;
             pointer-events: auto;
         }
         .center-welcome.hidden {
             opacity: 0;
-            transform: translateY(-130%);
             pointer-events: none;
         }
         .center-welcome-logo {
@@ -803,15 +804,11 @@ document.addEventListener('DOMContentLoaded', function () {
     function setCentered(val) {
         isCentered = val;
         if (val) {
-            inputArea.style.bottom = '';
             inputArea.classList.add('centered');
             centerWelcome.classList.remove('hidden');
             setTimeout(() => centerWelcome.classList.add('visible'), 10);
         } else {
             inputArea.classList.remove('centered');
-            inputArea.style.top = '';
-            inputArea.style.transform = '';
-            inputArea.style.bottom = '0';
             centerWelcome.classList.add('hidden');
             centerWelcome.classList.remove('visible');
         }
