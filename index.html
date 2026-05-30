@@ -583,6 +583,19 @@
         strong { font-weight: 600; }
         ul, ol { padding-left: 20px; margin: 6px 0; }
         li { margin-bottom: 3px; }
+        del { opacity: 0.5; text-decoration: line-through; }
+        hr { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+        blockquote { border-left: 3px solid var(--primary); padding: 4px 12px; margin: 8px 0; color: var(--text-muted); background: var(--surface-2); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+        blockquote p { margin: 0; }
+        .md-heading { font-weight: 600; letter-spacing: -0.02em; margin: 10px 0 4px; color: var(--text); }
+        h1.md-heading { font-size: 1.2rem; }
+        h2.md-heading { font-size: 1.05rem; }
+        h3.md-heading { font-size: 0.95rem; }
+        h4.md-heading, h5.md-heading, h6.md-heading { font-size: 0.875rem; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+        th, td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; }
+        th { background: var(--surface-3); font-weight: 600; color: var(--text); }
+        td { color: var(--text-muted); }
     </style>
 </head>
 <body>
@@ -700,14 +713,51 @@ document.addEventListener('DOMContentLoaded', function () {
     // ── MARKDOWN ──
     function mdToHtml(text) {
         let h = text;
+
+        // Tabel
+        const tableRegex = /(\|.+\|\n\|[-| :]+\|\n(?:\|.+\|\n?)+)/g;
+        h = h.replace(tableRegex, match => {
+            const rows = match.trim().split('\n');
+            const headers = rows[0].split('|').filter(c => c.trim() !== '');
+            const body = rows.slice(2);
+            const thead = '<thead><tr>' + headers.map(c => `<th>${c.trim()}</th>`).join('') + '</tr></thead>';
+            const tbody = '<tbody>' + body.map(r => {
+                const cells = r.split('|').filter(c => c.trim() !== '');
+                return '<tr>' + cells.map(c => `<td>${c.trim()}</td>`).join('') + '</tr>';
+            }).join('') + '</tbody>';
+            return `<table>${thead}${tbody}</table>`;
+        });
+
         h = h.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         h = h.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        h = h.replace(/~~(.*?)~~/g, '<del>$1</del>');
         h = h.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
         h = h.replace(/`([^`]+)`/g, '<code>$1</code>');
+
         const lines = h.split('\n');
-        let out = '', inList = false, listType = '';
+        let out = '', inList = false, listType = '', inBlockquote = false;
         for (const line of lines) {
             const t = line.trim();
+            if (t.startsWith('> ')) {
+                if (inList) { out += `</${listType}>`; inList = false; }
+                if (!inBlockquote) { out += '<blockquote>'; inBlockquote = true; }
+                out += `<p>${t.slice(2)}</p>`;
+                continue;
+            } else if (inBlockquote) {
+                out += '</blockquote>'; inBlockquote = false;
+            }
+            if (/^#{1,6} /.test(t)) {
+                if (inList) { out += `</${listType}>`; inList = false; }
+                const level = t.match(/^(#+)/)[1].length;
+                const content = t.replace(/^#+\s/, '');
+                out += `<h${level} class="md-heading">${content}</h${level}>`;
+                continue;
+            }
+            if (/^---+$/.test(t)) {
+                if (inList) { out += `</${listType}>`; inList = false; }
+                out += '<hr>';
+                continue;
+            }
             const isBullet = t.startsWith('* ') || t.startsWith('- ');
             const isNum = /^\d+\. /.test(t);
             if (isBullet || isNum) {
@@ -722,6 +772,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
         if (inList) out += `</${listType}>`;
+        if (inBlockquote) out += '</blockquote>';
         return out;
     }
 
