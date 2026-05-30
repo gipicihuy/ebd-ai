@@ -1074,6 +1074,783 @@ document.addEventListener('DOMContentLoaded', function () {
     // Mobile keyboard fix
     if (window.visualViewport) {
         const fix = () => {
+            const isZoomed = window.visualViewport.scale > 1.05;
+            if (isZoomed) return;
+            const offset = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop;
+            document.querySelector('.input-area').style.bottom = Math.max(0, offset) + 'px';
+        };
+        window.visualViewport.addEventListener('resize', fix);
+        window.visualViewport.addEventListener('scroll', fix);
+    }
+});
+</script>
+</body>
+</html>
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 14px;
+        }
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-dim);
+            animation: bounce 1.3s infinite ease-in-out;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-5px); opacity: 1; }
+        }
+
+        /* ── STREAMING CURSOR ── */
+        .stream-cursor {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+        .stream-cursor::before,
+        .stream-cursor::after,
+        .stream-cursor span {
+            content: '';
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--text-dim);
+            animation: dotBounce 1.2s infinite ease-in-out;
+        }
+        .stream-cursor::before { animation-delay: 0s; }
+        .stream-cursor span { animation-delay: 0.2s; }
+        .stream-cursor::after { animation-delay: 0.4s; }
+        @keyframes dotBounce {
+            0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+            40% { transform: translateY(-5px); opacity: 1; }
+        }
+
+        /* ── SUGGESTION CHIPS ── */
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .suggestion-chip {
+            background: var(--surface-2);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 7px 13px;
+            font-size: 12.5px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: 'Geist', sans-serif;
+        }
+        .suggestion-chip:hover {
+            border-color: var(--primary);
+            color: var(--text);
+            background: var(--primary-dim);
+        }
+
+        /* ── WELCOME SCREEN ── */
+        .welcome-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            text-align: center;
+            padding: 0 20px;
+        }
+        .welcome-logo {
+            width: 52px;
+            height: 52px;
+            background: var(--primary-dim);
+            border: 1px solid rgba(192,57,43,0.3);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: var(--primary);
+            margin-bottom: 18px;
+        }
+        .welcome-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+        .welcome-sub {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+        }
+        .welcome-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            max-width: 480px;
+        }
+        .welcome-chip {
+            background: var(--surface-2);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 9px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Geist', sans-serif;
+        }
+        .welcome-chip:hover {
+            border-color: var(--primary);
+            color: var(--text);
+            background: var(--primary-dim);
+        }
+
+        /* ── INPUT AREA ── */
+        .input-area {
+            position: fixed;
+            bottom: 0;
+            left: 260px;
+            right: 0;
+            background: linear-gradient(to top, var(--bg) 70%, transparent);
+            padding: 16px 20px 20px;
+            z-index: 50;
+            transition: left 0.25s cubic-bezier(0.4,0,0.2,1);
+        }
+        .input-wrapper {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+        .input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px 12px;
+            transition: border-color 0.15s;
+        }
+        .input-container:focus-within {
+            border-color: var(--border-hover);
+        }
+        .input-field {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            outline: none;
+            resize: none;
+            font-family: 'Geist', sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            max-height: 180px;
+            min-height: 22px;
+            height: 22px;
+            overflow-y: hidden;
+        }
+        .input-field::placeholder { color: var(--text-dim); }
+        .send-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        .send-btn:hover { background: var(--primary-hover); transform: scale(1.04); }
+        .send-btn:disabled { background: var(--surface-3); color: var(--text-dim); cursor: not-allowed; transform: none; }
+
+        /* ── TOAST ── */
+        .toast-custom {
+            position: fixed;
+            top: 72px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            background: var(--surface-3);
+            border: 1px solid var(--border-hover);
+            color: var(--text);
+            padding: 9px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            z-index: 999;
+            opacity: 0;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .toast-custom.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast-custom.error .toast-icon-el { color: var(--error); }
+        .toast-custom .toast-icon-el { color: var(--success); }
+
+        /* ── MODAL ── */
+        .modal-content {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: var(--radius);
+        }
+        .modal-header { border-bottom: 1px solid var(--border); }
+        .modal-footer { border-top: 1px solid var(--border); }
+        .btn-close { filter: invert(1) grayscale(1) brightness(2); }
+        .btn-primary { background: var(--primary); border-color: var(--primary); }
+        .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+
+        /* ── OVERLAY ── */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 90;
+        }
+        .overlay.active { display: block; }
+
+        /* ── MOBILE ── */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0; left: 0;
+                height: 100%;
+                z-index: 95;
+                transform: translateX(-100%);
+            }
+            .sidebar.active { transform: translateX(0); }
+            .input-area { left: 0; }
+            .navbar-brand { text-align: left; }
+            .close-sidebar-btn { display: flex !important; }
+            .history-delete { opacity: 1; }
+        }
+        .close-sidebar-btn { display: none; }
+
+        /* ── INLINE CODE ── */
+        code {
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1px 5px;
+            font-family: 'Geist Mono', monospace;
+            font-size: 0.82em;
+            color: #f38ba8;
+        }
+        a { color: #89b4fa; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        strong { font-weight: 600; }
+        ul, ol { padding-left: 20px; margin: 6px 0; }
+        li { margin-bottom: 3px; }
+    </style>
+</head>
+<body>
+
+<div class="overlay"></div>
+
+<nav class="navbar">
+    <button class="btn-icon d-md-none" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+    <span class="navbar-brand">
+        <img src="https://athars.space/uploads/351182a6.jpg" alt="logo" style="width:28px;height:28px;border-radius:50%;object-fit:cover;margin-right:8px;vertical-align:middle;border:1px solid var(--border);">
+        <span>Eberardos</span> AI
+    </span>
+    <button class="btn-icon d-none d-md-flex" id="desktopSidebarToggle"><i class="fas fa-sidebar"></i></button>
+</nav>
+
+<div class="app-container">
+    <div class="sidebar" id="mainSidebar">
+        <div class="sidebar-top">
+            <span class="sidebar-top-label">Riwayat</span>
+            <div class="sidebar-actions">
+                <button class="btn-icon" id="newChat" title="Chat baru"><i class="fas fa-plus"></i></button>
+                <button class="btn-icon" id="clearHistory" title="Hapus semua"><i class="fas fa-trash-alt"></i></button>
+                <button class="btn-icon close-sidebar-btn" id="closeSidebar"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div class="sidebar-body" id="chatHistory"></div>
+    </div>
+
+    <div class="main-content">
+        <div class="chat-container" id="chatContainer">
+            <div class="chat-inner" id="chatInner">
+                <div class="welcome-container" id="welcomeScreen">
+                    <div class="welcome-logo"><i class="fas fa-robot"></i></div>
+                    <h1 class="welcome-title">Eberardos AI</h1>
+                    <p class="welcome-sub">Mau nanya apa hari ini?</p>
+                    <div class="welcome-chips">
+                        <button class="welcome-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</button>
+                        <button class="welcome-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</button>
+                        <button class="welcome-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</button>
+                        <button class="welcome-chip" data-prompt="Rekomendasiin anime bagus dong">Rekomen anime</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="input-area">
+    <div class="input-wrapper">
+        <div class="input-container">
+            <textarea class="input-field" placeholder="Ketik pesan..." id="userInput" rows="1"></textarea>
+            <button class="send-btn" id="sendButton"><i class="fas fa-arrow-up"></i></button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="apiStatusModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-1">
+                <h6 class="modal-title">Pemberitahuan</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-1" style="font-size:13.5px; color: var(--text-muted);">
+                Jika jawaban tidak muncul, kemungkinan ada masalah pada server API atau koneksi internet.
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">Mengerti</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-custom" id="toastEl">
+    <i class="fas fa-check-circle toast-icon-el"></i>
+    <span id="toastMsg"></span>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const chatContainer = document.getElementById('chatContainer');
+    const chatInner = document.getElementById('chatInner');
+    const userInput = document.getElementById('userInput');
+    const sendButton = document.getElementById('sendButton');
+    const chatHistoryEl = document.getElementById('chatHistory');
+    const sidebar = document.getElementById('mainSidebar');
+    const overlay = document.querySelector('.overlay');
+    const welcomeScreen = document.getElementById('welcomeScreen');
+
+    const apiStatusModal = new bootstrap.Modal(document.getElementById('apiStatusModal'));
+    apiStatusModal.show();
+
+    let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || [];
+    let currentConversationId = null;
+
+    // ── TOAST ──
+    function showToast(msg, isError = false) {
+        const el = document.getElementById('toastEl');
+        const icon = el.querySelector('.toast-icon-el');
+        document.getElementById('toastMsg').textContent = msg;
+        el.classList.toggle('error', isError);
+        icon.className = `fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'} toast-icon-el`;
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 2800);
+    }
+
+    // ── SANITIZE ──
+    function sanitize(text) {
+        const d = document.createElement('div');
+        d.textContent = text;
+        return d.innerHTML;
+    }
+
+    // ── MARKDOWN ──
+    function mdToHtml(text) {
+        let h = text;
+        h = h.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        h = h.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        h = h.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+        h = h.replace(/`([^`]+)`/g, '<code>$1</code>');
+        const lines = h.split('\n');
+        let out = '', inList = false, listType = '';
+        for (const line of lines) {
+            const t = line.trim();
+            const isBullet = t.startsWith('* ') || t.startsWith('- ');
+            const isNum = /^\d+\. /.test(t);
+            if (isBullet || isNum) {
+                const lt = isBullet ? 'ul' : 'ol';
+                const item = line.substring(line.indexOf(' ') + 1);
+                if (!inList) { out += `<${lt}>`; listType = lt; inList = true; }
+                else if (listType !== lt) { out += `</${listType}><${lt}>`; listType = lt; }
+                out += `<li>${item}</li>`;
+            } else {
+                if (inList) { out += `</${listType}>`; inList = false; }
+                if (t !== '') out += `<p>${line}</p>`;
+            }
+        }
+        if (inList) out += `</${listType}>`;
+        return out;
+    }
+
+    // ── EXTRACT CODE BLOCKS ──
+    function extractCode(text) {
+        const re = /```([\s\S]*?)```/g;
+        const parts = [];
+        let last = 0, m;
+        while ((m = re.exec(text)) !== null) {
+            if (m.index > last) parts.push({ type: 'text', content: text.slice(last, m.index) });
+            const lang = m[1].split('\n')[0] || 'text';
+            const code = m[1].replace(/^\w+\n/, '');
+            parts.push({ type: 'code', content: code, language: lang });
+            last = m.index + m[0].length;
+        }
+        if (last < text.length) parts.push({ type: 'text', content: text.slice(last) });
+        return parts.length ? parts : [{ type: 'text', content: text }];
+    }
+
+    // ── CREATE CODE BLOCK ──
+    function createCodeBlock(code, lang = 'text') {
+        const wrap = document.createElement('div');
+        wrap.className = 'code-block';
+        wrap.innerHTML = `
+            <div class="code-header">
+                <span class="code-lang">${sanitize(lang)}</span>
+                <div class="code-actions">
+                    <button class="code-btn copy-btn" title="Copy"><i class="fas fa-copy"></i></button>
+                    <button class="code-btn dl-btn" title="Download"><i class="fas fa-download"></i></button>
+                </div>
+            </div>
+            <pre></pre>`;
+        wrap.querySelector('pre').textContent = code;
+        wrap.querySelector('.copy-btn').onclick = () => {
+            navigator.clipboard.writeText(code);
+            showToast('Kode disalin!');
+        };
+        wrap.querySelector('.dl-btn').onclick = () => downloadCode(code, lang);
+        return wrap;
+    }
+
+    function downloadCode(code, lang) {
+        const ext = { javascript:'js', typescript:'ts', python:'py', java:'java', html:'html', css:'css', php:'php', go:'go', rust:'rs', sql:'sql', json:'json' }[lang.toLowerCase()] || 'txt';
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([code], { type: 'text/plain' }));
+        a.download = `eberardos-code.${ext}`;
+        a.click();
+        showToast('Kode didownload!');
+    }
+
+    // ── RENDER CONTENT INTO EL ──
+    function renderContent(el, text) {
+        el.innerHTML = '';
+        extractCode(text).forEach(part => {
+            if (part.type === 'code') {
+                el.appendChild(createCodeBlock(part.content, part.language));
+            } else {
+                const d = document.createElement('div');
+                d.innerHTML = mdToHtml(sanitize(part.content));
+                el.appendChild(d);
+            }
+        });
+    }
+
+    // ── APPEND MESSAGE ──
+    function appendMessage(text, sender) {
+        hideWelcome();
+        const msg = document.createElement('div');
+        msg.className = `message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
+
+        const avatar = document.createElement('div');
+        avatar.className = `avatar ai-avatar`;
+        avatar.innerHTML = '<i class="fas fa-robot"></i>';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'message-bubble';
+        if (sender === 'user') {
+            bubble.textContent = text;
+        } else {
+            renderContent(bubble, text);
+        }
+
+        msg.appendChild(avatar);
+        msg.appendChild(bubble);
+        chatInner.appendChild(msg);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        return msg;
+    }
+
+    function hideWelcome() {
+        if (welcomeScreen) welcomeScreen.style.display = 'none';
+    }
+
+    // ── HISTORY ──
+    function updateHistory() {
+        chatHistoryEl.innerHTML = '';
+        if (!conversations.length) {
+            chatHistoryEl.innerHTML = '<div class="sidebar-empty">Belum ada percakapan</div>';
+            return;
+        }
+        conversations.forEach(c => {
+            const item = document.createElement('div');
+            item.className = `history-item ${currentConversationId === c.id ? 'active' : ''}`;
+            const label = c.messages[0]?.text?.substring(0, 35) || 'Percakapan baru';
+            item.innerHTML = `
+                <i class="fas fa-comment-dots history-icon"></i>
+                <span class="history-text">${sanitize(label)}</span>
+                <button class="history-delete" data-id="${c.id}" title="Hapus"><i class="fas fa-times"></i></button>`;
+            item.addEventListener('click', e => {
+                if (!e.target.closest('.history-delete')) {
+                    loadConv(c.id);
+                    if (window.innerWidth < 768) toggleSidebar();
+                }
+            });
+            item.querySelector('.history-delete').onclick = e => { e.stopPropagation(); deleteConv(c.id); };
+            chatHistoryEl.appendChild(item);
+        });
+    }
+
+    function saveConvs() {
+        localStorage.setItem('eberardosConversations', JSON.stringify(conversations));
+    }
+
+    function createNewConv() {
+        const c = { id: Date.now(), messages: [] };
+        conversations.unshift(c);
+        currentConversationId = c.id;
+        saveConvs();
+        updateHistory();
+        return c.id;
+    }
+
+    function loadConv(id) {
+        currentConversationId = id;
+        chatInner.innerHTML = '';
+        const c = conversations.find(x => x.id === id);
+        if (c) c.messages.forEach(m => appendMessage(m.text, m.sender));
+        updateHistory();
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function deleteConv(id) {
+        conversations = conversations.filter(c => c.id !== id);
+        if (currentConversationId === id) { currentConversationId = null; resetChat(); }
+        saveConvs();
+        updateHistory();
+        showToast('Percakapan dihapus');
+    }
+
+    function saveMsg(text, sender) {
+        let c = conversations.find(x => x.id === currentConversationId);
+        if (!c) { createNewConv(); c = conversations.find(x => x.id === currentConversationId); }
+        c.messages.push({ text, sender });
+        saveConvs();
+        updateHistory();
+    }
+
+    function resetChat() {
+        chatInner.innerHTML = `
+        <div class="welcome-container" id="welcomeScreen">
+            <div class="welcome-logo"><i class="fas fa-robot"></i></div>
+            <h1 class="welcome-title">Eberardos AI</h1>
+            <p class="welcome-sub">Mau nanya apa hari ini?</p>
+            <div class="welcome-chips">
+                <button class="welcome-chip" data-prompt="Apa itu Eberardos?">Apa itu Eberardos?</button>
+                <button class="welcome-chip" data-prompt="Buatkan kode HTML sederhana">Buatkan kode HTML</button>
+                <button class="welcome-chip" data-prompt="Jelaskan tentang AI">Jelaskan tentang AI</button>
+                <button class="welcome-chip" data-prompt="Rekomendasiin anime bagus dong">Rekomen anime</button>
+            </div>
+        </div>`;
+        addChipListeners();
+    }
+
+    function addChipListeners() {
+        document.querySelectorAll('.welcome-chip, .suggestion-chip').forEach(c => {
+            c.addEventListener('click', function () {
+                userInput.value = this.dataset.prompt;
+                sendMessage();
+            });
+        });
+    }
+
+    // ── SIDEBAR ──
+    function toggleSidebar() {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
+
+    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+    document.getElementById('desktopSidebarToggle')?.addEventListener('click', toggleSidebar);
+    document.getElementById('closeSidebar')?.addEventListener('click', toggleSidebar);
+    overlay.addEventListener('click', toggleSidebar);
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+    });
+
+    document.getElementById('newChat').addEventListener('click', () => {
+        createNewConv();
+        resetChat();
+        userInput.focus();
+        if (window.innerWidth < 768) toggleSidebar();
+        showToast('Chat baru dibuat');
+    });
+
+    document.getElementById('clearHistory').addEventListener('click', () => {
+        if (confirm('Hapus semua riwayat percakapan?')) {
+            conversations = [];
+            localStorage.removeItem('eberardosConversations');
+            currentConversationId = null;
+            resetChat();
+            updateHistory();
+            showToast('Semua riwayat dihapus');
+        }
+    });
+
+    // ── TEXTAREA ──
+    function resizeInput() {
+        userInput.style.height = 'auto';
+        userInput.style.height = userInput.scrollHeight + 'px';
+    }
+    userInput.addEventListener('input', resizeInput);
+    userInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if (!sendButton.disabled) sendMessage();
+        }
+    });
+
+    // ── SEND MESSAGE WITH STREAMING ──
+    async function sendMessage() {
+        const message = userInput.value.trim();
+        if (!message) return;
+
+        if (!currentConversationId) createNewConv();
+        const conv = conversations.find(c => c.id === currentConversationId);
+        if (!conv) return;
+
+        hideWelcome();
+        appendMessage(message, 'user');
+        saveMsg(message, 'user');
+        userInput.value = '';
+        resizeInput();
+        userInput.focus();
+
+        userInput.disabled = true;
+        sendButton.disabled = true;
+        sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        // Thinking indicator
+        const thinkDiv = document.createElement('div');
+        thinkDiv.className = 'message ai-message';
+        thinkDiv.innerHTML = `
+            <div class="avatar ai-avatar"><i class="fas fa-robot"></i></div>
+            <div class="message-bubble">
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>`;
+        chatInner.appendChild(thinkDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        const history = conv.messages.map(m => m.text).join('\n');
+        const combined = `${history}\n\nUser: ${message}`;
+
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: combined })
+            });
+
+            // Remove thinking indicator
+            chatInner.removeChild(thinkDiv);
+
+            // Create streaming bubble
+            const streamMsg = document.createElement('div');
+            streamMsg.className = 'message ai-message';
+            const streamAvatar = document.createElement('div');
+            streamAvatar.className = 'avatar ai-avatar';
+            streamAvatar.innerHTML = '<i class="fas fa-robot"></i>';
+            const streamBubble = document.createElement('div');
+            streamBubble.className = 'message-bubble';
+            streamMsg.appendChild(streamAvatar);
+            streamMsg.appendChild(streamBubble);
+            chatInner.appendChild(streamMsg);
+
+            // Add blinking cursor
+            const cursor = document.createElement('span');
+            cursor.className = 'stream-cursor';
+            cursor.innerHTML = '<span></span>';
+            streamBubble.appendChild(cursor);
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split('\n').filter(l => l.startsWith('data: '));
+                for (const line of lines) {
+                    const json = line.replace('data: ', '').trim();
+                    if (json === '[DONE]') break;
+                    try {
+                        const parsed = JSON.parse(json);
+                        const token = parsed.choices?.[0]?.delta?.content || '';
+                        if (token) {
+                            fullText += token;
+                            renderContent(streamBubble, fullText);
+                            // Re-attach cursor at end
+                            streamBubble.appendChild(cursor);
+                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                        }
+                    } catch (_) {}
+                }
+            }
+
+            // Remove cursor when done
+            cursor.remove();
+            saveMsg(fullText, 'ai');
+
+        } catch (err) {
+            console.error(err);
+            if (thinkDiv.parentNode) chatInner.removeChild(thinkDiv);
+            appendMessage('Maaf, terjadi kesalahan. Coba lagi ya.', 'ai');
+            saveMsg('Maaf, terjadi kesalahan. Coba lagi ya.', 'ai');
+            showToast('Terjadi kesalahan.', true);
+        } finally {
+            userInput.disabled = false;
+            sendButton.disabled = false;
+            sendButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
+            userInput.focus();
+        }
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+
+    // ── INIT ──
+    updateHistory();
+    if (conversations.length > 0) loadConv(conversations[0].id);
+    addChipListeners();
+
+    // Mobile keyboard fix
+    if (window.visualViewport) {
+        const fix = () => {
             const offset = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop;
             document.querySelector('.input-area').style.bottom = Math.max(0, offset) + 'px';
         };
