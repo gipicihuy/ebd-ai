@@ -737,7 +737,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ── MARKDOWN ──
     function mdToHtml(text) {
-        let h = text;
+        function esc(str) {
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+        let h = esc(text);
+        h = h.replace(/^&gt; /gm, '> ');
+        h = h.replace(/^(#{1,6}) /gm, '$1 ');
+        h = h.replace(/^---+$/gm, '---');
+        h = h.replace(/^\|/gm, '|');
 
         // Tabel
         const tableRegex = /(\|.+\|\n\|[-| :]+\|\n(?:\|.+\|\n?)+)/g;
@@ -856,7 +863,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 el.appendChild(createCodeBlock(part.content, part.language));
             } else {
                 const d = document.createElement('div');
-                d.innerHTML = mdToHtml(sanitize(part.content));
+                d.innerHTML = mdToHtml(part.content);
                 el.appendChild(d);
             }
         });
@@ -1054,7 +1061,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const thinkDiv = document.createElement('div');
         thinkDiv.className = 'message ai-message';
         thinkDiv.innerHTML = `
-            <div class="avatar ai-avatar"><i class="fas fa-robot"></i></div>
+            <div class="avatar ai-avatar"><img src="https://athars.space/uploads/351182a6.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"></div>
             <div class="message-bubble">
                 <div class="typing-indicator">
                     <div class="typing-dot"></div>
