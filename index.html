@@ -713,8 +713,9 @@
         /* ── MESSAGE ACTIONS ── */
         .message-actions {
             display: flex;
-            gap: 4px;
-            margin-top: 6px;
+            align-items: center;
+            gap: 2px;
+            margin-top: 4px;
             opacity: 0;
             transition: opacity 0.15s ease;
         }
@@ -723,24 +724,29 @@
             opacity: 1;
         }
         .user-message .message-actions { justify-content: flex-end; }
+        .msg-timestamp {
+            font-size: 11px;
+            color: var(--text-dim);
+            padding: 0 4px;
+            user-select: none;
+        }
         .action-btn {
             background: transparent;
-            border: 1px solid var(--border);
+            border: none;
             color: var(--text-dim);
             border-radius: 6px;
-            width: 26px;
-            height: 26px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
             transition: all 0.15s;
         }
         .action-btn:hover {
-            border-color: var(--border-hover);
             color: var(--text);
-            background: var(--surface-2);
+            background: var(--surface-3);
         }
 
         /* ── EDIT MODE ── */
@@ -1086,6 +1092,14 @@ document.addEventListener('DOMContentLoaded', function () {
         // Actions
         const actions = document.createElement('div');
         actions.className = 'message-actions';
+
+        if (sender === 'user') {
+            const now = new Date();
+            const ts = document.createElement('span');
+            ts.className = 'msg-timestamp';
+            ts.textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            actions.appendChild(ts);
+        }
 
         const copyBtn = document.createElement('button');
         copyBtn.className = 'action-btn';
