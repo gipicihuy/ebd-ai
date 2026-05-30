@@ -497,12 +497,11 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 60px 20px 100px;
+            padding: 0 20px 80px;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.4s ease;
             z-index: 40;
-            overflow: hidden;
         }
         .center-welcome.visible {
             opacity: 1;
@@ -1134,6 +1133,12 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('newChat').addEventListener('click', () => {
         currentConversationId = null;
         chatInner.innerHTML = '';
+        userInput.disabled = false;
+        sendButton.disabled = false;
+        sendButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
+        userInputCenter.disabled = false;
+        sendButtonCenter.disabled = false;
+        sendButtonCenter.innerHTML = '<i class="fas fa-arrow-up"></i>';
         setCentered(true);
         addChipListeners();
         if (window.innerWidth < 768) toggleSidebar();
@@ -1143,6 +1148,12 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('newChatMobile')?.addEventListener('click', () => {
         currentConversationId = null;
         chatInner.innerHTML = '';
+        userInput.disabled = false;
+        sendButton.disabled = false;
+        sendButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
+        userInputCenter.disabled = false;
+        sendButtonCenter.disabled = false;
+        sendButtonCenter.innerHTML = '<i class="fas fa-arrow-up"></i>';
         setCentered(true);
         addChipListeners();
         showToast('Chat baru dibuat');
