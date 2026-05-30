@@ -670,7 +670,7 @@
         }
         a { color: #89b4fa; text-decoration: none; }
         a:hover { text-decoration: underline; }
-        strong { font-weight: 600; color: var(--text); }
+        strong { font-weight: 600; color: #fff; }
         em { color: var(--text); font-style: normal; font-weight: 500; }
         del { opacity: 0.45; text-decoration: line-through; }
 
@@ -1018,6 +1018,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return `<div class="table-wrap"><table>${thead}${tbody}</table></div>`;
         });
 
+        h = h.replace(/- \*\*(.*?)\*\*/g, '<strong>$1</strong>');
         h = h.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         h = h.replace(/\*(.*?)\*/g, '<em>$1</em>');
         h = h.replace(/~~(.*?)~~/g, '<del>$1</del>');
