@@ -710,6 +710,81 @@
         td { padding: 7px 12px; color: var(--text); border-bottom: 1px solid var(--border); line-height: 1.5; }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: var(--surface-3); transition: background 0.1s; }
+        /* ── MESSAGE ACTIONS ── */
+        .message-actions {
+            display: flex;
+            gap: 4px;
+            margin-top: 6px;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+        .message:hover .message-actions,
+        .message:focus-within .message-actions {
+            opacity: 1;
+        }
+        .user-message .message-actions { justify-content: flex-end; }
+        .action-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            border-radius: 6px;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.15s;
+        }
+        .action-btn:hover {
+            border-color: var(--border-hover);
+            color: var(--text);
+            background: var(--surface-2);
+        }
+
+        /* ── EDIT MODE ── */
+        .edit-textarea {
+            width: 100%;
+            background: var(--surface-2);
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: 'Geist', sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            padding: 8px 12px;
+            resize: none;
+            outline: none;
+        }
+        .edit-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+            justify-content: flex-end;
+        }
+        .edit-save-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: 'Geist', sans-serif;
+        }
+        .edit-cancel-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: 'Geist', sans-serif;
+        }
+        .edit-save-btn:hover { background: var(--primary-hover); }
+        .edit-cancel-btn:hover { color: var(--text); border-color: var(--border-hover); }
     </style>
 </head>
 <body>
@@ -1008,11 +1083,195 @@ document.addEventListener('DOMContentLoaded', function () {
             renderContent(bubble, text);
         }
 
+        // Actions
+        const actions = document.createElement('div');
+        actions.className = 'message-actions';
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'action-btn';
+        copyBtn.title = 'Copy';
+        copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(text);
+            showToast('Disalin!');
+        };
+        actions.appendChild(copyBtn);
+
+        if (sender === 'user') {
+            const editBtn = document.createElement('button');
+            editBtn.className = 'action-btn';
+            editBtn.title = 'Edit';
+            editBtn.innerHTML = '<i class="fas fa-pencil"></i>';
+            editBtn.onclick = () => {
+                const original = bubble.textContent;
+                bubble.innerHTML = '';
+                const ta = document.createElement('textarea');
+                ta.className = 'edit-textarea';
+                ta.value = original;
+                ta.rows = 3;
+                ta.style.height = 'auto';
+                ta.style.height = ta.scrollHeight + 'px';
+                bubble.appendChild(ta);
+                ta.focus();
+                const editActs = document.createElement('div');
+                editActs.className = 'edit-actions';
+                const saveBtn = document.createElement('button');
+                saveBtn.className = 'edit-save-btn';
+                saveBtn.textContent = 'Kirim';
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'edit-cancel-btn';
+                cancelBtn.textContent = 'Batal';
+                editActs.appendChild(cancelBtn);
+                editActs.appendChild(saveBtn);
+                bubble.appendChild(editActs);
+                actions.style.display = 'none';
+                cancelBtn.onclick = () => {
+                    bubble.textContent = original;
+                    actions.style.display = '';
+                };
+                saveBtn.onclick = () => {
+                    const newText = ta.value.trim();
+                    if (!newText) return;
+                    bubble.textContent = newText;
+                    actions.style.display = '';
+                    // Update saved message
+                    const conv = conversations.find(c => c.id === currentConversationId);
+                    if (conv) {
+                        const idx = [...msg.parentNode.children].indexOf(msg);
+                        if (conv.messages[idx]) {
+                            conv.messages[idx].text = newText;
+                            // Remove messages after this point and re-send
+                            conv.messages.splice(idx + 1);
+                            saveConvs();
+                            // Remove subsequent DOM messages
+                            while (msg.nextSibling) msg.nextSibling.remove();
+                            sendEditedMessage(newText);
+                        }
+                    }
+                };
+            };
+            actions.appendChild(editBtn);
+        } else {
+            const regenBtn = document.createElement('button');
+            regenBtn.className = 'action-btn';
+            regenBtn.title = 'Regenerate';
+            regenBtn.innerHTML = '<i class="fas fa-rotate-right"></i>';
+            regenBtn.onclick = () => {
+                const conv = conversations.find(c => c.id === currentConversationId);
+                if (!conv) return;
+                const idx = [...msg.parentNode.children].indexOf(msg);
+                // Remove this AI message and re-send last user message
+                conv.messages.splice(idx);
+                saveConvs();
+                while (chatInner.children[idx]) chatInner.children[idx].remove();
+                const lastUser = conv.messages[conv.messages.length - 1];
+                if (lastUser?.sender === 'user') sendEditedMessage(lastUser.text);
+            };
+            actions.appendChild(regenBtn);
+        }
+
+        const wrap = document.createElement('div');
+        wrap.style.display = 'flex';
+        wrap.style.flexDirection = 'column';
+        if (sender === 'user') wrap.style.alignItems = 'flex-end';
+        wrap.appendChild(bubble);
+        wrap.appendChild(actions);
+
         msg.appendChild(avatar);
-        msg.appendChild(bubble);
+        msg.appendChild(wrap);
         chatInner.appendChild(msg);
         chatContainer.scrollTop = chatContainer.scrollHeight;
         return msg;
+    }
+    
+    // ── SEND EDITED / REGENERATED MESSAGE ──
+    async function sendEditedMessage(message) {
+        if (!currentConversationId) return;
+        const conv = conversations.find(c => c.id === currentConversationId);
+        if (!conv) return;
+
+        userInput.disabled = true;
+        sendButton.disabled = true;
+        sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        const thinkDiv = document.createElement('div');
+        thinkDiv.className = 'message ai-message';
+        thinkDiv.innerHTML = `
+            <div class="avatar ai-avatar"><img src="https://athars.space/uploads/351182a6.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"></div>
+            <div class="message-bubble">
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+                </div>
+            </div>`;
+        chatInner.appendChild(thinkDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        const history = conv.messages.map(m => m.text).join('\n');
+        const combined = `${history}\n\nUser: ${message}`;
+        const requestConvId = currentConversationId;
+
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: combined })
+            });
+            if (thinkDiv.parentNode) thinkDiv.parentNode.removeChild(thinkDiv);
+            if (requestConvId !== currentConversationId) return;
+
+            const streamMsg = document.createElement('div');
+            streamMsg.className = 'message ai-message';
+            const streamAvatar = document.createElement('div');
+            streamAvatar.className = 'avatar ai-avatar';
+            streamAvatar.innerHTML = '<img src="https://athars.space/uploads/351182a6.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+            const streamBubble = document.createElement('div');
+            streamBubble.className = 'message-bubble';
+            streamMsg.appendChild(streamAvatar);
+            streamMsg.appendChild(streamBubble);
+            chatInner.appendChild(streamMsg);
+
+            const cursor = document.createElement('span');
+            cursor.className = 'stream-cursor';
+            cursor.innerHTML = '<span></span>';
+            streamBubble.appendChild(cursor);
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split('\n').filter(l => l.startsWith('data: '));
+                for (const line of lines) {
+                    const json = line.replace('data: ', '').trim();
+                    if (json === '[DONE]') break;
+                    try {
+                        const parsed = JSON.parse(json);
+                        const token = parsed.choices?.[0]?.delta?.content || '';
+                        if (token) {
+                            fullText += token;
+                            renderContent(streamBubble, fullText);
+                            streamBubble.appendChild(cursor);
+                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                        }
+                    } catch (_) {}
+                }
+            }
+            cursor.remove();
+            if (requestConvId === currentConversationId) saveMsg(fullText, 'ai');
+        } catch (err) {
+            if (thinkDiv.parentNode) chatInner.removeChild(thinkDiv);
+            appendMessage('Maaf, terjadi kesalahan. Coba lagi ya.', 'ai');
+            saveMsg('Maaf, terjadi kesalahan. Coba lagi ya.', 'ai');
+            showToast('Terjadi kesalahan.', true);
+        } finally {
+            userInput.disabled = false;
+            sendButton.disabled = false;
+            sendButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
+            userInput.focus();
+        }
     }
 
     function hideWelcome() {}
