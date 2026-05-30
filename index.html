@@ -474,7 +474,7 @@
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 10px 12px;
-            transition: border-color 0.15s, box-shadow 0.3s;
+            transition: border-color 0.15s;
         }
         .input-area.centered .input-container {
             border-radius: 14px;
@@ -1288,9 +1288,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (isZoomed) return;
             const kb = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
             if (isCentered) {
-                inputArea.style.bottom = kb > 0 ? `${kb}px` : '';
+                centerWelcome.style.transform = kb > 0
+                    ? `translateY(-${kb / 2}px)`
+                    : '';
             } else {
-                inputArea.style.transform = `translateY(-${kb}px)`;
+                inputAreaBottom.style.transform = `translateY(-${kb}px)`;
             }
         };
         window.visualViewport.addEventListener('resize', fix);
