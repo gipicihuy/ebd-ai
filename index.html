@@ -671,7 +671,7 @@
         a { color: #89b4fa; text-decoration: none; }
         a:hover { text-decoration: underline; }
         strong { font-weight: 600; color: var(--text); }
-        em { color: var(--text-muted); font-style: italic; }
+        em { color: var(--text); font-style: normal; font-weight: 500; }
         del { opacity: 0.45; text-decoration: line-through; }
 
         /* paragraf */
@@ -1000,6 +1000,9 @@ document.addEventListener('DOMContentLoaded', function () {
         h = h.replace(/^(#{1,6}) /gm, '$1 ');
         h = h.replace(/^---+$/gm, '---');
         h = h.replace(/^\|/gm, '|');
+        h = h.replace(/^(\s*)&ndash; /gm, '$1- ');
+        h = h.replace(/^(\s*)– /gm, '$1- ');
+        h = h.replace(/^(\s*)• /gm, '$1- ');
 
         // Tabel
         const tableRegex = /(\|.+\|\n\|[-| :]+\|\n(?:\|.+\|\n?)+)/g;
@@ -1045,7 +1048,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 out += '<hr>';
                 continue;
             }
-            const isBullet = t.startsWith('* ') || t.startsWith('- ');
+            const isBullet = t.startsWith('* ') || t.startsWith('- ') || t.startsWith('– ') || t.startsWith('• ');
             const isNum = /^\d+\. /.test(t);
             if (isBullet || isNum) {
                 const lt = isBullet ? 'ul' : 'ol';
