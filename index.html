@@ -824,10 +824,12 @@ document.addEventListener('DOMContentLoaded', function () {
         isCentered = val;
         if (val) {
             inputAreaBottom.style.display = 'none';
+            document.body.style.overflow = 'hidden';
             centerWelcome.classList.remove('hidden');
             setTimeout(() => centerWelcome.classList.add('visible'), 10);
         } else {
             inputAreaBottom.style.display = '';
+            document.body.style.overflow = '';
             centerWelcome.classList.add('hidden');
             centerWelcome.classList.remove('visible');
             setTimeout(() => userInput.focus(), 100);
