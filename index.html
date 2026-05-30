@@ -118,7 +118,6 @@
         }
         .sidebar-top {
             padding: 14px;
-            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -566,7 +565,8 @@
             max-height: 180px;
             min-height: 22px;
             height: 22px;
-            overflow-y: hidden;
+            overflow-y: auto;
+            overscroll-behavior: contain;
         }
         .input-field::placeholder { color: var(--text-dim); }
         .send-btn {
@@ -823,13 +823,18 @@
 <div class="overlay"></div>
 
 <nav class="navbar">
-    <button class="btn-icon d-md-none" id="sidebarToggle"><i class="fas fa-bars"></i></button>
-    <span class="navbar-brand">
-        <img src="https://athars.space/uploads/351182a6.jpg" alt="logo" style="width:28px;height:28px;border-radius:50%;object-fit:cover;margin-right:8px;vertical-align:middle;border:1px solid var(--border);">
-        <span>Eberardos</span> AI
-    </span>
-    <button class="btn-icon d-md-none" id="newChatMobile" title="Chat baru"><i class="fas fa-plus"></i></button>
-    <button class="btn-icon d-none d-md-flex" id="desktopSidebarToggle"><i class="fas fa-sidebar"></i></button>
+    <button class="btn-icon" id="sidebarToggle">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <line x1="4" y1="7" x2="18" y2="7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
+            <line x1="4" y1="14" x2="12" y2="14" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
+        </svg>
+    </button>
+    <button class="btn-icon d-none d-md-flex" id="desktopSidebarToggle">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <line x1="4" y1="7" x2="18" y2="7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
+            <line x1="4" y1="14" x2="12" y2="14" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
+        </svg>
+    </button>
 </nav>
 
 <div class="app-container">
