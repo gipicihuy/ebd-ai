@@ -497,11 +497,12 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 20px 20px 100px;
+            padding: 60px 20px 100px;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.4s ease;
             z-index: 40;
+            overflow: hidden;
         }
         .center-welcome.visible {
             opacity: 1;
@@ -650,7 +651,7 @@
             .sidebar.active { transform: translateX(0); }
             .input-area { left: 0; }
             .input-area.centered { left: 0; }
-            .center-welcome { left: 0; top: 56px; }
+            .center-welcome { left: 0; top: 56px; padding-top: 60px; overflow: hidden; }
             .navbar-brand { text-align: left; }
             .close-sidebar-btn { display: flex !important; }
             .history-delete { opacity: 1; }
