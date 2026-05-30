@@ -822,6 +822,20 @@
             -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
             mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
         }
+        /* ── VERSION NAV ── */
+        .ver-nav {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .ver-label {
+            font-size: 11px;
+            color: var(--text-dim);
+            padding: 0 2px;
+            min-width: 28px;
+            text-align: center;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
@@ -860,7 +874,7 @@
     <div class="main-content">
         <div class="center-welcome" id="centerWelcome">
             <div class="center-welcome-logo">
-                <img src="https://athars.space/uploads/351182a6.jpg" alt="logo">
+                <img src="https://athars.space/uploads/5a4ab9d8.jpg" alt="logo">
             </div>
             <div class="center-welcome-title"><span>Eberardos</span> AI</div>
             <div class="center-welcome-sub">Mau nanya apa hari ini?</div>
@@ -933,6 +947,8 @@ document.addEventListener('DOMContentLoaded', function () {
     let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || [];
     let currentConversationId = null;
     let isCentered = true;
+    const responseVersions = new Map(); // key: msgIndex, value: [versions]
+    const responseVersionIdx = new Map(); // key: msgIndex, value: currentIdx
 
     const inputArea = document.querySelector('.input-area');
     const centerWelcome = document.getElementById('centerWelcome');
@@ -1116,7 +1132,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const avatar = document.createElement('div');
         avatar.className = `avatar ai-avatar`;
-        avatar.innerHTML = '<img src="https://athars.space/uploads/351182a6.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+        avatar.innerHTML = '<img src="https://athars.space/uploads/5a4ab9d8.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
 
         const bubble = document.createElement('div');
         bubble.className = 'message-bubble';
@@ -1204,6 +1220,45 @@ document.addEventListener('DOMContentLoaded', function () {
             };
             actions.appendChild(editBtn);
         } else {
+            const msgIdx = [...chatInner.children].length;
+
+            // Versi navigator
+            const verNav = document.createElement('div');
+            verNav.className = 'ver-nav';
+            verNav.style.display = 'none';
+            const verPrev = document.createElement('button');
+            verPrev.className = 'action-btn';
+            verPrev.innerHTML = '<i class="fas fa-chevron-left" style="font-size:10px"></i>';
+            const verLabel = document.createElement('span');
+            verLabel.className = 'ver-label';
+            verLabel.textContent = '1/1';
+            const verNext = document.createElement('button');
+            verNext.className = 'action-btn';
+            verNext.innerHTML = '<i class="fas fa-chevron-right" style="font-size:10px"></i>';
+            verNav.appendChild(verPrev);
+            verNav.appendChild(verLabel);
+            verNav.appendChild(verNext);
+
+            const updateVerNav = () => {
+                const vers = responseVersions.get(msgIdx) || [text];
+                const idx2 = responseVersionIdx.get(msgIdx) || 0;
+                verLabel.textContent = `${idx2 + 1}/${vers.length}`;
+                verPrev.disabled = idx2 === 0;
+                verNext.disabled = idx2 === vers.length - 1;
+                verNav.style.display = vers.length > 1 ? 'flex' : 'none';
+            };
+
+            verPrev.onclick = () => {
+                const vers = responseVersions.get(msgIdx) || [];
+                let idx2 = responseVersionIdx.get(msgIdx) || 0;
+                if (idx2 > 0) { idx2--; responseVersionIdx.set(msgIdx, idx2); renderContent(bubble, vers[idx2]); updateVerNav(); }
+            };
+            verNext.onclick = () => {
+                const vers = responseVersions.get(msgIdx) || [];
+                let idx2 = responseVersionIdx.get(msgIdx) || 0;
+                if (idx2 < vers.length - 1) { idx2++; responseVersionIdx.set(msgIdx, idx2); renderContent(bubble, vers[idx2]); updateVerNav(); }
+            };
+
             const regenBtn = document.createElement('button');
             regenBtn.className = 'action-btn';
             regenBtn.title = 'Regenerate';
@@ -1211,15 +1266,20 @@ document.addEventListener('DOMContentLoaded', function () {
             regenBtn.onclick = () => {
                 const conv = conversations.find(c => c.id === currentConversationId);
                 if (!conv) return;
-                const idx = [...msg.parentNode.children].indexOf(msg);
-                // Remove this AI message and re-send last user message
-                conv.messages.splice(idx);
-                saveConvs();
-                while (chatInner.children[idx]) chatInner.children[idx].remove();
-                const lastUser = conv.messages[conv.messages.length - 1];
-                if (lastUser?.sender === 'user') sendEditedMessage(lastUser.text);
+                const domIdx = [...msg.parentNode.children].indexOf(msg);
+                const lastUser = conv.messages.slice(0, domIdx).reverse().find(m => m.sender === 'user');
+                if (!lastUser) return;
+                regenForMsg(msgIdx, bubble, verNav, verLabel, verPrev, verNext, updateVerNav, lastUser.text, conv, domIdx);
             };
+
+            actions.appendChild(verNav);
             actions.appendChild(regenBtn);
+
+            // Init versions
+            if (!responseVersions.has(msgIdx)) {
+                responseVersions.set(msgIdx, [text]);
+                responseVersionIdx.set(msgIdx, 0);
+            }
         }
 
         const wrap = document.createElement('div');
@@ -1236,6 +1296,81 @@ document.addEventListener('DOMContentLoaded', function () {
         return msg;
     }
     
+    // ── REGEN FOR SPECIFIC MESSAGE ──
+    async function regenForMsg(msgIdx, bubble, verNav, verLabel, verPrev, verNext, updateVerNav, userText, conv, domIdx) {
+        userInput.disabled = true;
+        sendButton.disabled = true;
+        sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        bubble.innerHTML = '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+
+        const history = conv.messages.slice(0, domIdx).map(m => m.text).join('\n');
+        const combined = `${history}\n\nUser: ${userText}`;
+        const requestConvId = currentConversationId;
+
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: combined })
+            });
+            if (requestConvId !== currentConversationId) return;
+
+            bubble.innerHTML = '';
+            const cursor = document.createElement('span');
+            cursor.className = 'stream-cursor';
+            cursor.innerHTML = '<span></span>';
+            bubble.appendChild(cursor);
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split('\n').filter(l => l.startsWith('data: '));
+                for (const line of lines) {
+                    const json = line.replace('data: ', '').trim();
+                    if (json === '[DONE]') break;
+                    try {
+                        const parsed = JSON.parse(json);
+                        const token = parsed.choices?.[0]?.delta?.content || '';
+                        if (token) {
+                            fullText += token;
+                            renderContent(bubble, fullText);
+                            bubble.appendChild(cursor);
+                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                        }
+                    } catch (_) {}
+                }
+            }
+            cursor.remove();
+
+            // Simpan versi baru
+            const vers = responseVersions.get(msgIdx) || [];
+            vers.push(fullText);
+            responseVersions.set(msgIdx, vers);
+            responseVersionIdx.set(msgIdx, vers.length - 1);
+            renderContent(bubble, fullText);
+            updateVerNav();
+
+            // Update saved conv
+            if (requestConvId === currentConversationId) {
+                conv.messages[domIdx] = { text: fullText, sender: 'ai' };
+                saveConvs();
+            }
+        } catch (err) {
+            bubble.innerHTML = '<p style="color:var(--error)">Gagal regenerate.</p>';
+            showToast('Terjadi kesalahan.', true);
+        } finally {
+            userInput.disabled = false;
+            sendButton.disabled = false;
+            sendButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
+        }
+    }
+    
     // ── SEND EDITED / REGENERATED MESSAGE ──
     async function sendEditedMessage(message) {
         if (!currentConversationId) return;
@@ -1249,7 +1384,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const thinkDiv = document.createElement('div');
         thinkDiv.className = 'message ai-message';
         thinkDiv.innerHTML = `
-            <div class="avatar ai-avatar"><img src="https://athars.space/uploads/351182a6.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"></div>
+            <div class="avatar ai-avatar"><img src="https://athars.space/uploads/5a4ab9d8.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"></div>
             <div class="message-bubble">
                 <div class="typing-indicator">
                     <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
@@ -1275,7 +1410,7 @@ document.addEventListener('DOMContentLoaded', function () {
             streamMsg.className = 'message ai-message';
             const streamAvatar = document.createElement('div');
             streamAvatar.className = 'avatar ai-avatar';
-            streamAvatar.innerHTML = '<img src="https://athars.space/uploads/351182a6.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+            streamAvatar.innerHTML = '<img src="https://athars.space/uploads/5a4ab9d8.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
             const streamBubble = document.createElement('div');
             streamBubble.className = 'message-bubble';
             const streamWrap = document.createElement('div');
@@ -1329,16 +1464,51 @@ document.addEventListener('DOMContentLoaded', function () {
                 regenBtn.className = 'action-btn';
                 regenBtn.title = 'Regenerate';
                 regenBtn.innerHTML = '<div class="icon-rotate-cw"></div>';
+                const streamMsgIdx2 = [...chatInner.children].indexOf(streamMsg);
+                responseVersions.set(streamMsgIdx2, [fullText]);
+                responseVersionIdx.set(streamMsgIdx2, 0);
+                const verNav3 = document.createElement('div');
+                verNav3.className = 'ver-nav';
+                verNav3.style.display = 'none';
+                const verPrev3 = document.createElement('button');
+                verPrev3.className = 'action-btn';
+                verPrev3.innerHTML = '<i class="fas fa-chevron-left" style="font-size:10px"></i>';
+                const verLabel3 = document.createElement('span');
+                verLabel3.className = 'ver-label';
+                verLabel3.textContent = '1/1';
+                const verNext3 = document.createElement('button');
+                verNext3.className = 'action-btn';
+                verNext3.innerHTML = '<i class="fas fa-chevron-right" style="font-size:10px"></i>';
+                verNav3.appendChild(verPrev3);
+                verNav3.appendChild(verLabel3);
+                verNav3.appendChild(verNext3);
+                const updateVerNav3 = () => {
+                    const vers = responseVersions.get(streamMsgIdx2) || [];
+                    const i = responseVersionIdx.get(streamMsgIdx2) || 0;
+                    verLabel3.textContent = `${i + 1}/${vers.length}`;
+                    verPrev3.disabled = i === 0;
+                    verNext3.disabled = i === vers.length - 1;
+                    verNav3.style.display = vers.length > 1 ? 'flex' : 'none';
+                };
+                verPrev3.onclick = () => {
+                    const vers = responseVersions.get(streamMsgIdx2) || [];
+                    let i = responseVersionIdx.get(streamMsgIdx2) || 0;
+                    if (i > 0) { i--; responseVersionIdx.set(streamMsgIdx2, i); renderContent(streamBubble, vers[i]); updateVerNav3(); }
+                };
+                verNext3.onclick = () => {
+                    const vers = responseVersions.get(streamMsgIdx2) || [];
+                    let i = responseVersionIdx.get(streamMsgIdx2) || 0;
+                    if (i < vers.length - 1) { i++; responseVersionIdx.set(streamMsgIdx2, i); renderContent(streamBubble, vers[i]); updateVerNav3(); }
+                };
                 regenBtn.onclick = () => {
                     const conv = conversations.find(c => c.id === currentConversationId);
                     if (!conv) return;
-                    const idx = [...streamMsg.parentNode.children].indexOf(streamMsg);
-                    conv.messages.splice(idx);
-                    saveConvs();
-                    while (chatInner.children[idx]) chatInner.children[idx].remove();
-                    const lastUser = conv.messages[conv.messages.length - 1];
-                    if (lastUser?.sender === 'user') sendEditedMessage(lastUser.text);
+                    const domIdx = [...streamMsg.parentNode.children].indexOf(streamMsg);
+                    const lastUser = conv.messages.slice(0, domIdx).reverse().find(m => m.sender === 'user');
+                    if (!lastUser) return;
+                    regenForMsg(streamMsgIdx2, streamBubble, verNav3, verLabel3, verPrev3, verNext3, updateVerNav3, lastUser.text, conv, domIdx);
                 };
+                actions.appendChild(verNav3);
                 actions.appendChild(copyBtn);
                 actions.appendChild(regenBtn);
                 streamWrap.appendChild(actions);
@@ -1545,7 +1715,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const thinkDiv = document.createElement('div');
         thinkDiv.className = 'message ai-message';
         thinkDiv.innerHTML = `
-            <div class="avatar ai-avatar"><img src="https://athars.space/uploads/351182a6.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"></div>
+            <div class="avatar ai-avatar"><img src="https://athars.space/uploads/5a4ab9d8.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"></div>
             <div class="message-bubble">
                 <div class="typing-indicator">
                     <div class="typing-dot"></div>
@@ -1576,7 +1746,7 @@ document.addEventListener('DOMContentLoaded', function () {
             streamMsg.className = 'message ai-message';
             const streamAvatar = document.createElement('div');
             streamAvatar.className = 'avatar ai-avatar';
-            streamAvatar.innerHTML = '<img src="https://athars.space/uploads/351182a6.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+            streamAvatar.innerHTML = '<img src="https://athars.space/uploads/5a4ab9d8.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
             const streamBubble = document.createElement('div');
             streamBubble.className = 'message-bubble';
             const streamWrap = document.createElement('div');
@@ -1635,16 +1805,51 @@ document.addEventListener('DOMContentLoaded', function () {
                 regenBtn.className = 'action-btn';
                 regenBtn.title = 'Regenerate';
                 regenBtn.innerHTML = '<div class="icon-rotate-cw"></div>';
+                const streamMsgIdx = [...chatInner.children].indexOf(streamMsg);
+                responseVersions.set(streamMsgIdx, [fullText]);
+                responseVersionIdx.set(streamMsgIdx, 0);
+                const verNav2 = document.createElement('div');
+                verNav2.className = 'ver-nav';
+                verNav2.style.display = 'none';
+                const verPrev2 = document.createElement('button');
+                verPrev2.className = 'action-btn';
+                verPrev2.innerHTML = '<i class="fas fa-chevron-left" style="font-size:10px"></i>';
+                const verLabel2 = document.createElement('span');
+                verLabel2.className = 'ver-label';
+                verLabel2.textContent = '1/1';
+                const verNext2 = document.createElement('button');
+                verNext2.className = 'action-btn';
+                verNext2.innerHTML = '<i class="fas fa-chevron-right" style="font-size:10px"></i>';
+                verNav2.appendChild(verPrev2);
+                verNav2.appendChild(verLabel2);
+                verNav2.appendChild(verNext2);
+                const updateVerNav2 = () => {
+                    const vers = responseVersions.get(streamMsgIdx) || [];
+                    const i = responseVersionIdx.get(streamMsgIdx) || 0;
+                    verLabel2.textContent = `${i + 1}/${vers.length}`;
+                    verPrev2.disabled = i === 0;
+                    verNext2.disabled = i === vers.length - 1;
+                    verNav2.style.display = vers.length > 1 ? 'flex' : 'none';
+                };
+                verPrev2.onclick = () => {
+                    const vers = responseVersions.get(streamMsgIdx) || [];
+                    let i = responseVersionIdx.get(streamMsgIdx) || 0;
+                    if (i > 0) { i--; responseVersionIdx.set(streamMsgIdx, i); renderContent(streamBubble, vers[i]); updateVerNav2(); }
+                };
+                verNext2.onclick = () => {
+                    const vers = responseVersions.get(streamMsgIdx) || [];
+                    let i = responseVersionIdx.get(streamMsgIdx) || 0;
+                    if (i < vers.length - 1) { i++; responseVersionIdx.set(streamMsgIdx, i); renderContent(streamBubble, vers[i]); updateVerNav2(); }
+                };
                 regenBtn.onclick = () => {
                     const conv = conversations.find(c => c.id === currentConversationId);
                     if (!conv) return;
-                    const idx = [...streamMsg.parentNode.children].indexOf(streamMsg);
-                    conv.messages.splice(idx);
-                    saveConvs();
-                    while (chatInner.children[idx]) chatInner.children[idx].remove();
-                    const lastUser = conv.messages[conv.messages.length - 1];
-                    if (lastUser?.sender === 'user') sendEditedMessage(lastUser.text);
+                    const domIdx = [...streamMsg.parentNode.children].indexOf(streamMsg);
+                    const lastUser = conv.messages.slice(0, domIdx).reverse().find(m => m.sender === 'user');
+                    if (!lastUser) return;
+                    regenForMsg(streamMsgIdx, streamBubble, verNav2, verLabel2, verPrev2, verNext2, updateVerNav2, lastUser.text, conv, domIdx);
                 };
+                actions.appendChild(verNav2);
                 actions.appendChild(copyBtn);
                 actions.appendChild(regenBtn);
                 streamWrap.appendChild(actions);
