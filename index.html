@@ -240,15 +240,15 @@
 
         .message-bubble {
             max-width: 82%;
-            font-size: 0.875rem;
-            line-height: 1.65;
+            font-size: 0.9375rem;
+            line-height: 1.7;
             word-break: break-word;
         }
         .user-message .message-bubble {
             background: var(--surface-3);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg) var(--radius-lg) 4px var(--radius-lg);
-            padding: 8px 14px;
+            padding: 10px 16px;
         }
         .ai-message .message-bubble {
             color: var(--text);
@@ -1147,9 +1147,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 const ta = document.createElement('textarea');
                 ta.className = 'edit-textarea';
                 ta.value = original;
-                ta.rows = 3;
+                ta.rows = 4;
                 ta.style.height = 'auto';
-                ta.style.height = ta.scrollHeight + 'px';
+                ta.style.height = Math.max(ta.scrollHeight, 120) + 'px';
                 bubble.appendChild(ta);
                 ta.focus();
                 const editActs = document.createElement('div');
