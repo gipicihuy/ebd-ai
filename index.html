@@ -1147,7 +1147,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const bubble = document.createElement('div');
         bubble.className = 'message-bubble';
         if (sender === 'user') {
-            bubble.textContent = text;
+            bubble.textContent = text.replace(/\s*\n\s*/g, ' ').trim();
         } else {
             renderContent(bubble, text);
         }
