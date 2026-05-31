@@ -217,7 +217,7 @@
             from { opacity: 0; transform: translateY(6px); }
             to   { opacity: 1; transform: translateY(0); }
         }
-        .user-message { flex-direction: row-reverse; }
+        .user-message { flex-direction: row-reverse; align-self: flex-end; max-width: 72%; }
 
         .avatar {
             width: 30px;
@@ -249,9 +249,8 @@
             border: 1px solid var(--border);
             border-radius: var(--radius-lg) var(--radius-lg) 4px var(--radius-lg);
             padding: 10px 16px;
-            display: table;
-            max-width: 82%;
             word-break: break-word;
+            hyphens: auto;
         }
         .ai-message .message-bubble {
             color: var(--text);
