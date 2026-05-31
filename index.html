@@ -252,6 +252,7 @@
             padding: 10px 16px;
             display: inline-block;
             max-width: 82%;
+            white-space: normal;
         }
         .ai-message .message-bubble {
             color: var(--text);
@@ -1595,6 +1596,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function saveMsg(text, sender) {
+        if (sender === 'user') text = text.replace(/\s*\n\s*/g, ' ').trim();
         let c = conversations.find(x => x.id === currentConversationId);
         if (!c) { createNewConv(); c = conversations.find(x => x.id === currentConversationId); }
         c.messages.push({ text, sender });
