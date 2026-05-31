@@ -1149,7 +1149,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const bubble = document.createElement('div');
         bubble.className = 'message-bubble';
         if (sender === 'user') {
-            bubble.textContent = text.replace(/\s*\n\s*/g, ' ').trim();
+            bubble.textContent = text.replace(/\s+/g, ' ').trim();
         } else {
             renderContent(bubble, text);
         }
@@ -1597,7 +1597,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function saveMsg(text, sender) {
-        if (sender === 'user') text = text.replace(/\s*\n\s*/g, ' ').trim();
+        if (sender === 'user') text = text.replace(/\s+/g, ' ').trim();
         let c = conversations.find(x => x.id === currentConversationId);
         if (!c) { createNewConv(); c = conversations.find(x => x.id === currentConversationId); }
         c.messages.push({ text, sender });
