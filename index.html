@@ -1741,8 +1741,10 @@ document.addEventListener('DOMContentLoaded', function () {
         chatContainer.scrollTop = chatContainer.scrollHeight;
         
         const requestConvId = currentConversationId;
+        const now = new Date();
+        const timeInfo = `Waktu sekarang: ${now.toLocaleString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' })}`;
         const history = conv.messages.map(m => m.text).join('\n');
-        const combined = `${history}\n\nUser: ${message}`;
+        const combined = `${timeInfo}\n\n${history}\n\nUser: ${message}`;
 
         try {
             const response = await fetch('/api/chat', {
