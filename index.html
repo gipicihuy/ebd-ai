@@ -1611,6 +1611,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function addChipListeners() {
         document.querySelectorAll('.welcome-chip, .suggestion-chip').forEach(c => {
+            c.replaceWith(c.cloneNode(true));
+        });
+        document.querySelectorAll('.welcome-chip, .suggestion-chip').forEach(c => {
             c.addEventListener('click', function () {
                 const target = isCentered ? userInputCenter : userInput;
                 target.value = this.dataset.prompt;
