@@ -251,6 +251,7 @@
             padding: 10px 16px;
             word-break: break-word;
             hyphens: auto;
+            max-width: 100%;
         }
         .ai-message .message-bubble {
             color: var(--text);
@@ -1146,7 +1147,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const bubble = document.createElement('div');
         bubble.className = 'message-bubble';
         if (sender === 'user') {
-            bubble.textContent = text.replace(/\s+/g, ' ').trim();
+            bubble.innerHTML = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
         } else {
             renderContent(bubble, text);
         }
@@ -1294,7 +1295,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const wrap = document.createElement('div');
         wrap.style.display = 'flex';
         wrap.style.flexDirection = 'column';
-        if (sender === 'user') wrap.style.alignItems = 'flex-end';
+        if (sender === 'user') { wrap.style.alignItems = 'flex-end'; wrap.style.maxWidth = '100%'; }
         wrap.appendChild(bubble);
         wrap.appendChild(actions);
 
