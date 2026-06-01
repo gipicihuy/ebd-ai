@@ -1,11 +1,9 @@
 export default async function handler(req, res) {
     const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
-    // ── GET: ambil gist by id ──
     if (req.method === 'GET') {
         const { id } = req.query;
         if (!id) return res.status(400).json({ error: 'Missing id' });
-
         try {
             const r = await fetch(`https://api.github.com/gists/${id}`, {
                 headers: {
@@ -16,6 +14,23 @@ export default async function handler(req, res) {
             });
             if (!r.ok) return res.status(404).json({ error: 'Gist not found' });
             const gist = await r.json();
+
+            const createdAt = new Date(gist.created_at);
+            const ageHours = (Date.now() - createdAt.getTime()) / (1000 * 60 * 60);
+            if (ageHours > 5) {
+                if (GITHUB_TOKEN) {
+                    await fetch(`https://api.github.com/gists/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Accept': 'application/vnd.github+json',
+                            'Authorization': `Bearer ${GITHUB_TOKEN}`,
+                            'X-GitHub-Api-Version': '2022-11-28'
+                        }
+                    });
+                }
+                return res.status(404).json({ error: 'Conversation expired' });
+            }
+
             const content = gist.files?.['conversation.json']?.content;
             if (!content) return res.status(404).json({ error: 'Invalid gist' });
             const data = JSON.parse(content);
@@ -25,21 +40,17 @@ export default async function handler(req, res) {
         }
     }
 
-    // ── POST: buat gist baru ──
     if (req.method === 'POST') {
         if (!GITHUB_TOKEN) return res.status(500).json({ error: 'GITHUB_TOKEN not set' });
-
         const { messages, title } = req.body;
         if (!messages || !Array.isArray(messages)) {
             return res.status(400).json({ error: 'Invalid messages' });
         }
-
         const payload = {
             title: title || 'Shared Chat',
             created_at: new Date().toISOString(),
             messages
         };
-
         try {
             const r = await fetch('https://api.github.com/gists', {
                 method: 'POST',
@@ -59,12 +70,10 @@ export default async function handler(req, res) {
                     }
                 })
             });
-
             if (!r.ok) {
                 const err = await r.json();
                 return res.status(500).json({ error: err.message || 'Failed to create gist' });
             }
-
             const gist = await r.json();
             return res.status(200).json({ id: gist.id });
         } catch (err) {
