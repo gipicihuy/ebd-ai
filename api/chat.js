@@ -7,6 +7,12 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
+    const abortController = new AbortController();
+
+    req.on('close', () => {
+        abortController.abort();
+    });
+
     try {
         const { prompt } = req.body;
         const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -25,7 +31,8 @@ export default async function handler(req, res) {
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: prompt }
                 ]
-            })
+            }),
+            signal: abortController.signal
         });
 
         res.setHeader('Content-Type', 'text/event-stream');
@@ -44,7 +51,11 @@ export default async function handler(req, res) {
 
         res.end();
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        if (error.name === 'AbortError') {
+            res.end();
+        } else {
+            console.error('Error:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
     }
 }
