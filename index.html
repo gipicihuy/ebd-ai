@@ -1859,6 +1859,7 @@ let isProgrammaticScroll = false;
         const msgObj = { text, sender };
         if (imageData) msgObj.imageData = imageData;
         c.messages.push(msgObj);
+        if (sender === 'user') delete c.shareId;
         saveConvs();
         updateHistory();
         updateShareBtn();
@@ -2245,6 +2246,29 @@ let isProgrammaticScroll = false;
         const backdrop = document.getElementById('shareModalBackdrop');
         const body = document.getElementById('shareModalBody');
         backdrop.classList.add('show');
+        if (conv.shareId) {
+            const shareUrl = `${location.origin}/share/${conv.shareId}`;
+            const backdrop = document.getElementById('shareModalBackdrop');
+            const body = document.getElementById('shareModalBody');
+            backdrop.classList.add('show');
+            body.innerHTML = `
+                <div class="share-link-box">
+                    <span class="share-link-text">${shareUrl}</span>
+                    <button class="share-copy-btn" id="copyShareLink">Salin</button>
+                </div>
+                <div class="share-modal-note">
+                    <i class="fas fa-lock"></i>
+                    Hanya orang yang punya link ini yang bisa melihat
+                </div>`;
+            document.getElementById('copyShareLink').onclick = () => {
+                navigator.clipboard.writeText(shareUrl);
+                document.getElementById('copyShareLink').textContent = 'Disalin!';
+                setTimeout(() => { document.getElementById('copyShareLink').textContent = 'Salin'; }, 2000);
+                showToast('Link disalin!');
+            };
+            return;
+        }
+
         body.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;"><div style="width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 10px;"></div>Membuat link...</div>`;
 
         try {
@@ -2257,6 +2281,8 @@ let isProgrammaticScroll = false;
             const data = await res.json();
             if (!data.id) throw new Error('no id');
 
+            conv.shareId = data.id;
+            saveConvs();
             const shareUrl = `${location.origin}/share/${data.id}`;
             body.innerHTML = `
                 <div class="share-link-box">
