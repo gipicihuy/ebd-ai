@@ -1733,6 +1733,7 @@ let isGenerating = false;
 
         userInput.disabled = true;
         sendButton.disabled = false;
+        isGenerating = true;
         sendButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"><rect x="3" y="3" width="8" height="8" rx="1.5" fill="white"/></svg>';
 
         // Thinking indicator
@@ -1792,7 +1793,6 @@ let isGenerating = false;
             
             activeReader = response.body.getReader();
             const reader = activeReader;
-            isGenerating = true;
             const decoder = new TextDecoder();
             let fullText = '';
 
