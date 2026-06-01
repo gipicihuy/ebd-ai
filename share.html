@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Chat – Eberardos AI</title>
+    <link rel="icon" href="https://eberardos.my.id/eberardos.jpg" type="image/jpeg">
+    <meta property="og:title" content="Shared Chat – Eberardos AI">
+    <meta property="og:description" content="Lihat percakapan yang dibagikan dari Eberardos AI.">
+    <meta property="og:image" content="https://eberardos.my.id/eberardos.jpg">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #c0392b;
+            --primary-dim: rgba(192,57,43,0.15);
+            --bg: #141414;
+            --surface: #1a1a1a;
+            --surface-2: #202020;
+            --surface-3: #272727;
+            --border: rgba(255,255,255,0.07);
+            --border-hover: rgba(255,255,255,0.13);
+            --text: #e8e8e8;
+            --text-muted: #666;
+            --text-dim: #444;
+            --success: #22c55e;
+            --error: #ef4444;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-lg: 18px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Geist', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 2px; }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            background: rgba(20,20,20,0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 1.25rem;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 56px;
+        }
+        .navbar-brand {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.02em;
+            text-decoration: none;
+        }
+        .navbar-brand span { color: var(--primary); }
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-try {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 7px 14px;
+            font-size: 13px;
+            font-family: 'Geist', sans-serif;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.15s;
+        }
+        .btn-try:hover { background: #a93226; }
+
+        /* ── CONTENT ── */
+        .page {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 80px 20px 60px;
+        }
+
+        /* ── SHARED HEADER ── */
+        .share-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+            padding: 16px 18px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+        .share-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .share-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .share-meta { flex: 1; min-width: 0; }
+        .share-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.02em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .share-date {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .share-badge {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--primary-dim);
+            border: 1px solid rgba(192,57,43,0.25);
+            color: var(--primary);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 11.5px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        /* ── MESSAGES ── */
+        .message {
+            display: flex;
+            gap: 12px;
+            padding: 6px 0;
+            animation: msgIn 0.2s ease;
+        }
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .user-message { flex-direction: row-reverse; }
+
+        .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .ai-avatar {
+            background: var(--primary-dim);
+            border: 1px solid rgba(192,57,43,0.3);
+        }
+        .user-message .avatar { display: none; }
+
+        .message-bubble {
+            max-width: 82%;
+            font-size: 0.9375rem;
+            line-height: 1.7;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+        .user-message .message-bubble {
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg) var(--radius-lg) 4px var(--radius-lg);
+            padding: 10px 16px;
+        }
+        .ai-message .message-bubble { color: var(--text); }
+        .ai-message .message-bubble p { margin: 0 0 0.6em; line-height: 1.7; }
+        .ai-message .message-bubble p:last-child { margin-bottom: 0; }
+
+        /* ── CODE BLOCKS ── */
+        .code-block {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            margin: 10px 0;
+            overflow: hidden;
+            font-family: 'Geist Mono', monospace;
+        }
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 12px;
+            background: var(--surface-3);
+            border-bottom: 1px solid var(--border);
+        }
+        .code-lang {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .copy-code-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            border-radius: 5px;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.15s;
+        }
+        .copy-code-btn:hover { border-color: var(--border-hover); color: var(--text); }
+        .code-block pre {
+            margin: 0;
+            padding: 14px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-size: 13px;
+            color: #cdd6f4;
+            line-height: 1.6;
+        }
+
+        /* ── TYPOGRAPHY ── */
+        code {
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1px 5px;
+            font-family: 'Geist Mono', monospace;
+            font-size: 0.82em;
+            color: #f38ba8;
+        }
+        a { color: #89b4fa; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        strong { font-weight: 600; color: #fff; }
+        em { color: var(--text); font-style: normal; font-weight: 500; }
+        del { opacity: 0.45; text-decoration: line-through; }
+        ul, ol { padding-left: 1.4em; margin: 4px 0 8px; }
+        li { margin-bottom: 4px; line-height: 1.65; color: var(--text); }
+        li::marker { color: var(--text-muted); }
+        .md-heading { font-weight: 600; letter-spacing: -0.02em; color: var(--text); line-height: 1.3; }
+        h1.md-heading { font-size: 1.15rem; margin: 16px 0 6px; }
+        h2.md-heading { font-size: 1.0rem; margin: 14px 0 5px; }
+        h3.md-heading { font-size: 0.925rem; margin: 12px 0 4px; }
+        h4.md-heading, h5.md-heading, h6.md-heading { font-size: 0.875rem; margin: 10px 0 4px; color: var(--text-muted); }
+        hr { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+        blockquote {
+            border-left: 2px solid var(--primary);
+            margin: 10px 0;
+            padding: 6px 14px;
+            background: rgba(192,57,43,0.06);
+            border-radius: 0 6px 6px 0;
+        }
+        blockquote p { margin: 0; color: var(--text-muted); font-style: italic; }
+        .table-wrap { overflow-x: auto; margin: 10px 0; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: var(--surface-3); font-weight: 600; color: var(--text); padding: 8px 12px; text-align: left; font-size: 12px; border-bottom: 1px solid var(--border); }
+        td { padding: 7px 12px; color: var(--text); border-bottom: 1px solid var(--border); line-height: 1.5; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: var(--surface-3); }
+
+        /* ── LOADING / ERROR ── */
+        .state-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            gap: 12px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        .spinner {
+            width: 28px;
+            height: 28px;
+            border: 2px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error-icon { font-size: 28px; color: var(--error); }
+
+        /* ── DIVIDER ── */
+        .msg-divider {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 11px;
+            padding: 8px 0 4px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        /* ── FOOTER ── */
+        .share-footer {
+            margin-top: 32px;
+            padding: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .share-footer-text {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .share-footer-text strong { color: var(--text); }
+
+        /* ── TOAST ── */
+        .toast-custom {
+            position: fixed;
+            top: 72px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            background: var(--surface-3);
+            border: 1px solid var(--border-hover);
+            color: var(--text);
+            padding: 9px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            z-index: 999;
+            opacity: 0;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .toast-custom.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast-icon { color: var(--success); }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="/" class="navbar-brand"><span>Eberardos</span> AI</a>
+    <div class="navbar-right">
+        <a href="/" class="btn-try"><i class="fas fa-comment-dots"></i> Coba Sekarang</a>
+    </div>
+</nav>
+
+<div class="page" id="page">
+    <div class="state-center" id="loadingState">
+        <div class="spinner"></div>
+        <span>Memuat percakapan...</span>
+    </div>
+</div>
+
+<div class="toast-custom" id="toastEl">
+    <i class="fas fa-check-circle toast-icon"></i>
+    <span id="toastMsg"></span>
+</div>
+
+<script>
+(async function () {
+    const gistId = location.pathname.split('/share/')[1]?.split('/')[0];
+    const page = document.getElementById('page');
+
+    function showToast(msg) {
+        const el = document.getElementById('toastEl');
+        document.getElementById('toastMsg').textContent = msg;
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 2800);
+    }
+
+    function sanitize(text) {
+        const d = document.createElement('div');
+        d.textContent = text;
+        return d.innerHTML;
+    }
+
+    function mdToHtml(text) {
+        text = text.replace(/^[ \t]*[-–•]\s+/gm, '__LISTITEM__');
+        function esc(str) {
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+        let h = esc(text);
+        h = h.replace(/^&gt; /gm, '> ');
+        h = h.replace(/^(#{1,6}) /gm, '$1 ');
+        h = h.replace(/^---+$/gm, '---');
+        h = h.replace(/^\|/gm, '|');
+
+        const tableRegex = /(\|.+\|\n\|[-| :]+\|\n(?:\|.+\|\n?)+)/g;
+        h = h.replace(tableRegex, match => {
+            const rows = match.trim().split('\n');
+            const headers = rows[0].split('|').filter(c => c.trim() !== '');
+            const body = rows.slice(2);
+            const thead = '<thead><tr>' + headers.map(c => `<th>${c.trim()}</th>`).join('') + '</tr></thead>';
+            const tbody = '<tbody>' + body.map(r => {
+                const cells = r.split('|').filter(c => c.trim() !== '');
+                return '<tr>' + cells.map(c => `<td>${c.trim()}</td>`).join('') + '</tr>';
+            }).join('') + '</tbody>';
+            return `<div class="table-wrap"><table>${thead}${tbody}</table></div>`;
+        });
+
+        h = h.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        h = h.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        h = h.replace(/~~(.*?)~~/g, '<del>$1</del>');
+        h = h.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+        h = h.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+        const lines = h.split('\n');
+        let out = '', inList = false, listType = '', inBQ = false;
+        for (const line of lines) {
+            const t = line.trim();
+            if (t.startsWith('> ')) {
+                if (inList) { out += `</${listType}>`; inList = false; }
+                if (!inBQ) { out += '<blockquote>'; inBQ = true; }
+                out += `<p>${t.slice(2)}</p>`; continue;
+            } else if (inBQ) { out += '</blockquote>'; inBQ = false; }
+            if (/^#{1,6} /.test(t)) {
+                if (inList) { out += `</${listType}>`; inList = false; }
+                const level = t.match(/^(#+)/)[1].length;
+                out += `<h${level} class="md-heading">${t.replace(/^#+\s/, '')}</h${level}>`; continue;
+            }
+            if (/^---+$/.test(t)) {
+                if (inList) { out += `</${listType}>`; inList = false; }
+                out += '<hr>'; continue;
+            }
+            const isBullet = t.startsWith('__LISTITEM__') || t.startsWith('* ') || t.startsWith('- ');
+            const isNum = /^\d+\. /.test(t);
+            if (isBullet) {
+                const item = t.replace('__LISTITEM__', '').replace(/^\*\s+/, '').replace(/^-\s+/, '');
+                if (!inList) { out += '<ul>'; listType = 'ul'; inList = true; }
+                else if (listType !== 'ul') { out += '</ol><ul>'; listType = 'ul'; }
+                out += `<li>${item}</li>`;
+            } else if (isNum) {
+                const item = line.substring(line.indexOf(' ') + 1);
+                if (!inList) { out += '<ol>'; listType = 'ol'; inList = true; }
+                else if (listType !== 'ol') { out += '</ul><ol>'; listType = 'ol'; }
+                out += `<li>${item}</li>`;
+            } else {
+                if (inList) { out += `</${listType}>`; inList = false; }
+                if (t !== '') out += `<p>${line}</p>`;
+            }
+        }
+        if (inList) out += `</${listType}>`;
+        if (inBQ) out += '</blockquote>';
+        return out;
+    }
+
+    function extractCode(text) {
+        const re = /```([\s\S]*?)```/g;
+        const parts = [];
+        let last = 0, m;
+        while ((m = re.exec(text)) !== null) {
+            if (m.index > last) parts.push({ type: 'text', content: text.slice(last, m.index) });
+            const lang = m[1].split('\n')[0] || 'text';
+            const code = m[1].replace(/^\w+\n/, '');
+            parts.push({ type: 'code', content: code, language: lang });
+            last = m.index + m[0].length;
+        }
+        if (text.slice(last)) parts.push({ type: 'text', content: text.slice(last) });
+        return parts.length ? parts : [{ type: 'text', content: text }];
+    }
+
+    function renderContent(el, text) {
+        el.innerHTML = '';
+        extractCode(text).forEach(part => {
+            if (part.type === 'code') {
+                const wrap = document.createElement('div');
+                wrap.className = 'code-block';
+                wrap.innerHTML = `
+                    <div class="code-header">
+                        <span class="code-lang">${sanitize(part.language)}</span>
+                        <button class="copy-code-btn" title="Copy"><i class="fas fa-copy"></i></button>
+                    </div>
+                    <pre></pre>`;
+                wrap.querySelector('pre').textContent = part.content;
+                wrap.querySelector('.copy-code-btn').onclick = () => {
+                    navigator.clipboard.writeText(part.content);
+                    showToast('Kode disalin!');
+                };
+                el.appendChild(wrap);
+            } else {
+                const d = document.createElement('div');
+                d.innerHTML = mdToHtml(part.content);
+                el.appendChild(d);
+            }
+        });
+    }
+
+    function renderMessages(messages) {
+        const frag = document.createDocumentFragment();
+        messages.forEach((m, i) => {
+            // Divider antara pasang pesan
+            if (i > 0 && m.sender === 'user') {
+                const div = document.createElement('div');
+                div.className = 'msg-divider';
+                frag.appendChild(div);
+            }
+
+            const msg = document.createElement('div');
+            msg.className = `message ${m.sender === 'user' ? 'user-message' : 'ai-message'}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar ai-avatar';
+            avatar.innerHTML = '<img src="https://i.pinimg.com/736x/ae/82/16/ae821617cb36d05edfaeb5fd83b87328.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+
+            if (m.sender === 'user') {
+                if (m.imageData) {
+                    const img = document.createElement('img');
+                    img.src = `data:${m.imageData.mime};base64,${m.imageData.base64}`;
+                    img.style.cssText = 'max-width:220px;max-height:220px;border-radius:10px;border:1px solid var(--border);margin-bottom:4px;display:block;';
+                    bubble.appendChild(img);
+                }
+                const textEl = document.createElement('div');
+                textEl.innerHTML = m.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+                bubble.appendChild(textEl);
+            } else {
+                renderContent(bubble, m.text);
+            }
+
+            const wrap = document.createElement('div');
+            wrap.style.cssText = 'display:flex;flex-direction:column;';
+            if (m.sender === 'user') wrap.style.alignItems = 'flex-end';
+            wrap.appendChild(bubble);
+
+            msg.appendChild(avatar);
+            msg.appendChild(wrap);
+            frag.appendChild(msg);
+        });
+        return frag;
+    }
+
+    // ── TIDAK ADA ID ──
+    if (!gistId) {
+        page.innerHTML = `<div class="state-center"><i class="fas fa-link-slash error-icon"></i><span>Link tidak valid</span></div>`;
+        return;
+    }
+
+    // ── FETCH DATA ──
+    try {
+        const res = await fetch(`/api/share?id=${gistId}`);
+        if (!res.ok) throw new Error('not found');
+        const data = await res.json();
+
+        // Update title & OG
+        const firstMsg = data.messages?.[0]?.text?.substring(0, 60) || 'Shared Chat';
+        document.title = `${firstMsg} – Eberardos AI`;
+
+        const createdAt = data.created_at
+            ? new Date(data.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+            : '';
+
+        const msgCount = data.messages?.length || 0;
+
+        page.innerHTML = '';
+
+        // Header
+        const header = document.createElement('div');
+        header.className = 'share-header';
+        header.innerHTML = `
+            <div class="share-logo"><img src="https://i.pinimg.com/736x/ae/82/16/ae821617cb36d05edfaeb5fd83b87328.jpg" alt="logo"></div>
+            <div class="share-meta">
+                <div class="share-title">${sanitize(firstMsg)}...</div>
+                <div class="share-date">${createdAt}</div>
+            </div>
+            <div class="share-badge"><i class="fas fa-share-nodes"></i> Shared</div>`;
+        page.appendChild(header);
+
+        // Messages
+        const msgsEl = document.createElement('div');
+        msgsEl.appendChild(renderMessages(data.messages || []));
+        page.appendChild(msgsEl);
+
+        // Footer
+        const footer = document.createElement('div');
+        footer.className = 'share-footer';
+        footer.innerHTML = `
+            <div class="share-footer-text">
+                Percakapan ini dibagikan dari <strong>Eberardos AI</strong> &mdash; ${msgCount} pesan
+            </div>
+            <a href="/" class="btn-try"><i class="fas fa-comment-dots"></i> Mulai Chat</a>`;
+        page.appendChild(footer);
+
+    } catch (err) {
+        page.innerHTML = `
+            <div class="state-center">
+                <i class="fas fa-circle-exclamation error-icon"></i>
+                <span>Percakapan tidak ditemukan atau sudah dihapus</span>
+                <a href="/" style="color:var(--primary);font-size:13px;margin-top:4px;">← Kembali ke Eberardos AI</a>
+            </div>`;
+    }
+})();
+</script>
+</body>
+</html>
