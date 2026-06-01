@@ -1457,7 +1457,7 @@ let userScrolledUp = false;
         msg.appendChild(avatar);
         msg.appendChild(wrap);
         chatInner.appendChild(msg);
-        if (!userScrolledUp) chatContainer.scrollTop = chatContainer.scrollHeight;
+        if (!userScrolledUp) { isProgrammaticScroll = true; chatContainer.scrollTop = chatContainer.scrollHeight; isProgrammaticScroll = false; }
         return msg;
     }
     
@@ -1506,7 +1506,7 @@ let userScrolledUp = false;
                             fullText += token;
                             renderContent(bubble, fullText);
                             bubble.appendChild(cursor);
-                            if (!userScrolledUp) chatContainer.scrollTop = chatContainer.scrollHeight;
+                            if (!userScrolledUp) { isProgrammaticScroll = true; chatContainer.scrollTop = chatContainer.scrollHeight; isProgrammaticScroll = false; }
                         }
                     } catch (_) {}
                 }
@@ -1556,7 +1556,7 @@ let userScrolledUp = false;
                 </div>
             </div>`;
         chatInner.appendChild(thinkDiv);
-        if (!userScrolledUp) chatContainer.scrollTop = chatContainer.scrollHeight;
+        if (!userScrolledUp) { isProgrammaticScroll = true; chatContainer.scrollTop = chatContainer.scrollHeight; isProgrammaticScroll = false; }
 
         const history = conv.messages.map(m => m.text).join('\n');
         const combined = `${history}\n\nUser: ${message}`;
@@ -1610,7 +1610,7 @@ let userScrolledUp = false;
                             fullText += token;
                             renderContent(streamBubble, fullText);
                             streamBubble.appendChild(cursor);
-                            if (!userScrolledUp) chatContainer.scrollTop = chatContainer.scrollHeight;
+                            if (!userScrolledUp) { isProgrammaticScroll = true; chatContainer.scrollTop = chatContainer.scrollHeight; isProgrammaticScroll = false; }
                         }
                     } catch (_) {}
                 }
@@ -1767,7 +1767,7 @@ let userScrolledUp = false;
         const c = conversations.find(x => x.id === id);
         if (c) c.messages.forEach(m => appendMessage(m.text, m.sender, m.imageData || null));
         updateHistory();
-        if (!userScrolledUp) chatContainer.scrollTop = chatContainer.scrollHeight;
+        if (!userScrolledUp) { isProgrammaticScroll = true; chatContainer.scrollTop = chatContainer.scrollHeight; isProgrammaticScroll = false; }
     }
 
     function deleteConv(id) {
@@ -1996,7 +1996,7 @@ let userScrolledUp = false;
                 </div>
             </div>`;
         chatInner.appendChild(thinkDiv);
-        if (!userScrolledUp) chatContainer.scrollTop = chatContainer.scrollHeight;
+        if (!userScrolledUp) { isProgrammaticScroll = true; chatContainer.scrollTop = chatContainer.scrollHeight; isProgrammaticScroll = false; }
         
         const requestConvId = currentConversationId;
         const now = new Date();
@@ -2074,7 +2074,7 @@ let userScrolledUp = false;
                             renderContent(streamBubble, fullText);
                             // Re-attach cursor at end
                             streamBubble.appendChild(cursor);
-                            if (!userScrolledUp) chatContainer.scrollTop = chatContainer.scrollHeight;
+                            if (!userScrolledUp) { isProgrammaticScroll = true; chatContainer.scrollTop = chatContainer.scrollHeight; isProgrammaticScroll = false; }
                         }
                     } catch (_) {}
                 }
@@ -2188,7 +2188,10 @@ let userScrolledUp = false;
         }
     }
 
+    let isProgrammaticScroll = false;
+
     chatContainer.addEventListener('scroll', () => {
+        if (isProgrammaticScroll) return;
         if (isNearBottom()) {
             userScrolledUp = false;
         } else {
