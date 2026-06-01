@@ -1641,6 +1641,7 @@ let isGenerating = false;
     function loadConv(id) {
         currentConversationId = id;
         chatInner.innerHTML = '';
+        setCentered(false);
         const c = conversations.find(x => x.id === id);
         if (c) c.messages.forEach(m => appendMessage(m.text, m.sender));
         updateHistory();
