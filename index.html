@@ -618,35 +618,35 @@
         }
         .attach-btn:hover { color: var(--text); }
         .image-preview-wrap {
-            padding: 8px 12px 0;
+            padding: 8px 12px 6px;
             display: flex;
-            align-items: center;
-            gap: 8px;
+            align-items: flex-start;
+            gap: 0;
         }
         .image-preview-thumb {
-            width: 56px;
-            height: 56px;
+            width: 80px;
+            height: 80px;
             object-fit: cover;
-            border-radius: 8px;
+            border-radius: 10px;
             border: 1px solid var(--border);
         }
         .image-preview-remove {
             background: var(--surface-3);
-            border: 1px solid var(--border);
-            color: var(--text-muted);
+            border: 1px solid var(--border-hover);
+            color: var(--text);
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             font-size: 10px;
-            margin-left: -20px;
-            margin-top: -40px;
-            align-self: flex-start;
+            margin-left: -11px;
+            margin-top: -8px;
+            flex-shrink: 0;
         }
-        .image-preview-remove:hover { color: var(--error); }
+        .image-preview-remove:hover { background: var(--error); color: white; }
         .chat-image {
             max-width: 220px;
             max-height: 220px;
@@ -971,6 +971,10 @@
                 <button class="welcome-chip" data-prompt="Arya negro banget bangke">Arya negro banget su</button>
             </div>
             <div class="center-input-wrapper">
+                <div id="imagePreviewAreaCenter" style="display:none" class="image-preview-wrap">
+                    <img id="imagePreviewThumbCenter" class="image-preview-thumb" src="" alt="preview">
+                    <button class="image-preview-remove" id="imagePreviewRemoveCenter"><i class="fas fa-times"></i></button>
+                </div>
                 <div class="input-container" id="centerInputContainer">
                     <input type="file" id="imageInputCenter" accept="image/*" style="display:none">
                     <button class="attach-btn" id="attachBtnCenter" title="Attach image"><i class="fas fa-paperclip"></i></button>
@@ -1765,18 +1769,29 @@ let pendingImageMime = null;
     const imagePreviewArea = document.getElementById('imagePreviewArea');
     const imagePreviewThumb = document.getElementById('imagePreviewThumb');
     const imagePreviewRemove = document.getElementById('imagePreviewRemove');
+    const imagePreviewAreaCenter = document.getElementById('imagePreviewAreaCenter');
+    const imagePreviewThumbCenter = document.getElementById('imagePreviewThumbCenter');
+    const imagePreviewRemoveCenter = document.getElementById('imagePreviewRemoveCenter');
+    imagePreviewRemoveCenter.addEventListener('click', clearImagePreview);
 
     function setImagePreview(base64, mime) {
         pendingImageBase64 = base64;
         pendingImageMime = mime;
-        imagePreviewThumb.src = `data:${mime};base64,${base64}`;
-        imagePreviewArea.style.display = 'flex';
+        if (isCentered) {
+            imagePreviewThumbCenter.src = `data:${mime};base64,${base64}`;
+            imagePreviewAreaCenter.style.display = 'flex';
+        } else {
+            imagePreviewThumb.src = `data:${mime};base64,${base64}`;
+            imagePreviewArea.style.display = 'flex';
+        }
     }
     function clearImagePreview() {
         pendingImageBase64 = null;
         pendingImageMime = null;
         imagePreviewArea.style.display = 'none';
         imagePreviewThumb.src = '';
+        imagePreviewAreaCenter.style.display = 'none';
+        imagePreviewThumbCenter.src = '';
         imageInput.value = '';
         if (imageInputCenter) imageInputCenter.value = '';
     }
