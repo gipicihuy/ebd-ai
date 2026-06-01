@@ -542,8 +542,8 @@
             }
 
             const wrap = document.createElement('div');
-            wrap.style.cssText = 'display:flex;flex-direction:column;';
-            if (m.sender === 'user') wrap.style.alignItems = 'flex-end';
+            wrap.style.cssText = 'display:flex;flex-direction:column;max-width:75%;';
+            if (m.sender === 'user') { wrap.style.alignItems = 'flex-end'; wrap.style.marginLeft = 'auto'; }
             wrap.appendChild(bubble);
 
             msg.appendChild(avatar);
