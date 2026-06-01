@@ -1086,6 +1086,7 @@ let isGenerating = false;
 let pendingImageBase64 = null;
 let pendingImageMime = null;
 let userScrolledUp = false;
+let isProgrammaticScroll = false;
     const responseVersions = new Map(); // key: msgIndex, value: [versions]
     const responseVersionIdx = new Map(); // key: msgIndex, value: currentIdx
 
@@ -2187,8 +2188,6 @@ let userScrolledUp = false;
             scrollBtn.classList.remove('visible');
         }
     }
-
-    let isProgrammaticScroll = false;
 
     chatContainer.addEventListener('scroll', () => {
         if (isProgrammaticScroll) return;
