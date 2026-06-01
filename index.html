@@ -949,7 +949,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let conversations = JSON.parse(localStorage.getItem('eberardosConversations')) || [];
     let currentConversationId = null;
-    let isCentered = true;
+let isCentered = true;
+let activeReader = null;
+let isGenerating = false;
     const responseVersions = new Map(); // key: msgIndex, value: [versions]
     const responseVersionIdx = new Map(); // key: msgIndex, value: currentIdx
 
@@ -1705,6 +1707,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ── SEND MESSAGE WITH STREAMING ──
     async function sendMessage() {
+        if (isGenerating) {
+            if (activeReader) activeReader.cancel();
+            isGenerating = false;
+            userInput.disabled = false;
+            sendButton.disabled = false;
+            sendButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
+            return;
+        }
         const activeInput = isCentered ? userInputCenter : userInput;
         const message = activeInput.value.trim();
         if (!message) return;
@@ -1722,8 +1732,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!isCentered) userInput.focus();
 
         userInput.disabled = true;
-        sendButton.disabled = true;
-        sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        sendButton.disabled = false;
+        sendButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"><rect x="3" y="3" width="8" height="8" rx="1.5" fill="white"/></svg>';
 
         // Thinking indicator
         const thinkDiv = document.createElement('div');
@@ -1779,7 +1789,10 @@ document.addEventListener('DOMContentLoaded', function () {
             cursor.innerHTML = '<span></span>';
             streamBubble.appendChild(cursor);
 
-            const reader = response.body.getReader();
+            
+            activeReader = response.body.getReader();
+            const reader = activeReader;
+            isGenerating = true;
             const decoder = new TextDecoder();
             let fullText = '';
 
@@ -1878,6 +1891,8 @@ document.addEventListener('DOMContentLoaded', function () {
             saveMsg('Maaf, terjadi kesalahan. Coba lagi ya.', 'ai');
             showToast('Terjadi kesalahan.', true);
         } finally {
+            isGenerating = false;
+            activeReader = null;
             userInput.disabled = false;
             sendButton.disabled = false;
             sendButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
