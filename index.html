@@ -1085,6 +1085,7 @@ let activeReader = null;
 let isGenerating = false;
 let pendingImageBase64 = null;
 let pendingImageMime = null;
+let userScrolledUp = false;
     const responseVersions = new Map(); // key: msgIndex, value: [versions]
     const responseVersionIdx = new Map(); // key: msgIndex, value: currentIdx
 
@@ -2174,7 +2175,6 @@ let pendingImageMime = null;
     // ── SCROLL TO BOTTOM BUTTON ──
     const scrollBtn = document.getElementById('scrollBtn');
     let scrollTimer = null;
-    let userScrolledUp = false;
 
     function isNearBottom(threshold = 120) {
         return chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight <= threshold;
