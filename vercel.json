@@ -3,6 +3,10 @@
     {
       "source": "/api/chat",
       "destination": "/api/chat.js"
+    },
+    {
+      "source": "/share/:id",
+      "destination": "/share.html"
     }
   ],
   "functions": {
