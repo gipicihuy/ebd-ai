@@ -1,5 +1,10 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
+export const config = {
+    api: {
+        bodyParser: {
+            sizeLimit: '10mb',
+        },
+    },
+};
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
@@ -14,7 +19,7 @@ export default async function handler(req, res) {
                 'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`
             },
             body: JSON.stringify({
-                model: 'qwen/qwen3-vl-32b-instruct',
+                model: 'qwen/qwen2.5-vl-72b-instruct',
                 max_tokens: 1024,
                 messages: [
                     {
@@ -29,10 +34,11 @@ export default async function handler(req, res) {
         });
 
         const data = await response.json();
+        console.log('Vision response:', JSON.stringify(data));
         const description = data.choices?.[0]?.message?.content || '';
         res.status(200).json({ description });
     } catch (err) {
-        console.error(err);
+        console.error('Vision error:', err);
         res.status(500).json({ error: 'Vision error', description: '' });
     }
 }
