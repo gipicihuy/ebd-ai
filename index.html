@@ -941,6 +941,59 @@
             -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
             mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
         }
+        /* ── SHARE MODAL ── */
+        .share-modal-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        .share-modal-backdrop.show { opacity: 1; pointer-events: auto; }
+        .share-modal {
+            background: var(--surface);
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius);
+            padding: 20px;
+            width: 100%; max-width: 420px;
+            margin: 0 16px;
+        }
+        .share-modal-title {
+            font-size: 14px; font-weight: 600;
+            margin-bottom: 14px;
+            display: flex; align-items: center;
+            justify-content: space-between;
+        }
+        .share-link-box {
+            display: flex; gap: 8px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .share-link-text {
+            flex: 1; font-size: 12.5px;
+            color: var(--text-muted);
+            font-family: 'Geist Mono', monospace;
+            overflow: hidden; text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .share-copy-btn {
+            background: var(--primary); color: white;
+            border: none; border-radius: 6px;
+            padding: 5px 12px; font-size: 12px;
+            font-family: 'Geist', sans-serif;
+            cursor: pointer; flex-shrink: 0;
+            transition: background 0.15s;
+        }
+        .share-copy-btn:hover { background: var(--primary-hover); }
+        .share-modal-note {
+            font-size: 12px; color: var(--text-dim);
+            display: flex; align-items: center; gap: 6px;
+        }
         /* ── VERSION NAV ── */
         .ver-nav {
             display: flex;
@@ -973,6 +1026,9 @@
             <line x1="4" y1="7" x2="18" y2="7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
             <line x1="4" y1="14" x2="12" y2="14" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
         </svg>
+    </button>
+    <button class="btn-icon" id="navShareBtn" title="Share Chat" style="margin-left:auto;">
+        <i class="fas fa-share-nodes"></i>
     </button>
 </nav>
 
@@ -1060,9 +1116,16 @@
     <i class="fas fa-check-circle toast-icon-el"></i>
     <span id="toastMsg"></span>
 </div>
-
+<div class="share-modal-backdrop" id="shareModalBackdrop">
+    <div class="share-modal">
+        <div class="share-modal-title">
+            <span><i class="fas fa-share-nodes" style="color:var(--primary);margin-right:8px;"></i>Bagikan Percakapan</span>
+            <button class="action-btn" id="closeShareModal"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="shareModalBody"></div>
+    </div>
+</div>
 <button class="scroll-btn" id="scrollBtn"><i class="fas fa-chevron-down"></i></button>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -1441,6 +1504,13 @@ let isProgrammaticScroll = false;
             actions.appendChild(verNav);
             actions.appendChild(regenBtn);
 
+            const shareBtn = document.createElement('button');
+            shareBtn.className = 'action-btn';
+            shareBtn.title = 'Share';
+            shareBtn.innerHTML = '<i class="fas fa-share-nodes"></i>';
+            shareBtn.onclick = shareConversation;
+            actions.appendChild(shareBtn);
+
             // Init versions
             if (!responseVersions.has(msgIdx)) {
                 responseVersions.set(msgIdx, [text]);
@@ -1758,6 +1828,7 @@ let isProgrammaticScroll = false;
         currentConversationId = c.id;
         saveConvs();
         updateHistory();
+        updateShareBtn();
         return c.id;
     }
 
@@ -1768,6 +1839,7 @@ let isProgrammaticScroll = false;
         const c = conversations.find(x => x.id === id);
         if (c) c.messages.forEach(m => appendMessage(m.text, m.sender, m.imageData || null));
         updateHistory();
+        updateShareBtn();
         if (!userScrolledUp) { isProgrammaticScroll = true; chatContainer.scrollTop = chatContainer.scrollHeight; isProgrammaticScroll = false; }
     }
 
@@ -1776,6 +1848,7 @@ let isProgrammaticScroll = false;
         if (currentConversationId === id) { currentConversationId = null; resetChat(); }
         saveConvs();
         updateHistory();
+        updateShareBtn();
         showToast('Percakapan dihapus');
     }
 
@@ -1788,6 +1861,7 @@ let isProgrammaticScroll = false;
         c.messages.push(msgObj);
         saveConvs();
         updateHistory();
+        updateShareBtn();
     }
 
     function resetChat() {
@@ -1920,6 +1994,7 @@ let isProgrammaticScroll = false;
         centerWelcome.style.transform = '';
         setCentered(true);
         addChipListeners();
+        updateShareBtn();
         if (closeSidebar && window.innerWidth < 768) toggleSidebar();
         showToast('Chat baru dibuat');
     }
@@ -2162,11 +2237,64 @@ let isProgrammaticScroll = false;
             userInput.focus();
         }
     }
+    // ── SHARE ──
+    async function shareConversation() {
+        const conv = conversations.find(c => c.id === currentConversationId);
+        if (!conv || !conv.messages.length) return showToast('Tidak ada percakapan untuk dibagikan.', true);
 
+        const backdrop = document.getElementById('shareModalBackdrop');
+        const body = document.getElementById('shareModalBody');
+        backdrop.classList.add('show');
+        body.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;"><div style="width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 10px;"></div>Membuat link...</div>`;
+
+        try {
+            const firstMsg = conv.messages[0]?.text?.substring(0, 60) || 'Percakapan';
+            const res = await fetch('/api/share', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: conv.messages, title: firstMsg })
+            });
+            const data = await res.json();
+            if (!data.id) throw new Error('no id');
+
+            const shareUrl = `${location.origin}/share/${data.id}`;
+            body.innerHTML = `
+                <div class="share-link-box">
+                    <span class="share-link-text">${shareUrl}</span>
+                    <button class="share-copy-btn" id="copyShareLink">Salin</button>
+                </div>
+                <div class="share-modal-note">
+                    <i class="fas fa-lock"></i>
+                    Hanya orang yang punya link ini yang bisa melihat
+                </div>`;
+            document.getElementById('copyShareLink').onclick = () => {
+                navigator.clipboard.writeText(shareUrl);
+                document.getElementById('copyShareLink').textContent = 'Disalin!';
+                setTimeout(() => { document.getElementById('copyShareLink').textContent = 'Salin'; }, 2000);
+                showToast('Link disalin!');
+            };
+        } catch (err) {
+            body.innerHTML = `<p style="color:var(--error);font-size:13px;text-align:center;padding:16px;">Gagal membuat link. Coba lagi.</p>`;
+        }
+    }
+   document.getElementById('navShareBtn').addEventListener('click', shareConversation);
+
+    function updateShareBtn() {
+        const btn = document.getElementById('navShareBtn');
+        const conv = conversations.find(c => c.id === currentConversationId);
+        btn.style.display = (conv && conv.messages.length > 0) ? 'flex' : 'none';
+    }
+    document.getElementById('closeShareModal').addEventListener('click', () => {
+        document.getElementById('shareModalBackdrop').classList.remove('show');
+    });
+    document.getElementById('shareModalBackdrop').addEventListener('click', e => {
+        if (e.target === e.currentTarget) e.currentTarget.classList.remove('show');
+    });
     sendButton.addEventListener('click', sendMessage);
 
     // ── INIT ──
     updateHistory();
+    updateShareBtn();
     if (conversations.length > 0) {
         loadConv(conversations[0].id);
         setCentered(false);
