@@ -1859,7 +1859,6 @@ let isProgrammaticScroll = false;
         const msgObj = { text, sender };
         if (imageData) msgObj.imageData = imageData;
         c.messages.push(msgObj);
-        if (sender === 'user') delete c.shareId;
         saveConvs();
         updateHistory();
         updateShareBtn();
@@ -2236,6 +2235,9 @@ let isProgrammaticScroll = false;
             sendButton.disabled = false;
             sendButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
             userInput.focus();
+            const _sc = conversations.find(x => x.id === currentConversationId);
+            if (_sc) { delete _sc.shareId; saveConvs(); }
+            updateShareBtn();
         }
     }
     // ── SHARE ──
@@ -2308,7 +2310,11 @@ let isProgrammaticScroll = false;
     function updateShareBtn() {
         const btn = document.getElementById('navShareBtn');
         const conv = conversations.find(c => c.id === currentConversationId);
-        btn.style.display = (conv && conv.messages.length > 0) ? 'flex' : 'none';
+        const hasMsg = conv && conv.messages.length > 0;
+        btn.style.display = hasMsg ? 'flex' : 'none';
+        btn.disabled = isGenerating;
+        btn.style.opacity = isGenerating ? '0.4' : '1';
+        btn.style.cursor = isGenerating ? 'not-allowed' : 'pointer';
     }
     document.getElementById('closeShareModal').addEventListener('click', () => {
         document.getElementById('shareModalBackdrop').classList.remove('show');
