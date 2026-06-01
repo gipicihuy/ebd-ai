@@ -705,6 +705,36 @@
         .toast-custom.error .toast-icon-el { color: var(--error); }
         .toast-custom .toast-icon-el { color: var(--success); }
 
+        /* ── SCROLL TO BOTTOM ── */
+        .scroll-btn {
+            position: fixed;
+            bottom: 90px;
+            right: 24px;
+            width: 36px;
+            height: 36px;
+            background: var(--surface-3);
+            border: 1px solid var(--border-hover);
+            border-radius: 50%;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 13px;
+            z-index: 60;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease, background 0.15s;
+        }
+        .scroll-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .scroll-btn:hover {
+            background: var(--surface-2);
+            color: var(--text);
+        }
+
         /* ── MODAL ── */
         .modal-content {
             background: var(--surface);
@@ -1030,6 +1060,8 @@
     <i class="fas fa-check-circle toast-icon-el"></i>
     <span id="toastMsg"></span>
 </div>
+
+<button class="scroll-btn" id="scrollBtn"><i class="fas fa-chevron-down"></i></button>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -1424,7 +1456,7 @@ let pendingImageMime = null;
         msg.appendChild(avatar);
         msg.appendChild(wrap);
         chatInner.appendChild(msg);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        if (!userScrolledUp) chatContainer.scrollTop = chatContainer.scrollHeight;
         return msg;
     }
     
@@ -1473,7 +1505,7 @@ let pendingImageMime = null;
                             fullText += token;
                             renderContent(bubble, fullText);
                             bubble.appendChild(cursor);
-                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                            if (!userScrolledUp) chatContainer.scrollTop = chatContainer.scrollHeight;
                         }
                     } catch (_) {}
                 }
@@ -1523,7 +1555,7 @@ let pendingImageMime = null;
                 </div>
             </div>`;
         chatInner.appendChild(thinkDiv);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        if (!userScrolledUp) chatContainer.scrollTop = chatContainer.scrollHeight;
 
         const history = conv.messages.map(m => m.text).join('\n');
         const combined = `${history}\n\nUser: ${message}`;
@@ -1577,7 +1609,7 @@ let pendingImageMime = null;
                             fullText += token;
                             renderContent(streamBubble, fullText);
                             streamBubble.appendChild(cursor);
-                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                            if (!userScrolledUp) chatContainer.scrollTop = chatContainer.scrollHeight;
                         }
                     } catch (_) {}
                 }
@@ -1734,7 +1766,7 @@ let pendingImageMime = null;
         const c = conversations.find(x => x.id === id);
         if (c) c.messages.forEach(m => appendMessage(m.text, m.sender, m.imageData || null));
         updateHistory();
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        if (!userScrolledUp) chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
     function deleteConv(id) {
@@ -1963,7 +1995,7 @@ let pendingImageMime = null;
                 </div>
             </div>`;
         chatInner.appendChild(thinkDiv);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        if (!userScrolledUp) chatContainer.scrollTop = chatContainer.scrollHeight;
         
         const requestConvId = currentConversationId;
         const now = new Date();
@@ -2041,7 +2073,7 @@ let pendingImageMime = null;
                             renderContent(streamBubble, fullText);
                             // Re-attach cursor at end
                             streamBubble.appendChild(cursor);
-                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                            if (!userScrolledUp) chatContainer.scrollTop = chatContainer.scrollHeight;
                         }
                     } catch (_) {}
                 }
@@ -2138,6 +2170,42 @@ let pendingImageMime = null;
         setCentered(false);
     }
     addChipListeners();
+
+    // ── SCROLL TO BOTTOM BUTTON ──
+    const scrollBtn = document.getElementById('scrollBtn');
+    let scrollTimer = null;
+    let userScrolledUp = false;
+
+    function isNearBottom(threshold = 120) {
+        return chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight <= threshold;
+    }
+
+    function updateScrollBtn() {
+        if (!isNearBottom()) {
+            scrollBtn.classList.add('visible');
+        } else {
+            scrollBtn.classList.remove('visible');
+        }
+    }
+
+    chatContainer.addEventListener('scroll', () => {
+        if (isNearBottom()) {
+            userScrolledUp = false;
+        } else {
+            userScrolledUp = true;
+        }
+        scrollBtn.classList.remove('visible');
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(() => {
+            updateScrollBtn();
+        }, 600);
+    });
+
+    scrollBtn.addEventListener('click', () => {
+        userScrolledUp = false;
+        chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+        scrollBtn.classList.remove('visible');
+    });
 
     // Mobile keyboard fix
     if (window.visualViewport) {
