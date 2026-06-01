@@ -1184,7 +1184,18 @@ let pendingImageMime = null;
             parts.push({ type: 'code', content: code, language: lang });
             last = m.index + m[0].length;
         }
-        if (last < text.length) parts.push({ type: 'text', content: text.slice(last) });
+        // Deteksi unclosed code block saat streaming
+        const remaining = text.slice(last);
+        const openIdx = remaining.indexOf('```');
+        if (openIdx !== -1) {
+            if (openIdx > 0) parts.push({ type: 'text', content: remaining.slice(0, openIdx) });
+            const inner = remaining.slice(openIdx + 3);
+            const lang = inner.split('\n')[0] || 'text';
+            const code = inner.replace(/^\w+\n/, '');
+            parts.push({ type: 'code', content: code, language: lang });
+        } else if (remaining) {
+            parts.push({ type: 'text', content: remaining });
+        }
         return parts.length ? parts : [{ type: 'text', content: text }];
     }
 
