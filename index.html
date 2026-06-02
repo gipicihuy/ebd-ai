@@ -2371,17 +2371,21 @@ let isProgrammaticScroll = false;
 
     // Mobile keyboard fix
     if (window.visualViewport) {
+        let fixRaf = null;
         const fix = () => {
-            const isZoomed = window.visualViewport.scale > 1.05;
-            if (isZoomed) return;
-            const kb = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
-            if (isCentered) {
-                centerWelcome.style.transform = kb > 0
-                    ? `translateY(-${kb / 2}px)`
-                    : '';
-            } else {
-                inputAreaBottom.style.transform = `translateY(-${kb}px)`;
-            }
+            if (fixRaf) cancelAnimationFrame(fixRaf);
+            fixRaf = requestAnimationFrame(() => {
+                const isZoomed = window.visualViewport.scale > 1.05;
+                if (isZoomed) return;
+                const kb = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
+                if (isCentered) {
+                    centerWelcome.style.transition = 'transform 0.18s ease';
+                    centerWelcome.style.transform = kb > 0 ? `translateY(-${kb / 2}px)` : '';
+                } else {
+                    inputAreaBottom.style.transition = 'transform 0.18s ease';
+                    inputAreaBottom.style.transform = `translateY(-${kb}px)`;
+                }
+            });
         };
         window.visualViewport.addEventListener('resize', fix);
         window.visualViewport.addEventListener('scroll', fix);
