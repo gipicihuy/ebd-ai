@@ -2395,8 +2395,7 @@ let isProgrammaticScroll = false;
                     inputAreaBottom.style.bottom = kb > 0 ? `${kb}px` : '0px';
                     inputAreaBottom.style.transform = '';
 
-                    const inputH = inputAreaBottom.offsetHeight;
-                    chatContainer.style.paddingBottom = `${inputH + kb + 16}px`;
+                    chatContainer.style.paddingBottom = `${kb + 140}px`;
 
                     if (kb > 0 && !userScrolledUp) {
                         isProgrammaticScroll = true;
@@ -2413,7 +2412,7 @@ let isProgrammaticScroll = false;
                 lastKb = 0;
                 inputAreaBottom.style.bottom = '0px';
                 inputAreaBottom.style.transform = '';
-                chatContainer.style.paddingBottom = '';
+                chatContainer.style.paddingBottom = '140px';
                 centerWelcome.style.transform = '';
             });
         };
