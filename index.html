@@ -2395,6 +2395,10 @@ let isProgrammaticScroll = false;
                     inputAreaBottom.style.bottom = kb > 0 ? `${kb}px` : '0px';
                     inputAreaBottom.style.transform = '';
 
+                    const visibleHeight = window.visualViewport.height;
+                    chatContainer.style.height = `${visibleHeight - 56}px`;
+                    chatContainer.style.maxHeight = `${visibleHeight - 56}px`;
+
                     if (kb > 0 && !userScrolledUp) {
                         isProgrammaticScroll = true;
                         chatContainer.scrollTop = chatContainer.scrollHeight - chatContainer.clientHeight;
@@ -2410,7 +2414,8 @@ let isProgrammaticScroll = false;
                 lastKb = 0;
                 inputAreaBottom.style.bottom = '0px';
                 inputAreaBottom.style.transform = '';
-                chatContainer.style.paddingBottom = '';
+                chatContainer.style.height = '';
+                chatContainer.style.maxHeight = '';
                 centerWelcome.style.transform = '';
             });
         };
