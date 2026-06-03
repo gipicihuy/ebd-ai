@@ -5,6 +5,14 @@
       "destination": "/api/chat.js"
     },
     {
+      "source": "/api/intent",
+      "destination": "/api/intent.js"
+    },
+    {
+      "source": "/api/music",
+      "destination": "/api/music.js"
+    },
+    {
       "source": "/share/:id",
       "destination": "/share.html"
     }
