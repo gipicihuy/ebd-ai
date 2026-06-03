@@ -2372,23 +2372,58 @@ let isProgrammaticScroll = false;
     // Mobile keyboard fix
     if (window.visualViewport) {
         let fixRaf = null;
+        let lastKb = 0;
+
         const fix = () => {
             if (fixRaf) cancelAnimationFrame(fixRaf);
+            const distFromBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight;
+
             fixRaf = requestAnimationFrame(() => {
                 const isZoomed = window.visualViewport.scale > 1.05;
                 if (isZoomed) return;
-                const kb = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
+
+                const vvHeight = window.visualViewport.height;
+                const kb = Math.max(0, window.innerHeight - vvHeight);
+
+                if (kb === lastKb) return;
+                lastKb = kb;
+
                 if (isCentered) {
-                    centerWelcome.style.transition = 'transform 0.18s ease';
+                    centerWelcome.style.transition = 'none';
                     centerWelcome.style.transform = kb > 0 ? `translateY(-${kb / 2}px)` : '';
                 } else {
-                    inputAreaBottom.style.transition = 'transform 0.18s ease';
-                    inputAreaBottom.style.transform = `translateY(-${kb}px)`;
+                    inputAreaBottom.style.transition = 'none';
+                    inputAreaBottom.style.bottom = kb > 0 ? `${kb}px` : '0px';
+                    inputAreaBottom.style.transform = '';
+
+                    const inputH = inputAreaBottom.offsetHeight;
+                    chatContainer.style.paddingBottom = `${inputH + kb + 16}px`;
+
+                    if (distFromBottom <= 120) {
+                        isProgrammaticScroll = true;
+                        chatContainer.scrollTop = chatContainer.scrollHeight - chatContainer.clientHeight;
+                        isProgrammaticScroll = false;
+                    }
                 }
             });
         };
+
+        const reset = () => {
+            if (fixRaf) cancelAnimationFrame(fixRaf);
+            fixRaf = requestAnimationFrame(() => {
+                lastKb = 0;
+                inputAreaBottom.style.bottom = '0px';
+                inputAreaBottom.style.transform = '';
+                chatContainer.style.paddingBottom = '';
+                centerWelcome.style.transform = '';
+            });
+        };
+
         window.visualViewport.addEventListener('resize', fix);
         window.visualViewport.addEventListener('scroll', fix);
+
+        userInput.addEventListener('blur', () => setTimeout(reset, 100));
+        userInputCenter.addEventListener('blur', () => setTimeout(reset, 100));
     }
 });
 </script>
