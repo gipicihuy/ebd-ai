@@ -182,13 +182,28 @@
         .mc-progress-wrap{flex:1;display:flex;flex-direction:column;gap:4px;cursor:pointer}
         .mc-bar-track{width:100%;height:3px;background:var(--surface-3);border-radius:99px;position:relative;transition:height 0.15s}
         .mc-bar-track:hover{height:5px}
-        .mc-bar-fill{height:100%;background:var(--primary);border-radius:99px;width:0%;position:relative;pointer-events:none;transition:width 0.1s linear}
-        .mc-bar-fill::after{content:'';position:absolute;right:-5px;top:50%;transform:translateY(-50%) scale(0);width:10px;height:10px;border-radius:50%;background:var(--primary);transition:transform 0.15s}
-        .mc-bar-track:hover .mc-bar-fill::after{transform:translateY(-50%) scale(1)}
+        .mc-bar-fill{height:100%;background:var(--primary);border-radius:99px;width:0%;position:relative;pointer-events:none}
+        .mc-bar-dot{position:absolute;right:-5px;top:50%;transform:translateY(-50%) scale(0);width:10px;height:10px;border-radius:50%;background:var(--primary);transition:transform 0.15s;pointer-events:none}
+        .mc-bar-track:hover .mc-bar-dot{transform:translateY(-50%) scale(1)}
         .mc-times{display:flex;justify-content:space-between;font-size:10px;color:var(--text-dim);font-family:'Geist Mono',monospace;line-height:1}
-        .mc-loading{display:flex;align-items:center;gap:10px;padding:14px 12px}
-        .mc-loading-dots{display:flex;gap:4px;align-items:center}
-        .mc-loading-
+        .mc-skeleton{display:flex;align-items:center;gap:12px;padding:12px}
+        .mc-skeleton-thumb{width:56px;height:56px;border-radius:8px;background:var(--surface-3);flex-shrink:0;overflow:hidden;position:relative}
+        .mc-skeleton-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+        .mc-skeleton-title{height:12px;border-radius:6px;background:var(--surface-3);width:75%;overflow:hidden;position:relative}
+        .mc-skeleton-artist{height:10px;border-radius:6px;background:var(--surface-3);width:45%;overflow:hidden;position:relative}
+        .mc-skeleton-controls{display:flex;align-items:center;gap:8px;margin-top:2px}
+        .mc-skeleton-btn{width:32px;height:32px;border-radius:50%;background:var(--surface-3);flex-shrink:0;overflow:hidden;position:relative}
+        .mc-skeleton-bar{flex:1;height:3px;border-radius:99px;background:var(--surface-3);overflow:hidden;position:relative}
+        .mc-shimmer{position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.06) 50%,transparent 100%);animation:mcShimmer 1.4s infinite}
+        @keyframes mcShimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+        .mc-eq{display:flex;align-items:flex-end;gap:2px;height:14px;margin-left:2px}
+        .mc-eq-bar{width:3px;border-radius:2px;background:var(--primary);animation:mcEq 0.8s infinite ease-in-out}
+        .mc-eq-bar:nth-child(1){animation-delay:0s;height:6px}
+        .mc-eq-bar:nth-child(2){animation-delay:0.15s;height:10px}
+        .mc-eq-bar:nth-child(3){animation-delay:0.3s;height:14px}
+        .mc-eq-bar:nth-child(4){animation-delay:0.15s;height:8px}
+        @keyframes mcEq{0%,100%{transform:scaleY(0.4)}50%{transform:scaleY(1)}}
+        @keyframes mcPulse{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
 </style>
 </head>
 <body>
@@ -793,10 +808,28 @@ let isProgrammaticScroll = false;
         bubble.innerHTML = '';
         const wrap = document.createElement('div');
         wrap.className = 'mc-wrap';
-        wrap.innerHTML = `<div class="mc-loading"><div class="mc-loading-dots"><div class="mc-loading-dot"></div><div class="mc-loading-dot"></div><div class="mc-loading-dot"></div></div><span class="mc-loading-text">Memutar lagu...</span></div>`;
+        wrap.innerHTML = `
+            <div class="mc-skeleton">
+                <div class="mc-skeleton-thumb"><div class="mc-shimmer"></div></div>
+                <div class="mc-skeleton-info">
+                    <div class="mc-skeleton-title"><div class="mc-shimmer"></div></div>
+                    <div class="mc-skeleton-artist"><div class="mc-shimmer"></div></div>
+                    <div class="mc-skeleton-controls">
+                        <div class="mc-skeleton-btn"><div class="mc-shimmer"></div></div>
+                        <div class="mc-skeleton-bar"><div class="mc-shimmer"></div></div>
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;padding:0 12px 10px;margin-top:-4px">
+                <div class="mc-eq"><div class="mc-eq-bar"></div><div class="mc-eq-bar"></div><div class="mc-eq-bar"></div><div class="mc-eq-bar"></div></div>
+                <span style="font-size:11px;color:var(--text-dim)">Mencari lagu...</span>
+            </div>`;
         bubble.appendChild(wrap);
         return wrap;
     }
+
+    // Registry audio aktif — untuk stop bentrok
+    const _audioRegistry = new Set();
 
     function hydrateMusicCard(wrap, d) {
         const iconPlay = `<svg viewBox="0 0 24 24" fill="white" width="13" height="13"><path d="M8 5v14l11-7z"/></svg>`;
@@ -814,7 +847,7 @@ let isProgrammaticScroll = false;
                     <div class="mc-controls">
                         <button class="mc-play-btn">${iconSpin}</button>
                         <div class="mc-progress-wrap">
-                            <div class="mc-bar-track"><div class="mc-bar-fill"></div></div>
+                            <div class="mc-bar-track"><div class="mc-bar-fill"><div class="mc-bar-dot"></div></div></div>
                             <div class="mc-times"><span class="mc-cur">0:00</span><span class="mc-dur">${fmtTime(d.d)}</span></div>
                         </div>
                     </div>
@@ -829,6 +862,8 @@ let isProgrammaticScroll = false;
         const durEl = wrap.querySelector('.mc-dur');
         let isDragging = false;
 
+        _audioRegistry.add(audio);
+
         audio.addEventListener('canplay', () => {
             playBtn.innerHTML = iconPlay;
         });
@@ -840,6 +875,17 @@ let isProgrammaticScroll = false;
         playBtn.addEventListener('click', () => {
             if (audio.readyState < 2) return;
             if (audio.paused) {
+                // Stop semua audio lain
+                _audioRegistry.forEach(a => {
+                    if (a !== audio && !a.paused) {
+                        a.pause();
+                        a.currentTime = 0;
+                    }
+                });
+                // Update semua play button lain ke icon play
+                document.querySelectorAll('.mc-play-btn').forEach(btn => {
+                    if (btn !== playBtn) btn.innerHTML = iconPlay;
+                });
                 audio.play();
                 playBtn.innerHTML = iconPause;
             } else {
