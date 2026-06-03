@@ -167,25 +167,28 @@
         .share-modal-note{font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:6px}
         .ver-nav{display:flex;align-items:center;gap:2px}
         .ver-label{font-size:11px;color:var(--text-dim);padding:0 2px;min-width:28px;text-align:center;user-select:none}
-        .mc-wrap{background:var(--surface-2);border:1px solid var(--border);border-radius:14px;overflow:hidden;max-width:340px;width:100%}
-        .mc-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:var(--surface-3)}
-        .mc-body{padding:12px 14px 14px}
-        .mc-title{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
-        .mc-artist{font-size:12px;color:var(--text-muted);margin-bottom:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .mc-player{display:flex;align-items:center;gap:10px}
-        .mc-play-btn{width:34px;height:34px;border-radius:50%;background:var(--primary);border:none;color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background 0.15s}
-        .mc-play-btn:hover{background:var(--primary-hover)}
-        .mc-play-btn svg{width:14px;height:14px;fill:white}
-        .mc-progress-wrap{flex:1;display:flex;flex-direction:column;gap:5px}
-        .mc-progress{width:100%;height:3px;border-radius:2px;background:var(--surface-3);cursor:pointer;-webkit-appearance:none;appearance:none;outline:none}
-        .mc-progress::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--primary);cursor:pointer}
-        .mc-progress::-webkit-slider-runnable-track{background:linear-gradient(to right,var(--primary) var(--prog,0%),var(--surface-3) var(--prog,0%));height:3px;border-radius:2px}
-        .mc-times{display:flex;justify-content:space-between;font-size:10px;color:var(--text-dim);font-family:'Geist Mono',monospace}
-        .mc-loading{display:flex;align-items:center;gap:8px;padding:12px 0;color:var(--text-muted);font-size:13px}
-        .mc-loading-dot{width:5px;height:5px;border-radius:50%;background:var(--primary);animation:mcPulse 1.2s infinite ease-in-out}
-        .mc-loading-dot:nth-child(2){animation-delay:0.2s}.mc-loading-dot:nth-child(3){animation-delay:0.4s}
-        @keyframes mcPulse{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
-        .mc-error{display:flex;align-items:center;gap:8px;padding:10px 14px;color:var(--error);font-size:13px;background:rgba(239,68,68,0.06);border-radius:10px;max-width:340px}
+        .mc-wrap{background:var(--surface-2);border:1px solid var(--border);border-radius:14px;overflow:hidden;max-width:320px;width:100%}
+        .mc-inner{display:flex;align-items:center;gap:12px;padding:12px}
+        .mc-thumb{width:56px;height:56px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--surface-3);display:block}
+        .mc-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+        .mc-meta{min-width:0}
+        .mc-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+        .mc-artist{font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+        .mc-controls{display:flex;align-items:center;gap:8px}
+        .mc-play-btn{width:32px;height:32px;border-radius:50%;background:var(--primary);border:none;color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background 0.15s,transform 0.1s}
+        .mc-play-btn:hover{background:var(--primary-hover);transform:scale(1.06)}
+        .mc-play-btn:active{transform:scale(0.95)}
+        .mc-play-btn svg{width:13px;height:13px;fill:white;display:block}
+        .mc-progress-wrap{flex:1;display:flex;flex-direction:column;gap:4px;cursor:pointer}
+        .mc-bar-track{width:100%;height:3px;background:var(--surface-3);border-radius:99px;position:relative;transition:height 0.15s}
+        .mc-bar-track:hover{height:5px}
+        .mc-bar-fill{height:100%;background:var(--primary);border-radius:99px;width:0%;position:relative;pointer-events:none;transition:width 0.1s linear}
+        .mc-bar-fill::after{content:'';position:absolute;right:-5px;top:50%;transform:translateY(-50%) scale(0);width:10px;height:10px;border-radius:50%;background:var(--primary);transition:transform 0.15s}
+        .mc-bar-track:hover .mc-bar-fill::after{transform:translateY(-50%) scale(1)}
+        .mc-times{display:flex;justify-content:space-between;font-size:10px;color:var(--text-dim);font-family:'Geist Mono',monospace;line-height:1}
+        .mc-loading{display:flex;align-items:center;gap:10px;padding:14px 12px}
+        .mc-loading-dots{display:flex;gap:4px;align-items:center}
+        .mc-loading-
 </style>
 </head>
 <body>
@@ -790,48 +793,65 @@ let isProgrammaticScroll = false;
         bubble.innerHTML = '';
         const wrap = document.createElement('div');
         wrap.className = 'mc-wrap';
-        wrap.innerHTML = `<div class="mc-body"><div class="mc-loading"><div class="mc-loading-dot"></div><div class="mc-loading-dot"></div><div class="mc-loading-dot"></div><span>Memutar lagu...</span></div></div>`;
+        wrap.innerHTML = `<div class="mc-loading"><div class="mc-loading-dots"><div class="mc-loading-dot"></div><div class="mc-loading-dot"></div><div class="mc-loading-dot"></div></div><span class="mc-loading-text">Memutar lagu...</span></div>`;
         bubble.appendChild(wrap);
         return wrap;
     }
 
     function hydrateMusicCard(wrap, d) {
+        const iconPlay = `<svg viewBox="0 0 24 24" fill="white" width="13" height="13"><path d="M8 5v14l11-7z"/></svg>`;
+        const iconPause = `<svg viewBox="0 0 24 24" fill="white" width="13" height="13"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+        const iconSpin = `<div class="mc-spinner"></div>`;
+
         wrap.innerHTML = `
-            <img class="mc-thumb" src="${d.th}" alt="${d.n}" onerror="this.style.display='none'">
-            <div class="mc-body">
-                <div class="mc-title">${sanitize(d.n)}</div>
-                <div class="mc-artist">${sanitize(d.a)}</div>
-                <div class="mc-player">
-                    <button class="mc-play-btn" id="mcPlayBtn_${Date.now()}">
-                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </button>
-                    <div class="mc-progress-wrap">
-                        <input type="range" class="mc-progress" min="0" max="100" value="0" step="0.1">
-                        <div class="mc-times"><span class="mc-cur">0:00</span><span class="mc-dur">${fmtTime(d.d)}</span></div>
+            <div class="mc-inner">
+                <img class="mc-thumb" src="${d.th}" alt="" onerror="this.style.opacity='0'">
+                <div class="mc-info">
+                    <div class="mc-meta">
+                        <div class="mc-title">${sanitize(d.n)}</div>
+                        <div class="mc-artist">${sanitize(d.a)}</div>
+                    </div>
+                    <div class="mc-controls">
+                        <button class="mc-play-btn">${iconSpin}</button>
+                        <div class="mc-progress-wrap">
+                            <div class="mc-bar-track"><div class="mc-bar-fill"></div></div>
+                            <div class="mc-times"><span class="mc-cur">0:00</span><span class="mc-dur">${fmtTime(d.d)}</span></div>
+                        </div>
                     </div>
                 </div>
             </div>`;
 
         const audio = new Audio(d.src);
-        audio.crossOrigin = 'anonymous';
         const playBtn = wrap.querySelector('.mc-play-btn');
-        const progress = wrap.querySelector('.mc-progress');
+        const barFill = wrap.querySelector('.mc-bar-fill');
+        const barTrack = wrap.querySelector('.mc-bar-track');
         const curEl = wrap.querySelector('.mc-cur');
         const durEl = wrap.querySelector('.mc-dur');
+        let isDragging = false;
 
-        const iconPlay = `<svg viewBox="0 0 24 24" fill="white" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>`;
-        const iconPause = `<svg viewBox="0 0 24 24" fill="white" width="14" height="14"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+        audio.addEventListener('canplay', () => {
+            playBtn.innerHTML = iconPlay;
+        });
+
+        audio.addEventListener('error', () => {
+            musicCardError(wrap);
+        });
 
         playBtn.addEventListener('click', () => {
-            if (audio.paused) { audio.play(); playBtn.innerHTML = iconPause; }
-            else { audio.pause(); playBtn.innerHTML = iconPlay; }
+            if (audio.readyState < 2) return;
+            if (audio.paused) {
+                audio.play();
+                playBtn.innerHTML = iconPause;
+            } else {
+                audio.pause();
+                playBtn.innerHTML = iconPlay;
+            }
         });
 
         audio.addEventListener('timeupdate', () => {
-            if (!audio.duration) return;
+            if (!audio.duration || isDragging) return;
             const pct = (audio.currentTime / audio.duration) * 100;
-            progress.value = pct;
-            progress.style.setProperty('--prog', pct + '%');
+            barFill.style.width = pct + '%';
             curEl.textContent = fmtTime(Math.floor(audio.currentTime));
         });
 
@@ -841,17 +861,25 @@ let isProgrammaticScroll = false;
 
         audio.addEventListener('ended', () => {
             playBtn.innerHTML = iconPlay;
-            progress.value = 0;
-            progress.style.setProperty('--prog', '0%');
+            barFill.style.width = '0%';
             curEl.textContent = '0:00';
         });
 
-        progress.addEventListener('input', () => {
-            if (audio.duration) {
-                audio.currentTime = (progress.value / 100) * audio.duration;
-                progress.style.setProperty('--prog', progress.value + '%');
-            }
-        });
+        function seekFromEvent(e) {
+            const rect = barTrack.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+            barFill.style.width = (pct * 100) + '%';
+            curEl.textContent = fmtTime(Math.floor(pct * audio.duration));
+            if (audio.duration) audio.currentTime = pct * audio.duration;
+        }
+
+        barTrack.addEventListener('mousedown', e => { isDragging = true; seekFromEvent(e); });
+        barTrack.addEventListener('touchstart', e => { isDragging = true; seekFromEvent(e); }, { passive: true });
+        window.addEventListener('mousemove', e => { if (isDragging) seekFromEvent(e); });
+        window.addEventListener('touchmove', e => { if (isDragging) seekFromEvent(e); }, { passive: true });
+        window.addEventListener('mouseup', () => { isDragging = false; });
+        window.addEventListener('touchend', () => { isDragging = false; });
     }
 
     function musicCardError(wrap) {
@@ -1126,7 +1154,28 @@ let isProgrammaticScroll = false;
         chatInner.innerHTML = '';
         setCentered(false);
         const c = conversations.find(x => x.id === id);
-        if (c) c.messages.forEach(m => appendMessage(m.text, m.sender, m.imageData || null));
+        if (c) c.messages.forEach(m => {
+            if (m.musicData) {
+                hideWelcome();
+                const mcMsg = document.createElement('div');
+                mcMsg.className = 'message ai-message';
+                const mcAvatar = document.createElement('div');
+                mcAvatar.className = 'avatar ai-avatar';
+                mcAvatar.innerHTML = '<img src="https://i.pinimg.com/736x/ae/82/16/ae821617cb36d05edfaeb5fd83b87328.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+                const mcBubble = document.createElement('div');
+                mcBubble.className = 'message-bubble';
+                const mcWrap = document.createElement('div');
+                mcWrap.style.cssText = 'display:flex;flex-direction:column;';
+                mcWrap.appendChild(mcBubble);
+                mcMsg.appendChild(mcAvatar);
+                mcMsg.appendChild(mcWrap);
+                chatInner.appendChild(mcMsg);
+                const cardWrap = createMusicCard(mcBubble);
+                hydrateMusicCard(cardWrap, m.musicData);
+            } else {
+                appendMessage(m.text, m.sender, m.imageData || null);
+            }
+        });
         updateHistory();
         updateShareBtn();
         if (!userScrolledUp) { isProgrammaticScroll = true; chatContainer.scrollTop = chatContainer.scrollHeight; isProgrammaticScroll = false; }
@@ -1141,12 +1190,13 @@ let isProgrammaticScroll = false;
         showToast('Percakapan dihapus');
     }
 
-    function saveMsg(text, sender, imageData = null) {
+    function saveMsg(text, sender, imageData = null, musicData = null) {
         if (sender === 'user') text = text.replace(/\s+/g, ' ').trim();
         let c = conversations.find(x => x.id === currentConversationId);
         if (!c) { createNewConv(); c = conversations.find(x => x.id === currentConversationId); }
         const msgObj = { text, sender };
         if (imageData) msgObj.imageData = imageData;
+        if (musicData) msgObj.musicData = musicData;
         c.messages.push(msgObj);
         saveConvs();
         updateHistory();
@@ -1399,7 +1449,7 @@ let isProgrammaticScroll = false;
                         const payload = await musicRes.json();
                         const d = JSON.parse(atob(payload._r));
                         hydrateMusicCard(cardWrap, d);
-                        saveMsg(`🎵 ${d.n} — ${d.a}`, 'ai');
+                        saveMsg(`🎵 ${d.n} — ${d.a}`, 'ai', null, d);
                     } catch {
                         musicCardError(cardWrap);
                         saveMsg('🎵 Lagu tidak ditemukan.', 'ai');
