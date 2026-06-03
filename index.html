@@ -870,6 +870,20 @@ let isProgrammaticScroll = false;
     }
 
     async function checkIntent(message) {
+        const playPatterns = [
+            /^(coba\s+)?(tolong\s+)?(puterin|putarkan|putar|mainin|mainkan|setelin|pasangin|nyalain)\s+(.+)/i,
+            /^play\s+(.+)/i,
+            /^(pengen|mau|ingin)\s+(denger|dengerin|dengarkan|putar|muterin)\s+(.+)/i,
+            /^(bisa\s+)?(puterin|putar|play|mainin)\s+(.+)/i,
+        ];
+        for (const pattern of playPatterns) {
+            const m = message.match(pattern);
+            if (m) {
+                let query = m[m.length - 1].trim();
+                query = query.replace(/^(lagu|musik|song|track)\s+/i, '').trim();
+                if (query.length > 0) return { intent: 'media', query };
+            }
+        }
         try {
             const res = await fetch('/api/intent', {
                 method: 'POST',
