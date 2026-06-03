@@ -867,8 +867,11 @@ let isProgrammaticScroll = false;
         _audioRegistry.add(audio);
 
         audio.addEventListener('canplay', () => {
-            playBtn.innerHTML = iconPlay;
+            if (playBtn.innerHTML !== iconPause) playBtn.innerHTML = iconPlay;
         });
+        if (audio.readyState >= 2) {
+            if (playBtn.innerHTML !== iconPause) playBtn.innerHTML = iconPlay;
+        }
 
         audio.addEventListener('error', () => {
             musicCardError(wrap);
@@ -901,6 +904,7 @@ let isProgrammaticScroll = false;
             const pct = (audio.currentTime / audio.duration) * 100;
             barFill.style.width = pct + '%';
             curEl.textContent = fmtTime(Math.floor(audio.currentTime));
+            if (!audio.paused && playBtn.innerHTML !== iconPause) playBtn.innerHTML = iconPause;
         });
 
         audio.addEventListener('loadedmetadata', () => {
@@ -939,6 +943,7 @@ let isProgrammaticScroll = false;
             document.removeEventListener('touchend', onTouchEnd);
         };
         barTrack.addEventListener('mousedown', e => {
+            if (audio.readyState < 2) return;
             isDragging = true;
             seekFromEvent(e);
             e.preventDefault();
@@ -948,6 +953,7 @@ let isProgrammaticScroll = false;
             document.addEventListener('touchend', onTouchEnd);
         });
         barTrack.addEventListener('touchstart', e => {
+            if (audio.readyState < 2) return;
             isDragging = true;
             seekFromEvent(e);
             document.addEventListener('mousemove', onMouseMove);
