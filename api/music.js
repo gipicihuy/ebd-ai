@@ -2,7 +2,7 @@ import ytSearch from 'yt-search';
 import axios from 'axios';
 import crypto from 'crypto';
 
-async function savetube(url, format = 'mp3') {
+async function savetube(url) {
     const id = [
         /youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
         /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
@@ -62,18 +62,19 @@ export default async function handler(req, res) {
         const video = results.videos?.[0];
         if (!video) return res.status(404).json({ error: 'Not found' });
 
-        const info = await savetube(video.url, 'mp3');
+        const info = await savetube(video.url);
 
-        // Obfuscated payload — frontend hanya terima data render
+        const proxiedAudio = `/api/proxy?u=${Buffer.from(info.audio).toString('base64')}`;
+
         const payload = {
             _t: Date.now(),
-            _r: btoa(JSON.stringify({
+            _r: Buffer.from(JSON.stringify({
                 n: info.title || video.title,
                 a: video.author?.name || video.author || '',
                 th: info.thumbnail || video.thumbnail,
-                src: info.audio,
+                src: proxiedAudio,
                 d: info.duration || video.seconds || 0
-            }))
+            })).toString('base64')
         };
 
         res.status(200).json(payload);
