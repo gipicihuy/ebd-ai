@@ -1,22 +1,20 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs/promises';
+const INTENT_SYSTEM = `You are a music play intent detector. Respond ONLY with raw JSON, no markdown, no explanation.
 
-const INTENT_SYSTEM = `Kamu adalah intent detector. Tugasmu HANYA menganalisis apakah pengguna ingin memutar musik/lagu.
+If the user wants to PLAY a song RIGHT NOW → {"intent":"media","query":"song name or artist"}
+Otherwise → {"intent":"chat"}
 
-Respond HANYA dengan JSON, tanpa teks lain, tanpa markdown.
+PLAY triggers (Indonesian/English): puterin, putar, play, mainin, setelin, dengerin, muter, pasangin, nyalain, coba puter, coba puterin, coba mainin, pengen denger, mau denger, mau dengerin, pengen dengerin, tolong puterin, bisa puterin, putarkan, mainkan
 
-Format jika ingin memutar:
-{"intent":"media","query":"nama lagu atau artis"}
+NOT play (just talking about music): bagus ga, lirik, chord, genre, siapa penyanyi, makna lagu, aku suka, rekomendasi, info tentang
 
-Format jika BUKAN ingin memutar:
-{"intent":"chat"}
+Examples:
+"coba puterin lagu everything u are" → {"intent":"media","query":"everything u are"}
+"puterin penyangkalan" → {"intent":"media","query":"penyangkalan"}
+"play Blue Yung Kai" → {"intent":"media","query":"Blue Yung Kai"}
+"lagu Blue bagus ga?" → {"intent":"chat"}
+"siapa penyanyi Blue?" → {"intent":"chat"}
 
-Aturan KETAT:
-- intent "media" HANYA jika pengguna secara eksplisit meminta untuk memutar/memainkan lagu sekarang
-- Kalimat seperti "puterin X", "play X", "putar X", "mainin X", "setelin X", "dengerin X" → media
-- Kalimat diskusi/tanya seperti "lagu X bagus ga", "lirik X", "siapa penyanyi X", "genre X", "makna X", "aku suka X" → chat
-- Jika ragu, kembalikan chat`;
+Extract only the song/artist name as query, remove filler words like "lagu", "musik", "dong", "coba", "tolong".`;
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
