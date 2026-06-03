@@ -847,7 +847,7 @@ let isProgrammaticScroll = false;
                         <div class="mc-artist">${sanitize(d.a)}</div>
                     </div>
                     <div class="mc-controls">
-                        <button class="mc-play-btn">${iconSpin}</button>
+                        <button class="mc-play-btn">${iconPlay}</button>
                         <div class="mc-progress-wrap">
                             <div class="mc-bar-track"><div class="mc-bar-fill"><div class="mc-bar-dot"></div></div></div>
                             <div class="mc-times"><span class="mc-cur">0:00</span><span class="mc-dur">${fmtTime(d.d)}</span></div>
@@ -867,11 +867,8 @@ let isProgrammaticScroll = false;
         _audioRegistry.add(audio);
 
         audio.addEventListener('canplay', () => {
-            if (playBtn.innerHTML !== iconPause) playBtn.innerHTML = iconPlay;
+            if (!audio.paused && playBtn.innerHTML !== iconPause) playBtn.innerHTML = iconPause;
         });
-        if (audio.readyState >= 2) {
-            if (playBtn.innerHTML !== iconPause) playBtn.innerHTML = iconPlay;
-        }
 
         audio.addEventListener('error', () => {
             musicCardError(wrap);
