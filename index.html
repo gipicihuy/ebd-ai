@@ -982,11 +982,13 @@ let isProgrammaticScroll = false;
             /^(pengen|mau|ingin)\s+(denger|dengerin|dengarkan|putar|muterin)\s+(.+)/i,
             /^(bisa\s+)?(puterin|putar|play|mainin)\s+(.+)/i,
         ];
+        const cleanMessage = message.replace(/\p{Emoji}/gu, '').trim();
         for (const pattern of playPatterns) {
-            const m = message.match(pattern);
+            const m = cleanMessage.match(pattern);
             if (m) {
                 let query = m[m.length - 1].trim();
                 query = query.replace(/^(lagu|musik|song|track)\s+/i, '').trim();
+                query = query.replace(/[\u{1F000}-\u{1FFFF}|\u{2600}-\u{27FF}|\uD800-\uDFFF]|\p{Emoji}/gu, '').trim();
                 if (query.length > 0) return { intent: 'media', query };
             }
         }
