@@ -2376,7 +2376,6 @@ let isProgrammaticScroll = false;
 
         const fix = () => {
             if (fixRaf) cancelAnimationFrame(fixRaf);
-            const distFromBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight;
 
             fixRaf = requestAnimationFrame(() => {
                 const isZoomed = window.visualViewport.scale > 1.05;
@@ -2399,7 +2398,7 @@ let isProgrammaticScroll = false;
                     const inputH = inputAreaBottom.offsetHeight;
                     chatContainer.style.paddingBottom = `${inputH + kb + 16}px`;
 
-                    if (distFromBottom <= 120) {
+                    if (kb > 0) {
                         isProgrammaticScroll = true;
                         chatContainer.scrollTop = chatContainer.scrollHeight - chatContainer.clientHeight;
                         isProgrammaticScroll = false;
