@@ -167,6 +167,25 @@
         .share-modal-note{font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:6px}
         .ver-nav{display:flex;align-items:center;gap:2px}
         .ver-label{font-size:11px;color:var(--text-dim);padding:0 2px;min-width:28px;text-align:center;user-select:none}
+        .mc-wrap{background:var(--surface-2);border:1px solid var(--border);border-radius:14px;overflow:hidden;max-width:340px;width:100%}
+        .mc-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:var(--surface-3)}
+        .mc-body{padding:12px 14px 14px}
+        .mc-title{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+        .mc-artist{font-size:12px;color:var(--text-muted);margin-bottom:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .mc-player{display:flex;align-items:center;gap:10px}
+        .mc-play-btn{width:34px;height:34px;border-radius:50%;background:var(--primary);border:none;color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background 0.15s}
+        .mc-play-btn:hover{background:var(--primary-hover)}
+        .mc-play-btn svg{width:14px;height:14px;fill:white}
+        .mc-progress-wrap{flex:1;display:flex;flex-direction:column;gap:5px}
+        .mc-progress{width:100%;height:3px;border-radius:2px;background:var(--surface-3);cursor:pointer;-webkit-appearance:none;appearance:none;outline:none}
+        .mc-progress::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--primary);cursor:pointer}
+        .mc-progress::-webkit-slider-runnable-track{background:linear-gradient(to right,var(--primary) var(--prog,0%),var(--surface-3) var(--prog,0%));height:3px;border-radius:2px}
+        .mc-times{display:flex;justify-content:space-between;font-size:10px;color:var(--text-dim);font-family:'Geist Mono',monospace}
+        .mc-loading{display:flex;align-items:center;gap:8px;padding:12px 0;color:var(--text-muted);font-size:13px}
+        .mc-loading-dot{width:5px;height:5px;border-radius:50%;background:var(--primary);animation:mcPulse 1.2s infinite ease-in-out}
+        .mc-loading-dot:nth-child(2){animation-delay:0.2s}.mc-loading-dot:nth-child(3){animation-delay:0.4s}
+        @keyframes mcPulse{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
+        .mc-error{display:flex;align-items:center;gap:8px;padding:10px 14px;color:var(--error);font-size:13px;background:rgba(239,68,68,0.06);border-radius:10px;max-width:340px}
 </style>
 </head>
 <body>
@@ -766,6 +785,103 @@ let isProgrammaticScroll = false;
         }
     }
     
+    // ── MUSIC CARD ──
+    function createMusicCard(bubble) {
+        bubble.innerHTML = '';
+        const wrap = document.createElement('div');
+        wrap.className = 'mc-wrap';
+        wrap.innerHTML = `<div class="mc-body"><div class="mc-loading"><div class="mc-loading-dot"></div><div class="mc-loading-dot"></div><div class="mc-loading-dot"></div><span>Memutar lagu...</span></div></div>`;
+        bubble.appendChild(wrap);
+        return wrap;
+    }
+
+    function hydrateMusicCard(wrap, d) {
+        wrap.innerHTML = `
+            <img class="mc-thumb" src="${d.th}" alt="${d.n}" onerror="this.style.display='none'">
+            <div class="mc-body">
+                <div class="mc-title">${sanitize(d.n)}</div>
+                <div class="mc-artist">${sanitize(d.a)}</div>
+                <div class="mc-player">
+                    <button class="mc-play-btn" id="mcPlayBtn_${Date.now()}">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <div class="mc-progress-wrap">
+                        <input type="range" class="mc-progress" min="0" max="100" value="0" step="0.1">
+                        <div class="mc-times"><span class="mc-cur">0:00</span><span class="mc-dur">${fmtTime(d.d)}</span></div>
+                    </div>
+                </div>
+            </div>`;
+
+        const audio = new Audio(d.src);
+        audio.crossOrigin = 'anonymous';
+        const playBtn = wrap.querySelector('.mc-play-btn');
+        const progress = wrap.querySelector('.mc-progress');
+        const curEl = wrap.querySelector('.mc-cur');
+        const durEl = wrap.querySelector('.mc-dur');
+
+        const iconPlay = `<svg viewBox="0 0 24 24" fill="white" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>`;
+        const iconPause = `<svg viewBox="0 0 24 24" fill="white" width="14" height="14"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+
+        playBtn.addEventListener('click', () => {
+            if (audio.paused) { audio.play(); playBtn.innerHTML = iconPause; }
+            else { audio.pause(); playBtn.innerHTML = iconPlay; }
+        });
+
+        audio.addEventListener('timeupdate', () => {
+            if (!audio.duration) return;
+            const pct = (audio.currentTime / audio.duration) * 100;
+            progress.value = pct;
+            progress.style.setProperty('--prog', pct + '%');
+            curEl.textContent = fmtTime(Math.floor(audio.currentTime));
+        });
+
+        audio.addEventListener('loadedmetadata', () => {
+            durEl.textContent = fmtTime(Math.floor(audio.duration));
+        });
+
+        audio.addEventListener('ended', () => {
+            playBtn.innerHTML = iconPlay;
+            progress.value = 0;
+            progress.style.setProperty('--prog', '0%');
+            curEl.textContent = '0:00';
+        });
+
+        progress.addEventListener('input', () => {
+            if (audio.duration) {
+                audio.currentTime = (progress.value / 100) * audio.duration;
+                progress.style.setProperty('--prog', progress.value + '%');
+            }
+        });
+    }
+
+    function musicCardError(wrap) {
+        wrap.innerHTML = '';
+        const err = document.createElement('div');
+        err.className = 'mc-error';
+        err.innerHTML = '<i class="fas fa-circle-exclamation"></i><span>Lagu tidak ditemukan</span>';
+        wrap.appendChild(err);
+    }
+
+    function fmtTime(secs) {
+        if (!secs || isNaN(secs)) return '0:00';
+        const m = Math.floor(secs / 60);
+        const s = Math.floor(secs % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    async function checkIntent(message) {
+        try {
+            const res = await fetch('/api/intent', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            });
+            return await res.json();
+        } catch {
+            return { intent: 'chat' };
+        }
+    }
+
     // ── SEND EDITED / REGENERATED MESSAGE ──
     async function sendEditedMessage(message) {
         if (!currentConversationId) return;
@@ -1239,6 +1355,52 @@ let isProgrammaticScroll = false;
         const history = conv.messages.map(m => m.text).join('\n');
 
         try {
+            // ── INTENT DETECTION ──
+            if (!imgData) {
+                const intent = await checkIntent(message);
+                if (intent.intent === 'media' && intent.query) {
+                    if (thinkDiv.parentNode) thinkDiv.parentNode.removeChild(thinkDiv);
+                    const mcMsg = document.createElement('div');
+                    mcMsg.className = 'message ai-message';
+                    const mcAvatar = document.createElement('div');
+                    mcAvatar.className = 'avatar ai-avatar';
+                    mcAvatar.innerHTML = '<img src="https://i.pinimg.com/736x/ae/82/16/ae821617cb36d05edfaeb5fd83b87328.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+                    const mcBubble = document.createElement('div');
+                    mcBubble.className = 'message-bubble';
+                    const mcWrap = document.createElement('div');
+                    mcWrap.style.cssText = 'display:flex;flex-direction:column;';
+                    mcWrap.appendChild(mcBubble);
+                    mcMsg.appendChild(mcAvatar);
+                    mcMsg.appendChild(mcWrap);
+                    chatInner.appendChild(mcMsg);
+                    const cardWrap = createMusicCard(mcBubble);
+                    if (!userScrolledUp) { isProgrammaticScroll = true; chatContainer.scrollTop = chatContainer.scrollHeight; isProgrammaticScroll = false; }
+                    try {
+                        const musicRes = await fetch('/api/music', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ q: intent.query })
+                        });
+                        if (!musicRes.ok) throw new Error('not found');
+                        const payload = await musicRes.json();
+                        const d = JSON.parse(atob(payload._r));
+                        hydrateMusicCard(cardWrap, d);
+                        saveMsg(`🎵 ${d.n} — ${d.a}`, 'ai');
+                    } catch {
+                        musicCardError(cardWrap);
+                        saveMsg('🎵 Lagu tidak ditemukan.', 'ai');
+                    }
+                    isGenerating = false;
+                    activeReader = null;
+                    userInput.disabled = false;
+                    sendButton.disabled = false;
+                    sendButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
+                    userInput.focus();
+                    updateShareBtn();
+                    return;
+                }
+            }
+
             let imageDescription = '';
             if (imgData) {
                 const visionRes = await fetch('/api/vision', {
