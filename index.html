@@ -2398,7 +2398,7 @@ let isProgrammaticScroll = false;
                     const inputH = inputAreaBottom.offsetHeight;
                     chatContainer.style.paddingBottom = `${inputH + kb + 16}px`;
 
-                    if (kb > 0) {
+                    if (kb > 0 && !userScrolledUp) {
                         isProgrammaticScroll = true;
                         chatContainer.scrollTop = chatContainer.scrollHeight - chatContainer.clientHeight;
                         isProgrammaticScroll = false;
