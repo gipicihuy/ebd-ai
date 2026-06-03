@@ -13,6 +13,10 @@
       "destination": "/api/music.js"
     },
     {
+      "source": "/api/proxy",
+      "destination": "/api/proxy.js"
+    },
+    {
       "source": "/share/:id",
       "destination": "/share.html"
     }
