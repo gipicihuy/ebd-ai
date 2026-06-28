@@ -23,14 +23,14 @@ export default async function handler(req, res) {
     if (!message) return res.status(400).json({ error: 'Missing message' });
 
     try {
-        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.GROQ_KEY}`
+                'Authorization': `Bearer ${process.env.GEMINI_KEY}`
             },
             body: JSON.stringify({
-                model: 'llama-3.3-70b-versatile',
+                model: 'gemini-3.5-flash',
                 max_tokens: 80,
                 temperature: 0,
                 messages: [
