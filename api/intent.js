@@ -23,14 +23,14 @@ export default async function handler(req, res) {
     if (!message) return res.status(400).json({ error: 'Missing message' });
 
     try {
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
+        const callGemini = (model) => fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${process.env.GEMINI_KEY}`
             },
             body: JSON.stringify({
-                model: 'gemini-3.5-flash',
+                model,
                 max_tokens: 80,
                 temperature: 0,
                 messages: [
@@ -39,6 +39,13 @@ export default async function handler(req, res) {
                 ]
             })
         });
+
+        let response = await callGemini('gemini-3.5-flash');
+
+        if (!response.ok) {
+            console.error('Primary model failed:', response.status, await response.text().catch(() => ''));
+            response = await callGemini('gemini-3.1-flash-lite');
+        }
 
         const data = await response.json();
         const raw = data.choices?.[0]?.message?.content?.trim() || '{"intent":"chat"}';

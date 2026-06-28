@@ -18,14 +18,14 @@ export default async function handler(req, res) {
         const __dirname = path.dirname(fileURLToPath(import.meta.url));
         const systemPrompt = await fs.readFile(path.join(__dirname, '../data/system-prompt.txt'), 'utf-8');
 
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
+        const callGemini = (model) => fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${process.env.GEMINI_KEY}`
             },
             body: JSON.stringify({
-                model: 'gemini-3.5-flash',
+                model,
                 stream: true,
                 messages: [
                     { role: 'system', content: systemPrompt },
@@ -34,6 +34,19 @@ export default async function handler(req, res) {
             }),
             signal: abortController.signal
         });
+
+        let response = await callGemini('gemini-3.5-flash');
+
+        if (!response.ok) {
+            console.error('Primary model failed:', response.status, await response.text().catch(() => ''));
+            response = await callGemini('gemini-3.1-flash-lite');
+        }
+
+        if (!response.ok) {
+            const errText = await response.text().catch(() => '');
+            console.error('Fallback model also failed:', response.status, errText);
+            return res.status(502).json({ error: 'Both primary and fallback models failed' });
+        }
 
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
