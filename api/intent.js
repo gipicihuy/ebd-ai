@@ -23,14 +23,14 @@ export default async function handler(req, res) {
     if (!message) return res.status(400).json({ error: 'Missing message' });
 
     try {
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`
+                'Authorization': `Bearer ${process.env.GROQ_KEY}`
             },
             body: JSON.stringify({
-                model: 'deepseek/deepseek-v4-flash',
+                model: 'llama-3.3-70b-versatile',
                 max_tokens: 80,
                 temperature: 0,
                 messages: [
